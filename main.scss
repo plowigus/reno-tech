@@ -1,0 +1,50 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.top-nav {
+  .top-left-item {
+    margin: 5px;
+    margin-top: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    span {
+      margin-right: 2px;
+      color: #bf1522;
+    }
+  }
+}
+
+.navbar-section {
+  height: 90px;
+  border-bottom: 1px solid rgb(223, 219, 219);
+
+  .navbar-brand {
+    img {
+      height: 70px;
+    }
+
+    .text-colored {
+      color: #bf1522;
+    }
+  }
+
+  .navbar-nav {
+    .nav-link.active {
+      color: #bf1522;
+      font-weight: 500;
+    }
+
+    .nav-link {
+      margin: 0 15px;
+    }
+  }
+
+  .cta-menu {
+    span {
+      margin-right: 5px;
+    }
+  }
+}
