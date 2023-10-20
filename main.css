@@ -61,7 +61,7 @@
   font-size: 20px;
   transition: 0.4s;
   border-radius: 5px;
-  border: 1px solid #bf1522;
+  border: 1px solid transparent;
   width: 350px;
   justify-content: center;
 }
@@ -71,7 +71,7 @@
 .hero-section .text-wrapper-hero button:hover {
   color: #bf1522 !important;
   background-color: white !important;
-  border: 1px solid #bf1522;
+  border: 1px solid transparent;
 }
 
 .services-section {
