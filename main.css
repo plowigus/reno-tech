@@ -118,6 +118,30 @@
   height: 670px;
   width: 90%;
 }
+.services-section .splide .shadow-splide,
+.services-section .services-image-wrapper .shadow-splide {
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 90%;
+  background-color: rgba(41, 4, 7, 0.1568627451);
+}
+.services-section .splide .description-splide,
+.services-section .services-image-wrapper .description-splide {
+  z-index: 10;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.685);
+  width: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.services-section .splide .description-splide p,
+.services-section .services-image-wrapper .description-splide p {
+  color: white;
+  margin: 8px 0px;
+}
 .services-section .button-wrapper button {
   height: 60px;
   font-size: 20px;

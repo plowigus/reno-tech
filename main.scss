@@ -138,6 +138,30 @@
       height: 670px;
       width: 90%;
     }
+
+    .shadow-splide {
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 90%;
+      background-color: #29040728;
+    }
+
+    .description-splide {
+      z-index: 10;
+      bottom: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.685);
+      width: 90%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      p {
+        color: white;
+        margin: 8px 0px;
+      }
+    }
   }
 
   .button-wrapper {
