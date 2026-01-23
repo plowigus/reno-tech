@@ -2,11 +2,20 @@
 
 import { useState, useEffect, useLayoutEffect } from "react";
 import { InteractiveLogo } from "./Animation/InteractiveLogo";
-import FloatingLines from "./FloatingLines"; // Importujesz i używasz domyślnego
+// USUWAMY TO: import FloatingLines from "./FloatingLines"; 
 import { MatrixText } from "./Animation/MatrixText";
 import { motion } from "motion/react";
 import { Facebook, Instagram, Phone, ChevronDown } from "lucide-react";
 import { Clock } from "./Clock";
+import dynamic from "next/dynamic"; // 1. Dodaj import dynamic
+
+// 2. Tworzymy dynamiczny komponent. 
+// "ssr: false" sprawia, że Next.js nie próbuje renderować tego na serwerze,
+// a "loading: null" oznacza, że nie pokazujemy nic (lub spinner) zanim się załaduje.
+const FloatingLines = dynamic(() => import("./FloatingLines"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 bg-black" />, // Opcjonalnie: pusty div jako placeholder
+});
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -30,20 +39,22 @@ export function Hero() {
 
   return (
     <section className="min-h-screen relative bg-black z-10 p-4 md:p-8 text-white">
-      <motion.div
-        className="absolute inset-0 transform-gpu"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{
-          delay: delay,
-          duration: duration,
-          ease: "easeOut",
-        }}
-        style={{ willChange: "opacity" }}
-      >
-        {/* TERAZ JEST IDEALNIE CZYSTO I SZYBKO: */}
-        <FloatingLines />
-      </motion.div>
+      {/* Opóźniamy renderowanie FloatingLines, żeby nie blokowały Hydracji */}
+      {isMounted && (
+        <motion.div
+          className="absolute inset-0 transform-gpu"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            delay: delay,
+            duration: duration,
+            ease: "easeOut",
+          }}
+          style={{ willChange: "opacity" }}
+        >
+          <FloatingLines />
+        </motion.div>
+      )}
 
       {/* Hero Content - bez zmian */}
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center z-20 pointer-events-none">
