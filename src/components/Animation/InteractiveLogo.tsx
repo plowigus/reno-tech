@@ -15,8 +15,8 @@ export function InteractiveLogo() {
         opacity: [1, 1, 1, 1, 0],
       }}
       transition={{
-        duration: 5,
-        times: [0, 0.6, 0.85, 0.92, 1],
+        duration: 2,
+        times: [0, 0.75, 0.9, 0.95, 1],
         ease: [0.22, 1, 0.36, 1],
       }}
     >
@@ -42,7 +42,7 @@ export function InteractiveLogo() {
             fill="transparent"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
-            transition={{ duration: 3, ease: "easeInOut" }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
           />
         </g>
       </motion.svg>
