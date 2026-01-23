@@ -252,20 +252,20 @@ function hexToVec3(hex: string): Vector3 {
 }
 
 export default function FloatingLines({
-  linesGradient,
+  linesGradient = ["#B10B1A", "#440E03", "#9C2007"],
   enabledWaves = ["top", "middle", "bottom"],
-  lineCount = [6],
-  lineDistance = [5],
-  topWavePosition,
-  middleWavePosition,
-  bottomWavePosition = { x: 2.0, y: -0.7, rotate: -1 },
-  animationSpeed = 1,
+  lineCount = 5,
+  lineDistance = 30, // Było [5] domyślnie, u Ciebie 30
+  topWavePosition = { x: 1.5, y: 1.8, rotate: -0.6 },
+  middleWavePosition = { x: 1, y: 1.1, rotate: -0.6 },
+  bottomWavePosition = { x: 1.5, y: 1.8, rotate: -0.7 }, // Twoje customowe ustawienie
+  animationSpeed = 1.8, // Szybciej niż standardowe 1
   interactive = true,
-  bendRadius = 5.0,
-  bendStrength = -0.5,
-  mouseDamping = 0.05,
-  parallax = true,
-  parallaxStrength = 0.2,
+  bendRadius = 10,
+  bendStrength = 0.6,
+  mouseDamping = 0.08,
+  parallax = false, // Wyłączyłeś parallax w Hero
+  parallaxStrength = 0,
   mixBlendMode = "screen",
 }: FloatingLinesProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
