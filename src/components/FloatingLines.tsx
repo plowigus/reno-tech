@@ -11,7 +11,12 @@ import {
   Clock,
 } from "three";
 
-// --- SHADERY ---
+// --- KONFIGURACJA "OSZUKIWANIA OKA" ---
+const SHOW_ON_MOBILE = true; // Zmień na FALSE, jeśli chcesz całkowicie wyłączyć na telefonach (max performance)
+const MOBILE_DELAY = 1000;   // Opóźnienie na telefonie (ms) - 1s to dobry kompromis
+const DESKTOP_DELAY = 0;     // Desktop ładuje od razu
+
+// --- SHADERY BEZ ZMIAN ---
 const vertexShader = `
 precision highp float;
 void main() {
@@ -213,7 +218,7 @@ export default function FloatingLines({
   const targetParallaxRef = useRef<Vector2>(new Vector2(0, 0));
   const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
 
-  // Helpery
+  // Helpery - bez zmian
   const getLineCount = (waveType: "top" | "middle" | "bottom"): number => {
     if (typeof lineCount === "number") return lineCount;
     if (!enabledWaves.includes(waveType)) return 0;
@@ -238,28 +243,34 @@ export default function FloatingLines({
     if (!containerRef.current) return;
 
     let cleanup: (() => void) | null = null;
-    let idleId: any = null;
+    let timerId: NodeJS.Timeout | null = null;
 
+    // Główna funkcja inicjalizująca - wywołana po timeout
     const initThreeJS = () => {
       if (!containerRef.current) return;
 
       const container = containerRef.current;
+      const isMobile = window.innerWidth < 768;
+
+      // 🚨 KILL SWITCH MOBILE: Jeśli wolisz puste tło, ustaw SHOW_ON_MOBILE = false
+      if (isMobile && !SHOW_ON_MOBILE) {
+        setIsReady(true);
+        return;
+      }
+
       const scene = new Scene();
       const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       camera.position.z = 1;
 
-      // 🚀 OPTYMALIZACJA WYDAJNOŚCI
-      const isMobile = window.innerWidth < 768;
-
+      // 🚀 OPTYMALIZACJA WEBGL
       const renderer = new WebGLRenderer({
-        antialias: !isMobile, // Brak AA na mobile = duży zysk
+        antialias: !isMobile,
         alpha: false,
-        powerPreference: "high-performance", // Prośba o dedykowane GPU
-        depth: false,   // Wyłączamy bufor głębi (niepotrzebny w 2D) - oszczędność pamięci
-        stencil: false, // Wyłączamy bufor szablonu - oszczędność pamięci
+        powerPreference: "high-performance",
+        depth: false,
+        stencil: false,
       });
 
-      // Pixel Ratio: Max 1.5 na Desktop, sztywne 1.0 na Mobile
       renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
 
       renderer.domElement.style.display = "block";
@@ -304,9 +315,7 @@ export default function FloatingLines({
         });
       }
 
-      // 🚀 ZMIENNA PRECYZJA SHADERA
-      // Na mobile używamy 'mediump' - to daje kopa wydajnościowego.
-      // Na desktopie 'highp' dla jakości.
+      // 🚀 PRECYZJA SHADERA (Jakość vs Szybkość)
       const precisionPrefix = isMobile ? "precision mediump float;" : "precision highp float;";
       const finalFragmentShader = precisionPrefix + "\n" + fragmentShaderSource;
 
@@ -372,7 +381,7 @@ export default function FloatingLines({
       };
       renderLoop();
 
-      // Płynne pokazanie sceny
+      // Pokaż scenę
       setIsReady(true);
 
       cleanup = () => {
@@ -391,19 +400,14 @@ export default function FloatingLines({
       };
     };
 
-    // 🧠 INTELIGENTNE ŁADOWANIE (requestIdleCallback)
-    if ("requestIdleCallback" in window) {
-      idleId = (window as any).requestIdleCallback(initThreeJS, { timeout: 2000 });
-    } else {
-      idleId = setTimeout(initThreeJS, 100);
-    }
+    // --- TIMING ---
+    const isMobile = window.innerWidth < 768;
+    const delay = isMobile ? MOBILE_DELAY : DESKTOP_DELAY;
+
+    timerId = setTimeout(initThreeJS, delay);
 
     return () => {
-      if ("cancelIdleCallback" in window && idleId) {
-        (window as any).cancelIdleCallback(idleId);
-      } else {
-        clearTimeout(idleId);
-      }
+      if (timerId) clearTimeout(timerId);
       if (cleanup) cleanup();
     };
   }, [linesGradient, enabledWaves, lineCount, lineDistance, topLineCount, middleLineCount, bottomLineCount, topLineDistance, middleLineDistance, bottomLineDistance, topWavePosition, middleWavePosition, bottomWavePosition, animationSpeed, interactive, bendRadius, bendStrength, mouseDamping, parallax, parallaxStrength]);
