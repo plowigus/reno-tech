@@ -15,8 +15,8 @@ export function InteractiveLogo() {
         opacity: [1, 1, 1, 1, 0],
       }}
       transition={{
-        duration: 2,
-        times: [0, 0.75, 0.9, 0.95, 1],
+        duration: 1.0, // Skrócone z 2s na 1s
+        times: [0, 0.6, 0.8, 0.9, 1], // Dopasowane klatki
         ease: [0.22, 1, 0.36, 1],
       }}
     >
@@ -42,17 +42,10 @@ export function InteractiveLogo() {
             fill="transparent"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
+            transition={{ duration: 0.6, ease: "easeInOut" }} // Skrócone z 1.5s na 0.6s
           />
         </g>
       </motion.svg>
-
-      <motion.div
-        className="text-center mt-2 text-xs uppercase tracking-wider"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 4.5, duration: 0.5 }}
-      ></motion.div>
     </motion.div>
   );
 }

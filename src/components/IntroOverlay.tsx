@@ -19,16 +19,13 @@ export function IntroOverlay() {
             setShowIntro(false);
         } else {
             sessionStorage.setItem("introSeen", "true");
-            // ⚡ POPRAWKA: Wyłącz overlay po zakończeniu animacji (2.5s)
+            // Wyłącz overlay już po 1.1s (było 2.5s)
             const timer = setTimeout(() => {
                 setShowIntro(false);
-            }, 2500);
+            }, 1100);
             return () => clearTimeout(timer);
         }
     }, []);
-
-    // Jeśli showIntro jest false, AnimatePresence obsłuży animację wyjścia (exit)
-    // a potem usunie komponent z DOM.
 
     return (
         <AnimatePresence>
@@ -37,7 +34,8 @@ export function IntroOverlay() {
                     className="absolute inset-0 z-50 flex items-center justify-center bg-black"
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5, ease: "easeOut", delay: 1.9 }}
+                    // Zaczyna znikać po 0.8s
+                    transition={{ duration: 0.4, ease: "easeOut", delay: 0.4 }}
                 >
                     <div className="w-full h-full flex items-center justify-center">
                         <InteractiveLogo />

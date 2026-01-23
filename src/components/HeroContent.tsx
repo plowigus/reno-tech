@@ -7,17 +7,14 @@ const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function HeroContent({ children }: { children: React.ReactNode }) {
-    // ⚡ ZMIANA: Domyślnie TRUE (zakładamy, że trzeba animować/ukryć), żeby nie było flasha
     const [shouldAnimate, setShouldAnimate] = useState(true);
 
     useIsomorphicLayoutEffect(() => {
         const flag = sessionStorage.getItem("introSeen");
 
         if (flag) {
-            // Jeśli widział intro -> wyłączamy animację (pokaż natychmiast)
             setShouldAnimate(false);
         } else {
-            // Jeśli nie widział -> zostawiamy true (animuj wejście)
             setShouldAnimate(true);
         }
     }, []);
@@ -28,9 +25,9 @@ export function HeroContent({ children }: { children: React.ReactNode }) {
             opacity: 1,
             y: 0,
             transition: {
-                duration: 0.8,
+                duration: 0.5, // Krótszy czas wjazdu (było 0.8s)
                 ease: "easeOut" as const,
-                delay: 1.5
+                delay: 0.6 // Wjeżdża, gdy logo już zaczyna znikać (było 1.5s)
             }
         },
         instant: {
@@ -42,7 +39,6 @@ export function HeroContent({ children }: { children: React.ReactNode }) {
 
     return (
         <motion.div
-            // Jeśli shouldAnimate=true (start), to "hidden" (opacity 0) - brak flasha
             initial={shouldAnimate ? "hidden" : "instant"}
             animate={shouldAnimate ? "visible" : "instant"}
             variants={variants}
