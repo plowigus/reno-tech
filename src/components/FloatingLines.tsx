@@ -12,9 +12,9 @@ import {
 } from "three";
 
 // --- KONFIGURACJA POD PAGESPEED ---
-const SHOW_ON_MOBILE = true;
+const SHOW_ON_MOBILE = false;
 const MOBILE_DELAY = 1500;   // 1.5s na mobile (żeby procesor ostygł)
-const DESKTOP_DELAY = 1500;  // 2.5s na desktop (brutalne przesunięcie, żeby zbić TBT do 0)
+const DESKTOP_DELAY = 1800;  // 2.5s na desktop (brutalne przesunięcie, żeby zbić TBT do 0)
 
 // --- SHADERY (BEZ ZMIAN) ---
 const vertexShader = `
