@@ -8,33 +8,42 @@ const useIsomorphicLayoutEffect =
     typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 export function IntroOverlay() {
+    // Domyślnie TRUE - zakładamy, że intro MA BYĆ widoczne, żeby przykryć "golą" stronę.
+    // Dzięki temu nie ma "błysku" treści przed załadowaniem JS.
     const [showIntro, setShowIntro] = useState(true);
-    const [isMounted, setIsMounted] = useState(false);
 
     useIsomorphicLayoutEffect(() => {
-        setIsMounted(true);
+        // Sprawdzamy storage zaraz po załadowaniu JS
         const hasSeenIntro = sessionStorage.getItem("introSeen");
 
         if (hasSeenIntro) {
+            // Jeśli użytkownik już tu był -> wyłączamy intro NATYCHMIAST.
+            // Ponieważ używamy useLayoutEffect, powinno się to stać przed narysowaniem klatki,
+            // co zminimalizuje mignięcie czerni.
             setShowIntro(false);
         } else {
+            // Jeśli nowy użytkownik -> zapisujemy wizytę i odpalamy timer
             sessionStorage.setItem("introSeen", "true");
-            // Wyłącz overlay już po 1.1s (było 2.5s)
+
+            // Timer dostosowany do Twojej animacji (delay 0.4 + duration 0.4 = 0.8s wizualnie)
+            // Dajemy mały zapas (1.2s), żeby animacja wyjścia zdążyła się odegrać.
             const timer = setTimeout(() => {
                 setShowIntro(false);
-            }, 1100);
+            }, 1200);
+
             return () => clearTimeout(timer);
         }
     }, []);
 
     return (
         <AnimatePresence>
-            {showIntro && isMounted && (
+            {showIntro && (
                 <motion.div
                     className="absolute inset-0 z-50 flex items-center justify-center bg-black"
+                    // initial={{ opacity: 1 }} sprawia, że jest czarno od pierwszej milisekundy
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    // Zaczyna znikać po 0.8s
+                    // Twoje ustawienia:
                     transition={{ duration: 0.4, ease: "easeOut", delay: 0.4 }}
                 >
                     <div className="w-full h-full flex items-center justify-center">
