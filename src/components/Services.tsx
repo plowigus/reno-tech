@@ -69,7 +69,7 @@ export function Services() {
       const validItems = items.filter((item): item is HTMLDivElement => item !== null);
       const totalItems = validItems.length;
 
-      const ITEM_SPACING = 300;
+      const ITEM_SPACING = 220;
 
       // Initial Setup
       validItems.forEach((item, i) => {
@@ -101,9 +101,15 @@ export function Services() {
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: `+=${totalItems * 600}`, // Wait until last item is fully shown
+          end: `+=${totalItems * 220}`, // Wait until last item is fully shown
           pin: true,
           scrub: 1,
+          snap: {
+            snapTo: 1 / (totalItems - 1),
+            duration: { min: 0.3, max: 0.8 },
+            delay: 0,
+            ease: "back.out(2)",
+          },
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
@@ -245,7 +251,7 @@ function ServiceItem({
   isActive,
 }: ServiceItemProps) {
   return (
-    <div className="service-item-wrapper border-b border-red-600/15 last:border-0 backdrop-blur-md bg-black/40 rounded-3xl border border-red-600/10 p-6 md:p-10">
+    <div className="service-item-wrapper border-b border-red-600/15 last:border-0 backdrop-blur-md bg-black/40 rounded-3xl border border-red-600/10">
       <div className="flex gap-6 md:gap-10 items-center">
         {/* Number & Icon */}
         <div className="shrink-0 relative">

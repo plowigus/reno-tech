@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Renotech - Nowoczesna Strona Serwisu Renault
 
-## Getting Started
+Projekt to nowoczesna strona internetowa dla serwisu specjalizującego się w elektronice samochodowej marek Renault i Dacia. Strona została zaprojektowana z myślą o płynnych animacjach, ciemnej estetyce (dark mode) i wysokiej responsywności.
 
-First, run the development server:
+## 🚀 Przegląd Projektu
 
+Strona główna składa się z kilku kluczowych sekcji, które prowadzą użytkownika przez ofertę serwisu. Wykorzystuje zaawansowane techniki animacji scrollowania (scroll-driven animations) aby zbudować angażujące doświadczenie użytkownika.
+
+## 📂 Główne Sekcje
+
+### 1. Hero
+Sekcja powitalna z dynamicznym tłem i głównym hasłem. Odpowiada za pierwsze wrażenie i szybkie przekierowanie do oferty lub kontaktu.
+
+### 2. Services (Usługi)
+Centralna część strony prezentująca ofertę. Wykorzystuje mechanizm **pinned scroll** (przypięcia podczas przewijania).
+- **Lista Usług**: Karty usług przesuwają się pionowo (scroll list), podczas gdy sekcja "Dlaczego my" pozostaje przypięta po lewej stronie.
+- **Interakcje**:
+    - **Snap**: Lista usług automatycznie "przyciąga" się do najbliższego elementu po zatrzymaniu przewijania.
+    - **Bounce**: Delikatny efekt odbicia przy pozycjonowaniu elementów.
+    - **Layout**: Zoptymalizowany, aby mieścić 3 usługi w widoku, zapewniając szybki przegląd oferty.
+
+### 3. Shop (Sklep) - W budowie
+Planowana sekcja e-commerce/sklepu, która pozwoli na zakup akcesoriów i usług online. Obecnie w fazie rozwoju.
+
+## 🛠️ Stack Technologiczny
+
+Projekt zbudowany jest w oparciu o nowoczesne technologie webowe:
+
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Język**: [TypeScript](https://www.typescriptlang.org/)
+- **Style**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animacje**: [GSAP](https://gsap.com/) (GreenSock Animation Platform) z wtyczką ScrollTrigger
+- **Ikony**: [Lucide React](https://lucide.dev/)
+
+## 📦 Uruchomienie
+
+Aby uruchomić projekt lokalnie:
+
+1. Zainstaluj zależności:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Uruchom serwer deweloperski:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Strona będzie dostępna pod adresem `http://localhost:3000`.
