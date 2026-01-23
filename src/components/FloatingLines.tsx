@@ -11,7 +11,7 @@ import {
   Clock,
 } from "three";
 
-// --- SHADERY BEZ ZMIAN ---
+// --- SHADERY BEZ ZMIAN (Dla czystości) ---
 const vertexShader = `
 precision highp float;
 void main() {
@@ -21,37 +21,29 @@ void main() {
 
 const fragmentShader = `
 precision highp float;
-
 uniform float iTime;
 uniform vec3  iResolution;
 uniform float animationSpeed;
-
 uniform bool enableTop;
 uniform bool enableMiddle;
 uniform bool enableBottom;
-
 uniform int topLineCount;
 uniform int middleLineCount;
 uniform int bottomLineCount;
-
 uniform float topLineDistance;
 uniform float middleLineDistance;
 uniform float bottomLineDistance;
-
 uniform vec3 topWavePosition;
 uniform vec3 middleWavePosition;
 uniform vec3 bottomWavePosition;
-
 uniform vec2 iMouse;
 uniform bool interactive;
 uniform float bendRadius;
 uniform float bendStrength;
 uniform float bendInfluence;
-
 uniform bool parallax;
 uniform float parallaxStrength;
 uniform vec2 parallaxOffset;
-
 uniform vec3 lineGradient[8];
 uniform int lineGradientCount;
 
@@ -59,9 +51,7 @@ const vec3 BLACK = vec3(0.0);
 const vec3 PINK  = vec3(233.0, 71.0, 245.0) / 255.0;
 const vec3 BLUE  = vec3(47.0,  75.0, 162.0) / 255.0;
 
-mat2 rotate(float r) {
-  return mat2(cos(r), sin(r), -sin(r), cos(r));
-}
+mat2 rotate(float r) { return mat2(cos(r), sin(r), -sin(r), cos(r)); }
 
 vec3 background_color(vec2 uv) {
   vec3 col = vec3(0.0);
@@ -159,7 +149,6 @@ void main() {
 `;
 
 const MAX_GRADIENT_STOPS = 8;
-
 type WavePosition = { x: number; y: number; rotate: number; };
 
 type FloatingLinesProps = {
@@ -224,14 +213,13 @@ export default function FloatingLines({
   const targetParallaxRef = useRef<Vector2>(new Vector2(0, 0));
   const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
 
-  // Helpery do obliczania wartości - bez zmian
+  // Helpery
   const getLineCount = (waveType: "top" | "middle" | "bottom"): number => {
     if (typeof lineCount === "number") return lineCount;
     if (!enabledWaves.includes(waveType)) return 0;
     const index = enabledWaves.indexOf(waveType);
     return lineCount[index] ?? 6;
   };
-
   const getLineDistance = (waveType: "top" | "middle" | "bottom"): number => {
     if (typeof lineDistance === "number") return lineDistance;
     if (!enabledWaves.includes(waveType)) return 0.1;
@@ -242,7 +230,6 @@ export default function FloatingLines({
   const topLineCount = enabledWaves.includes("top") ? getLineCount("top") : 0;
   const middleLineCount = enabledWaves.includes("middle") ? getLineCount("middle") : 0;
   const bottomLineCount = enabledWaves.includes("bottom") ? getLineCount("bottom") : 0;
-
   const topLineDistance = enabledWaves.includes("top") ? getLineDistance("top") * 0.01 : 0.01;
   const middleLineDistance = enabledWaves.includes("middle") ? getLineDistance("middle") * 0.01 : 0.01;
   const bottomLineDistance = enabledWaves.includes("bottom") ? getLineDistance("bottom") * 0.01 : 0.01;
@@ -253,7 +240,7 @@ export default function FloatingLines({
     let cleanup: (() => void) | null = null;
     let idleId: any = null;
 
-    // Funkcja inicjalizująca Three.js
+    // Główna funkcja inicjalizująca - wywołana z opóźnieniem
     const initThreeJS = () => {
       if (!containerRef.current) return;
 
@@ -262,19 +249,19 @@ export default function FloatingLines({
       const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       camera.position.z = 1;
 
-      // 🚀 OPTYMALIZACJA MOBILNA
+      // --- OPTYMALIZACJA MOBILE ---
       const isMobile = window.innerWidth < 768;
       const renderer = new WebGLRenderer({
         antialias: !isMobile, // Wyłącz AA na mobile
         alpha: false
       });
-      // Zmniejsz rozdzielczość na mobile dla mega wydajności
       renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
 
       renderer.domElement.style.display = "block";
       renderer.domElement.style.width = "100%";
       renderer.domElement.style.height = "100%";
       container.appendChild(renderer.domElement);
+      // ---------------------------
 
       const uniforms = {
         iTime: { value: 0 },
@@ -370,7 +357,7 @@ export default function FloatingLines({
       };
       renderLoop();
 
-      // Płynne pokazanie (Fade In)
+      // 🟢 Pokaż scenę
       setIsReady(true);
 
       cleanup = () => {
@@ -390,11 +377,12 @@ export default function FloatingLines({
     };
 
     // 🧠 INTELIGENTNE ŁADOWANIE (requestIdleCallback)
-    // Jeśli przeglądarka ma "luz", ładuje od razu. Jeśli jest zajęta (słaby telefon), czeka do 2s.
+    // Jeśli przeglądarka jest zajęta (PageSpeed/słaby telefon), czekamy do 2 sekund.
+    // Jeśli jest wolna (Twój komputer), ładuje się natychmiast.
     if ("requestIdleCallback" in window) {
       idleId = (window as any).requestIdleCallback(initThreeJS, { timeout: 2000 });
     } else {
-      // Fallback dla Safari i starszych
+      // Fallback dla Safari
       idleId = setTimeout(initThreeJS, 100);
     }
 
