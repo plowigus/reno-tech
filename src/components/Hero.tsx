@@ -2,19 +2,15 @@
 
 import { useState, useEffect, useLayoutEffect } from "react";
 import { InteractiveLogo } from "./Animation/InteractiveLogo";
-// USUWAMY TO: import FloatingLines from "./FloatingLines"; 
 import { MatrixText } from "./Animation/MatrixText";
 import { motion } from "motion/react";
 import { Facebook, Instagram, Phone, ChevronDown } from "lucide-react";
 import { Clock } from "./Clock";
-import dynamic from "next/dynamic"; // 1. Dodaj import dynamic
+import dynamic from "next/dynamic";
 
-// 2. Tworzymy dynamiczny komponent. 
-// "ssr: false" sprawia, że Next.js nie próbuje renderować tego na serwerze,
-// a "loading: null" oznacza, że nie pokazujemy nic (lub spinner) zanim się załaduje.
 const FloatingLines = dynamic(() => import("./FloatingLines"), {
   ssr: false,
-  loading: () => <div className="absolute inset-0 bg-black" />, // Opcjonalnie: pusty div jako placeholder
+  loading: () => <div className="absolute inset-0 bg-black" />,
 });
 
 const useIsomorphicLayoutEffect =
@@ -34,19 +30,20 @@ export function Hero() {
     }
   }, []);
 
-  const delay = showIntro ? 1.7 : 0;
+  // ⚡ ZMNIEJSZAMY GŁÓWNY DELAY: z 1.7 na 1.5s (niech wchodzi dynamiczniej)
+  const delay = showIntro ? 1.5 : 0;
+  // ⚡ SZYBSZE WEJŚCIE DLA POWRACAJĄCYCH: duration 0s (instant)
   const duration = showIntro ? 0.5 : 0;
 
   return (
     <section className="min-h-screen relative bg-black z-10 p-4 md:p-8 text-white">
-      {/* Opóźniamy renderowanie FloatingLines, żeby nie blokowały Hydracji */}
       {isMounted && (
         <motion.div
           className="absolute inset-0 transform-gpu"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{
-            delay: delay,
+            delay: delay, // Tło wchodzi w 1.5s
             duration: duration,
             ease: "easeOut",
           }}
@@ -56,7 +53,7 @@ export function Hero() {
         </motion.div>
       )}
 
-      {/* Hero Content - bez zmian */}
+      {/* Hero Content */}
       <div className="absolute inset-0 flex flex-col justify-center items-center text-center z-20 pointer-events-none">
         {showIntro && (
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-50">
@@ -70,7 +67,8 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: showIntro ? delay + 0.1 : 0,
+              // ⚡ SYNCHRONIZACJA: Tekst wchodzi RAZEM z tłem (bez +0.1s)
+              delay: showIntro ? delay : 0,
               duration: showIntro ? 0.8 : 0,
               ease: "easeOut",
             }}
@@ -82,7 +80,8 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              delay: showIntro ? delay + 0.3 : 0,
+              // ⚡ SZYBSZA SEKWENCJA: Tylko +0.1s po głównym napisie (było +0.3s)
+              delay: showIntro ? delay + 0.1 : 0,
               duration: showIntro ? 0.8 : 0,
               ease: "easeOut",
             }}
@@ -92,13 +91,13 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Footer - bez zmian */}
       <motion.footer
         className="absolute bottom-0 left-0 right-0 p-4 z-20"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
-          delay: showIntro ? delay + 0.5 : 0,
+          // ⚡ SZYBSZA STOPKA: +0.2s po starcie (było +0.5s)
+          delay: showIntro ? delay + 0.2 : 0,
           duration: showIntro ? 0.2 : 0,
           ease: "easeOut",
         }}
