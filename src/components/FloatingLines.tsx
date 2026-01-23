@@ -11,7 +11,7 @@ import {
   Clock,
 } from "three";
 
-// --- SHADERY BEZ ZMIAN (Dla czystości) ---
+// --- SHADERY ---
 const vertexShader = `
 precision highp float;
 void main() {
@@ -19,8 +19,8 @@ void main() {
 }
 `;
 
-const fragmentShader = `
-precision highp float;
+// Wstrzykniemy precyzję dynamicznie w kodzie JS, żeby mobile miał lżej
+const fragmentShaderSource = `
 uniform float iTime;
 uniform vec3  iResolution;
 uniform float animationSpeed;
@@ -240,7 +240,6 @@ export default function FloatingLines({
     let cleanup: (() => void) | null = null;
     let idleId: any = null;
 
-    // Główna funkcja inicjalizująca - wywołana z opóźnieniem
     const initThreeJS = () => {
       if (!containerRef.current) return;
 
@@ -249,19 +248,24 @@ export default function FloatingLines({
       const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       camera.position.z = 1;
 
-      // --- OPTYMALIZACJA MOBILE ---
+      // 🚀 OPTYMALIZACJA WYDAJNOŚCI
       const isMobile = window.innerWidth < 768;
+
       const renderer = new WebGLRenderer({
-        antialias: !isMobile, // Wyłącz AA na mobile
-        alpha: false
+        antialias: !isMobile, // Brak AA na mobile = duży zysk
+        alpha: false,
+        powerPreference: "high-performance", // Prośba o dedykowane GPU
+        depth: false,   // Wyłączamy bufor głębi (niepotrzebny w 2D) - oszczędność pamięci
+        stencil: false, // Wyłączamy bufor szablonu - oszczędność pamięci
       });
+
+      // Pixel Ratio: Max 1.5 na Desktop, sztywne 1.0 na Mobile
       renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
 
       renderer.domElement.style.display = "block";
       renderer.domElement.style.width = "100%";
       renderer.domElement.style.height = "100%";
       container.appendChild(renderer.domElement);
-      // ---------------------------
 
       const uniforms = {
         iTime: { value: 0 },
@@ -300,7 +304,18 @@ export default function FloatingLines({
         });
       }
 
-      const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader });
+      // 🚀 ZMIENNA PRECYZJA SHADERA
+      // Na mobile używamy 'mediump' - to daje kopa wydajnościowego.
+      // Na desktopie 'highp' dla jakości.
+      const precisionPrefix = isMobile ? "precision mediump float;" : "precision highp float;";
+      const finalFragmentShader = precisionPrefix + "\n" + fragmentShaderSource;
+
+      const material = new ShaderMaterial({
+        uniforms,
+        vertexShader,
+        fragmentShader: finalFragmentShader
+      });
+
       const geometry = new PlaneGeometry(2, 2);
       const mesh = new Mesh(geometry, material);
       scene.add(mesh);
@@ -357,7 +372,7 @@ export default function FloatingLines({
       };
       renderLoop();
 
-      // 🟢 Pokaż scenę
+      // Płynne pokazanie sceny
       setIsReady(true);
 
       cleanup = () => {
@@ -377,12 +392,9 @@ export default function FloatingLines({
     };
 
     // 🧠 INTELIGENTNE ŁADOWANIE (requestIdleCallback)
-    // Jeśli przeglądarka jest zajęta (PageSpeed/słaby telefon), czekamy do 2 sekund.
-    // Jeśli jest wolna (Twój komputer), ładuje się natychmiast.
     if ("requestIdleCallback" in window) {
       idleId = (window as any).requestIdleCallback(initThreeJS, { timeout: 2000 });
     } else {
-      // Fallback dla Safari
       idleId = setTimeout(initThreeJS, 100);
     }
 
