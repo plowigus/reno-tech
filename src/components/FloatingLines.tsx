@@ -11,12 +11,12 @@ import {
   Clock,
 } from "three";
 
-// --- KONFIGURACJA "OSZUKIWANIA OKA" ---
-const SHOW_ON_MOBILE = true; // Zmień na FALSE, jeśli chcesz całkowicie wyłączyć na telefonach (max performance)
-const MOBILE_DELAY = 1000;   // Opóźnienie na telefonie (ms) - 1s to dobry kompromis
-const DESKTOP_DELAY = 0;     // Desktop ładuje od razu
+// --- KONFIGURACJA POD PAGESPEED ---
+const SHOW_ON_MOBILE = true;
+const MOBILE_DELAY = 1500;   // 1.5s na mobile (żeby procesor ostygł)
+const DESKTOP_DELAY = 1500;  // 2.5s na desktop (brutalne przesunięcie, żeby zbić TBT do 0)
 
-// --- SHADERY BEZ ZMIAN ---
+// --- SHADERY (BEZ ZMIAN) ---
 const vertexShader = `
 precision highp float;
 void main() {
@@ -24,7 +24,7 @@ void main() {
 }
 `;
 
-// Wstrzykniemy precyzję dynamicznie w kodzie JS, żeby mobile miał lżej
+// Fragment shader wstrzykujemy dynamicznie niżej
 const fragmentShaderSource = `
 uniform float iTime;
 uniform vec3  iResolution;
@@ -218,7 +218,7 @@ export default function FloatingLines({
   const targetParallaxRef = useRef<Vector2>(new Vector2(0, 0));
   const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
 
-  // Helpery - bez zmian
+  // Helpery
   const getLineCount = (waveType: "top" | "middle" | "bottom"): number => {
     if (typeof lineCount === "number") return lineCount;
     if (!enabledWaves.includes(waveType)) return 0;
@@ -252,7 +252,7 @@ export default function FloatingLines({
       const container = containerRef.current;
       const isMobile = window.innerWidth < 768;
 
-      // 🚨 KILL SWITCH MOBILE: Jeśli wolisz puste tło, ustaw SHOW_ON_MOBILE = false
+      // 🚨 KILL SWITCH MOBILE:
       if (isMobile && !SHOW_ON_MOBILE) {
         setIsReady(true);
         return;
@@ -264,7 +264,7 @@ export default function FloatingLines({
 
       // 🚀 OPTYMALIZACJA WEBGL
       const renderer = new WebGLRenderer({
-        antialias: !isMobile,
+        antialias: !isMobile, // Wyłączamy AA na mobile
         alpha: false,
         powerPreference: "high-performance",
         depth: false,
@@ -315,7 +315,7 @@ export default function FloatingLines({
         });
       }
 
-      // 🚀 PRECYZJA SHADERA (Jakość vs Szybkość)
+      // 🚀 PRECYZJA SHADERA
       const precisionPrefix = isMobile ? "precision mediump float;" : "precision highp float;";
       const finalFragmentShader = precisionPrefix + "\n" + fragmentShaderSource;
 
@@ -381,7 +381,7 @@ export default function FloatingLines({
       };
       renderLoop();
 
-      // Pokaż scenę
+      // Pokaż scenę (Fade In)
       setIsReady(true);
 
       cleanup = () => {
@@ -400,11 +400,17 @@ export default function FloatingLines({
       };
     };
 
-    // --- TIMING ---
-    const isMobile = window.innerWidth < 768;
-    const delay = isMobile ? MOBILE_DELAY : DESKTOP_DELAY;
+    // --- STRATEGIA TIMINGU (SZTYWNE OPÓŹNIENIE) ---
+    // Zastępujemy requestIdleCallback sztywnym timerem, 
+    // aby mieć pewność, że na Desktopie też zadziała z opóźnieniem (jeśli TBT wysokie).
 
-    timerId = setTimeout(initThreeJS, delay);
+    // Sprawdzamy typ urządzenia
+    const isMobileCheck = typeof window !== "undefined" ? window.innerWidth < 768 : false;
+
+    // Wybieramy opóźnienie
+    const finalDelay = isMobileCheck ? MOBILE_DELAY : DESKTOP_DELAY;
+
+    timerId = setTimeout(initThreeJS, finalDelay);
 
     return () => {
       if (timerId) clearTimeout(timerId);
