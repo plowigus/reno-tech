@@ -11,10 +11,9 @@ import {
   Clock,
 } from "three";
 
-// ... (Shadery bez zmian - kopiujemy je, żeby kod był kompletny)
+// --- SHADERY BEZ ZMIAN ---
 const vertexShader = `
 precision highp float;
-
 void main() {
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
@@ -66,22 +65,16 @@ mat2 rotate(float r) {
 
 vec3 background_color(vec2 uv) {
   vec3 col = vec3(0.0);
-
   float y = sin(uv.x - 0.2) * 0.3 - 0.1;
   float m = uv.y - y;
-
   col += mix(BLUE, BLACK, smoothstep(0.0, 1.0, abs(m)));
   col += mix(PINK, BLACK, smoothstep(0.0, 1.0, abs(m - 0.8)));
   return col * 0.5;
 }
 
 vec3 getLineColor(float t, vec3 baseColor) {
-  if (lineGradientCount <= 0) {
-    return baseColor;
-  }
-
+  if (lineGradientCount <= 0) return baseColor;
   vec3 gradientColor;
-  
   if (lineGradientCount == 1) {
     gradientColor = lineGradient[0];
   } else {
@@ -90,31 +83,25 @@ vec3 getLineColor(float t, vec3 baseColor) {
     int idx = int(floor(scaled));
     float f = fract(scaled);
     int idx2 = min(idx + 1, lineGradientCount - 1);
-
     vec3 c1 = lineGradient[idx];
     vec3 c2 = lineGradient[idx2];
-    
     gradientColor = mix(c1, c2, f);
   }
-  
   return gradientColor * 0.5;
 }
 
-  float wave(vec2 uv, float offset, vec2 screenUv, vec2 mouseUv, bool shouldBend) {
+float wave(vec2 uv, float offset, vec2 screenUv, vec2 mouseUv, bool shouldBend) {
   float time = iTime * animationSpeed;
-
   float x_offset   = offset;
   float x_movement = time * 0.1;
   float amp        = sin(offset + time * 0.2) * 0.3;
   float y          = sin(uv.x + x_offset + x_movement) * amp;
-
   if (shouldBend) {
     vec2 d = screenUv - mouseUv;
-    float influence = exp(-dot(d, d) * bendRadius); // radial falloff around cursor
+    float influence = exp(-dot(d, d) * bendRadius);
     float bendOffset = (mouseUv.y - screenUv.y) * influence * bendStrength * bendInfluence;
     y += bendOffset;
   }
-
   float m = uv.y - y;
   return 0.0175 / max(abs(m) + 0.01, 1e-3) + 0.01;
 }
@@ -122,76 +109,45 @@ vec3 getLineColor(float t, vec3 baseColor) {
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   vec2 baseUv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
   baseUv.y *= -1.0;
-  
-  if (parallax) {
-    baseUv += parallaxOffset;
-  }
-
+  if (parallax) baseUv += parallaxOffset;
   vec3 col = vec3(0.0);
-
   vec3 b = lineGradientCount > 0 ? vec3(0.0) : background_color(baseUv);
-
   vec2 mouseUv = vec2(0.0);
   if (interactive) {
     mouseUv = (2.0 * iMouse - iResolution.xy) / iResolution.y;
     mouseUv.y *= -1.0;
   }
-  
   if (enableBottom) {
     for (int i = 0; i < bottomLineCount; ++i) {
       float fi = float(i);
       float t = fi / max(float(bottomLineCount - 1), 1.0);
       vec3 lineCol = getLineColor(t, b);
-      
       float angle = bottomWavePosition.z * log(length(baseUv) + 1.0);
       vec2 ruv = baseUv * rotate(angle);
-      col += lineCol * wave(
-        ruv + vec2(bottomLineDistance * fi + bottomWavePosition.x, bottomWavePosition.y),
-        1.5 + 0.2 * fi,
-        baseUv,
-        mouseUv,
-        interactive
-      ) * 0.2;
+      col += lineCol * wave(ruv + vec2(bottomLineDistance * fi + bottomWavePosition.x, bottomWavePosition.y), 1.5 + 0.2 * fi, baseUv, mouseUv, interactive) * 0.2;
     }
   }
-
   if (enableMiddle) {
     for (int i = 0; i < middleLineCount; ++i) {
       float fi = float(i);
       float t = fi / max(float(middleLineCount - 1), 1.0);
       vec3 lineCol = getLineColor(t, b);
-      
       float angle = middleWavePosition.z * log(length(baseUv) + 1.0);
       vec2 ruv = baseUv * rotate(angle);
-      col += lineCol * wave(
-        ruv + vec2(middleLineDistance * fi + middleWavePosition.x, middleWavePosition.y),
-        2.0 + 0.15 * fi,
-        baseUv,
-        mouseUv,
-        interactive
-      );
+      col += lineCol * wave(ruv + vec2(middleLineDistance * fi + middleWavePosition.x, middleWavePosition.y), 2.0 + 0.15 * fi, baseUv, mouseUv, interactive);
     }
   }
-
   if (enableTop) {
     for (int i = 0; i < topLineCount; ++i) {
       float fi = float(i);
       float t = fi / max(float(topLineCount - 1), 1.0);
       vec3 lineCol = getLineColor(t, b);
-      
       float angle = topWavePosition.z * log(length(baseUv) + 1.0);
       vec2 ruv = baseUv * rotate(angle);
       ruv.x *= -1.0;
-      col += lineCol * wave(
-        ruv + vec2(topLineDistance * fi + topWavePosition.x, topWavePosition.y),
-        1.0 + 0.2 * fi,
-        baseUv,
-        mouseUv,
-        interactive
-      ) * 0.1;
+      col += lineCol * wave(ruv + vec2(topLineDistance * fi + topWavePosition.x, topWavePosition.y), 1.0 + 0.2 * fi, baseUv, mouseUv, interactive) * 0.1;
     }
   }
-
   fragColor = vec4(col, 1.0);
 }
 
@@ -204,11 +160,7 @@ void main() {
 
 const MAX_GRADIENT_STOPS = 8;
 
-type WavePosition = {
-  x: number;
-  y: number;
-  rotate: number;
-};
+type WavePosition = { x: number; y: number; rotate: number; };
 
 type FloatingLinesProps = {
   linesGradient?: string[];
@@ -262,7 +214,6 @@ export default function FloatingLines({
   mixBlendMode = "screen",
 }: FloatingLinesProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  // Dodajemy stan opacity do płynnego wejścia
   const [isReady, setIsReady] = useState(false);
 
   // Refy Three.js
@@ -273,6 +224,7 @@ export default function FloatingLines({
   const targetParallaxRef = useRef<Vector2>(new Vector2(0, 0));
   const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
 
+  // Helpery do obliczania wartości - bez zmian
   const getLineCount = (waveType: "top" | "middle" | "bottom"): number => {
     if (typeof lineCount === "number") return lineCount;
     if (!enabledWaves.includes(waveType)) return 0;
@@ -299,13 +251,10 @@ export default function FloatingLines({
     if (!containerRef.current) return;
 
     let cleanup: (() => void) | null = null;
-    let initTimer: NodeJS.Timeout | null = null;
+    let idleId: any = null;
 
-    // ⚡ SUPER OPTYMALIZACJA TBT:
-    // Opóźniamy start silnika aż o 2000ms (2 sekundy).
-    // Pozwalamy przeglądarce załadować Reacta, wykonać animację Intro,
-    // i uspokoić procesor, zanim uderzymy WebGLem.
-    initTimer = setTimeout(() => {
+    // Funkcja inicjalizująca Three.js
+    const initThreeJS = () => {
       if (!containerRef.current) return;
 
       const container = containerRef.current;
@@ -313,9 +262,15 @@ export default function FloatingLines({
       const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
       camera.position.z = 1;
 
-      // Zmniejszony PixelRatio dla wydajności
-      const renderer = new WebGLRenderer({ antialias: true, alpha: false });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      // 🚀 OPTYMALIZACJA MOBILNA
+      const isMobile = window.innerWidth < 768;
+      const renderer = new WebGLRenderer({
+        antialias: !isMobile, // Wyłącz AA na mobile
+        alpha: false
+      });
+      // Zmniejsz rozdzielczość na mobile dla mega wydajności
+      renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5));
+
       renderer.domElement.style.display = "block";
       renderer.domElement.style.width = "100%";
       renderer.domElement.style.height = "100%";
@@ -415,7 +370,7 @@ export default function FloatingLines({
       };
       renderLoop();
 
-      // 🚀 Kiedy wszystko gotowe, włączamy widoczność (Fade In)
+      // Płynne pokazanie (Fade In)
       setIsReady(true);
 
       cleanup = () => {
@@ -432,10 +387,23 @@ export default function FloatingLines({
           renderer.domElement.parentElement.removeChild(renderer.domElement);
         }
       };
-    }, 2000); // ⚡ 2 SEKUNDY opóźnienia
+    };
+
+    // 🧠 INTELIGENTNE ŁADOWANIE (requestIdleCallback)
+    // Jeśli przeglądarka ma "luz", ładuje od razu. Jeśli jest zajęta (słaby telefon), czeka do 2s.
+    if ("requestIdleCallback" in window) {
+      idleId = (window as any).requestIdleCallback(initThreeJS, { timeout: 2000 });
+    } else {
+      // Fallback dla Safari i starszych
+      idleId = setTimeout(initThreeJS, 100);
+    }
 
     return () => {
-      if (initTimer) clearTimeout(initTimer);
+      if ("cancelIdleCallback" in window && idleId) {
+        (window as any).cancelIdleCallback(idleId);
+      } else {
+        clearTimeout(idleId);
+      }
       if (cleanup) cleanup();
     };
   }, [linesGradient, enabledWaves, lineCount, lineDistance, topLineCount, middleLineCount, bottomLineCount, topLineDistance, middleLineDistance, bottomLineDistance, topWavePosition, middleWavePosition, bottomWavePosition, animationSpeed, interactive, bendRadius, bendStrength, mouseDamping, parallax, parallaxStrength]);
@@ -443,7 +411,7 @@ export default function FloatingLines({
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full relative overflow-hidden floating-lines-container transition-opacity duration-1000 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+      className={`w-full h-full relative overflow-hidden floating-lines-container transition-opacity duration-700 ${isReady ? 'opacity-100' : 'opacity-0'}`}
       style={{
         mixBlendMode: mixBlendMode,
         minWidth: "100%",
