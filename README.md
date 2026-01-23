@@ -19,8 +19,22 @@ Centralna część strony prezentująca ofertę. Wykorzystuje mechanizm **pinned
     - **Bounce**: Delikatny efekt odbicia przy pozycjonowaniu elementów.
     - **Layout**: Zoptymalizowany, aby mieścić 3 usługi w widoku, zapewniając szybki przegląd oferty.
 
-### 3. Shop (Sklep) - W budowie
-Planowana sekcja e-commerce/sklepu, która pozwoli na zakup akcesoriów i usług online. Obecnie w fazie rozwoju.
+### 3. Shop (Sklep)
+W pełni funkcjonalna sekcja e-commerce prezentująca asortyment produktów.
+
+- **Strona Główna Sklepu**: Siatka produktów z nowoczesnymi kartami (zdjęcia, ceny, nazwy).
+- **Strona Produktu**: Szczegółowy widok pojedynczego produktu z zaawansowanym layoutem:
+    - **Galeria "Sticky"**: Zdjęcie produktu pozostaje widoczne podczas przewijania opisu.
+    - **Wybór Wariantu**: Interaktywny selektor rozmiarów dla odzieży (S-XXL) oraz automatyczne wykrywanie rozmiaru uniwersalnego dla akcesoriów.
+    - **Optymalizacja**: Zdjęcia w formacie kwadratu (1:1) dla lepszej prezentacji na różnych urządzeniach.
+
+### 4. Nawigacja i Layout
+Zmodernizowany interfejs użytkownika zapewniający intuicyjną obsługę:
+
+- **Globalny Navbar**: Pasek nawigacji dostępny na każdej podstronie.
+- **Glassmorphism**: Stylistyka półprzezroczystego szkła (backdrop-blur) nadająca nowoczesny i lekki wygląd.
+- **Pozycjonowanie Absolute**: Navbar nakłada się na sekcję Hero, ale nie podąża za użytkownikiem podczas przewijania (absolute positioning), co pozwala skupić się na treści.
+- **Hero Section**: Idealnie wycentrowane treści powitalne z animacjami Matrix i interaktywnym logo.
 
 ## 🛠️ Stack Technologiczny
 
