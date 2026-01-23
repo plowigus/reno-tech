@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Cpu, Navigation, Key, Zap, Fuel, Package, Check } from "lucide-react";
@@ -63,8 +63,9 @@ export function Services() {
   const containerRef = useRef<HTMLElement>(null);
   const itemsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const ctx = gsap.context(() => {
+      // ... (keep existing GSAP logic)
       const items = itemsRef.current;
       const validItems = items.filter((item): item is HTMLDivElement => item !== null);
       const totalItems = validItems.length;
