@@ -22,10 +22,12 @@ export default function Navbar() {
             <Link
               key={label}
               href={href}
-              className="group relative px-3 py-1 text-sm font-medium text-white tracking-wide transition-colors duration-150 hover:text-white cursor-pointer"
+              className="group px-3 py-1 text-sm font-medium text-white tracking-wide transition-colors duration-150 hover:text-white cursor-pointer"
             >
-              <span className="relative z-50">{label}</span>
-              <span className="absolute bottom-0 left-0 w-full h-[2px] bg-red-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left ease-out" />
+              <span className="relative z-50 inline-block">
+                {label}
+                <span className="absolute bottom-[-4px] left-0 w-full h-[1.5px] bg-red-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left ease-out" />
+              </span>
             </Link>
           ))}
         </nav>
