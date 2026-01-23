@@ -8,11 +8,13 @@ import { Facebook, Instagram, Phone, ChevronDown } from "lucide-react";
 import { Clock } from "./Clock";
 import dynamic from "next/dynamic";
 
+// Dynamiczny import komponentu FloatingLines
 const FloatingLines = dynamic(() => import("./FloatingLines"), {
   ssr: false,
   loading: () => <div className="absolute inset-0 bg-black" />,
 });
 
+// Bezpieczny hook dla SSR
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
@@ -30,10 +32,16 @@ export function Hero() {
     }
   }, []);
 
-  // ⚡ ZMNIEJSZAMY GŁÓWNY DELAY: z 1.7 na 1.5s (niech wchodzi dynamiczniej)
-  const delay = showIntro ? 1.5 : 0;
-  // ⚡ SZYBSZE WEJŚCIE DLA POWRACAJĄCYCH: duration 0s (instant)
-  const duration = showIntro ? 0.5 : 0;
+  // Logika czasów: 0 jeśli wracamy, normalne wartości jeśli pierwsze wejście
+  const baseDelay = showIntro ? 1.5 : 0;
+  const baseDuration = showIntro ? 0.5 : 0;
+
+  // Funkcja generująca obiekt transition z poprawnymi typami dla Motion
+  const getTransition = (delayOffset: number = 0, durationOverride: number = 0) => ({
+    delay: showIntro ? baseDelay + delayOffset : 0,
+    duration: showIntro ? (durationOverride || baseDuration) : 0,
+    ease: "easeOut" as const, // "as const" naprawia błąd typu Easing
+  });
 
   return (
     <section className="min-h-screen relative bg-black z-10 p-4 md:p-8 text-white">
@@ -42,11 +50,7 @@ export function Hero() {
           className="absolute inset-0 transform-gpu"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{
-            delay: delay, // Tło wchodzi w 1.5s
-            duration: duration,
-            ease: "easeOut",
-          }}
+          transition={getTransition(0, 0.5)}
           style={{ willChange: "opacity" }}
         >
           <FloatingLines />
@@ -66,12 +70,7 @@ export function Hero() {
             className="px-4 py-2 mb-2 text-5xl md:text-7xl lg:text-9xl font-bold tracking-tighter"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              // ⚡ SYNCHRONIZACJA: Tekst wchodzi RAZEM z tłem (bez +0.1s)
-              delay: showIntro ? delay : 0,
-              duration: showIntro ? 0.8 : 0,
-              ease: "easeOut",
-            }}
+            transition={getTransition(0, 0.8)}
           >
             RENO<span className="text-red-700">tech.</span>
           </motion.div>
@@ -79,12 +78,7 @@ export function Hero() {
             className="px-4 py-2 text-center text-lg md:text-2xl uppercase tracking-[0.2em] w-full flex justify-center font-light"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              // ⚡ SZYBSZA SEKWENCJA: Tylko +0.1s po głównym napisie (było +0.3s)
-              delay: showIntro ? delay + 0.1 : 0,
-              duration: showIntro ? 0.8 : 0,
-              ease: "easeOut",
-            }}
+            transition={getTransition(0.1, 0.8)}
           >
             <MatrixText />
           </motion.div>
@@ -95,12 +89,7 @@ export function Hero() {
         className="absolute bottom-0 left-0 right-0 p-4 z-20"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{
-          // ⚡ SZYBSZA STOPKA: +0.2s po starcie (było +0.5s)
-          delay: showIntro ? delay + 0.2 : 0,
-          duration: showIntro ? 0.2 : 0,
-          ease: "easeOut",
-        }}
+        transition={getTransition(0.2, 0.2)}
       >
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-sm relative">
           <div className="flex items-center gap-4">
