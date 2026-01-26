@@ -3,6 +3,9 @@ import Image from "next/image";
 import Logo from "../../public/renotech-logo.png";
 import { auth } from "@/auth";
 import UserNav from "./UserNav";
+import { db } from "@/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 const links = [
   { label: "O nas", href: "/#about" },
@@ -14,6 +17,17 @@ const links = [
 
 export default async function Navbar() {
   const session = await auth();
+  let user = session?.user;
+
+  if (session?.user?.id) {
+    const dbUser = await db.query.users.findFirst({
+      where: eq(users.id, session.user.id),
+    });
+
+    if (dbUser) {
+      user = { ...session.user, ...dbUser };
+    }
+  }
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50 px-4 py-4 transition-all duration-300">
@@ -35,7 +49,7 @@ export default async function Navbar() {
             </Link>
           ))}
           <div className="ml-4 pl-4 border-l border-white/20">
-            <UserNav user={session?.user} />
+            <UserNav user={user} />
           </div>
         </nav>
         <div className="border border-white px-4 py-2 md:hidden">Menu</div>

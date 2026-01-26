@@ -65,6 +65,7 @@ export async function updateUserProfile(prevState: ProfileState, formData: FormD
             .where(eq(users.id, session.user.id));
 
         revalidatePath("/dashboard");
+        revalidatePath("/", "layout");
         return { success: "Profil został zaktualizowany" };
     } catch (error) {
         console.error("Profile update error:", error);

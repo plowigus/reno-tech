@@ -84,7 +84,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 defaultValue={user.name || ""}
                                 type="text"
                                 placeholder="Jan Kowalski"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -98,7 +98,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 defaultValue={user.phoneNumber || ""}
                                 type="tel"
                                 placeholder="+48 123 456 789"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -119,7 +119,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 defaultValue={user.street || ""}
                                 type="text"
                                 placeholder="ul. Przykładowa 1/2"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -133,7 +133,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 defaultValue={user.postalCode || ""}
                                 type="text"
                                 placeholder="00-000"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -147,7 +147,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 defaultValue={user.city || ""}
                                 type="text"
                                 placeholder="Warszawa"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -161,7 +161,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 defaultValue={user.country || "Poland"}
                                 type="text"
                                 placeholder="Polska"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
