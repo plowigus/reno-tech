@@ -5,10 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { User } from "next-auth";
 import { handleSignOut } from "@/app/actions/auth-actions";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, User as UserIcon, Crown } from "lucide-react";
+
+interface UserWithRole extends User {
+    role?: string;
+}
 
 interface UserNavProps {
-    user: User | null | undefined;
+    user: UserWithRole | null | undefined;
 }
 
 export default function UserNav({ user }: UserNavProps) {
@@ -31,7 +35,7 @@ export default function UserNav({ user }: UserNavProps) {
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-2 focus:outline-none"
             >
-                <div className="relative w-8 h-8 rounded-full overflow-hidden border border-white/20">
+                <div className={`relative w-8 h-8 rounded-full overflow-hidden border border-white/20 ${user.role === "admin" ? "ring-2 ring-yellow-500 ring-offset-2 ring-offset-black" : ""}`}>
                     {user.image ? (
                         <Image
                             src={user.image}
@@ -44,6 +48,12 @@ export default function UserNav({ user }: UserNavProps) {
                             <span className="text-sm font-bold">
                                 {user.name?.charAt(0) || "U"}
                             </span>
+                        </div>
+                    )}
+
+                    {user.role === "admin" && (
+                        <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-black rounded-full p-[2px] border-2 border-zinc-900 flex items-center justify-center z-10">
+                            <Crown size={10} strokeWidth={3} />
                         </div>
                     )}
                 </div>

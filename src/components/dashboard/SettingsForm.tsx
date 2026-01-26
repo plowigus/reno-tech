@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { updateUserProfile, ProfileState } from "@/app/actions/user-actions";
 import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
-import { Loader2, User, Phone, MapPin, Building, Globe, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, User, Phone, MapPin, Building, Globe, CheckCircle2, AlertCircle, Crown } from "lucide-react";
 import AddressAutocomplete from "./AddressAutocomplete";
 
 interface SettingsFormProps {
@@ -46,6 +46,11 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 </div>
                             )}
                         </div>
+                        {user.role === "admin" && (
+                            <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-zinc-900 text-yellow-500 rounded-full p-1.5 border-2 border-zinc-800 shadow-lg z-10">
+                                <Crown size={20} className="fill-yellow-500/10" strokeWidth={2.5} />
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-2">

@@ -25,7 +25,11 @@ export default async function Navbar() {
     });
 
     if (dbUser) {
-      user = { ...session.user, ...dbUser };
+      user = {
+        ...session.user,
+        ...dbUser,
+        role: dbUser.role || "user"
+      };
     }
   }
 

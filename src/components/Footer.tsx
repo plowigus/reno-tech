@@ -5,8 +5,8 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-black pt-20 pb-10 px-6 md:px-8">
-      <div className="max-w-7xl mx-auto z-20 relative">
+    <footer className="relative bg-black pt-20 pb-10 px-4">
+      <div className="max-w-7xl mx-auto border-t border-white/10 pt-10 px-6 z-20 relative">
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
           {/* Brand */}
@@ -59,7 +59,7 @@ export function Footer() {
                   href="tel:+48123456789"
                   className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors font-light"
                 >
-                  <Phone size={18} className="flex-shrink-0" />
+                  <Phone size={18} className="shrink-0" />
                   <span>+48 123 456 789</span>
                 </a>
               </li>
@@ -68,12 +68,12 @@ export function Footer() {
                   href="mailto:kontakt@renotech.pl"
                   className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors font-light"
                 >
-                  <Mail size={18} className="flex-shrink-0" />
+                  <Mail size={18} className="shrink-0" />
                   <span>kontakt@renotech.pl</span>
                 </a>
               </li>
               <li className="flex items-start gap-3 text-gray-400 font-light">
-                <MapPin size={18} className="flex-shrink-0 mt-0.5" />
+                <MapPin size={18} className="shrink-0 mt-0.5" />
                 <span>
                   ul. Stefana Grota-Roweckiego 35/22
                   <br />
@@ -85,7 +85,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400 font-light">
             © {currentYear} RenoTech. Wszystkie prawa zastrzeżone.
           </p>

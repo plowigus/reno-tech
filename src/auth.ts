@@ -17,6 +17,7 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+    trustHost: true,
     adapter: DrizzleAdapter(db),
     providers: [
         Google,
