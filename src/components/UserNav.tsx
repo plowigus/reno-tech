@@ -52,7 +52,7 @@ export default function UserNav({ user }: UserNavProps) {
                     )}
 
                     {user.role === "admin" && (
-                        <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-black rounded-full p-[2px] border-2 border-zinc-900 flex items-center justify-center z-10">
+                        <div className="absolute -bottom-1 z-20 -right-1 bg-yellow-500 text-black rounded-full p-[2px] border-2 border-zinc-900 flex items-center justify-center ">
                             <Crown size={10} strokeWidth={3} />
                         </div>
                     )}
