@@ -5,22 +5,27 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-// ZMIANA IMPORTU: Bierzemy typ z auth-actions
-import { AuthState } from "@/app/actions/auth-actions";
+import { AuthState } from "@/app/actions/auth-actions"; // Upewnij się, że ścieżka jest OK
 
 const RegisterSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(6, "Hasło musi mieć min. 6 znaków"),
+    email: z.string().email({ message: "Nieprawidłowy adres email" }),
+    password: z.string()
+        .min(8, "Hasło musi mieć min. 8 znaków")
+        .regex(/[A-Z]/, "Hasło musi zawierać jedną dużą literę")
+        .regex(/[0-9]/, "Hasło musi zawierać jedną cyfrę")
+        .regex(/[^A-Za-z0-9]/, "Hasło musi zawierać jeden znak specjalny"),
     name: z.string().min(2, "Imię jest wymagane"),
 });
 
 export async function registerUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
-    // ... (reszta kodu bez zmian)
+    // 1. Walidacja danych
     const rawData = Object.fromEntries(formData.entries());
     const validated = RegisterSchema.safeParse(rawData);
 
     if (!validated.success) {
-        return { error: "Błędne dane formularza." };
+        // ZMIANA: Zamiast .errors używamy .issues
+        const errorMessage = validated.error.issues[0]?.message ?? "Nieprawidłowe dane formularza";
+        return { error: errorMessage };
     }
 
     const { email, password, name } = validated.data;
@@ -40,11 +45,13 @@ export async function registerUser(prevState: AuthState, formData: FormData): Pr
             email,
             name,
             password: hashedPassword,
+            // Dodajemy domyślne wartości dla nowych pól, żeby baza nie krzyczała (opcjonalne, jeśli są nullable)
+            role: "user",
         });
 
         return { success: "Konto utworzone! Możesz się zalogować." };
     } catch (err) {
-        console.error(err);
-        return { error: "Wystąpił błąd serwera." };
+        console.error("Błąd rejestracji:", err);
+        return { error: "Wystąpił błąd serwera podczas tworzenia konta." };
     }
 }

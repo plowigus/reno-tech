@@ -21,6 +21,11 @@ export const users = pgTable("user", {
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),
     role: text("role").default("user"),
+    street: text("street"),
+    city: text("city"),
+    postalCode: text("postal_code"),
+    country: text("country").default("Poland"),
+    phoneNumber: text("phone_number"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
