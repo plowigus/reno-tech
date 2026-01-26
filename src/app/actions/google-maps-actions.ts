@@ -93,9 +93,16 @@ export async function getPlaceDetails(placeId: string): Promise<AddressComponent
             if (types.includes("street_number")) {
                 streetNumber = component.longText || component.shortText;
             }
-            if (types.includes("locality") || types.includes("postal_town")) {
+            if (types.includes("locality")) {
+                city = component.longText || component.shortText;
+            } else if (!city && types.includes("administrative_area_level_2")) {
+                // Fallback to county/district if locality is missing
+                city = component.longText || component.shortText;
+            } else if (!city && types.includes("postal_town")) {
+                // Fallback to postal town
                 city = component.longText || component.shortText;
             }
+
             if (types.includes("postal_code")) {
                 postalCode = component.longText || component.shortText;
             }

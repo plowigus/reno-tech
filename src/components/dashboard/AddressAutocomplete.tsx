@@ -68,6 +68,7 @@ export default function AddressAutocomplete({
         setIsLoading(false);
 
         if (details) {
+            setQuery(details.street);
             onAddressSelect(details);
         }
     };
