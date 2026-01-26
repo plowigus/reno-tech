@@ -1,11 +1,12 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { loginUser, loginWithGoogle, AuthState } from "@/app/actions/auth-actions";
-import { registerUser } from "@/app/actions/register";
+import { loginUser, loginWithGoogle, AuthState } from "@/app/actions/auth-actions"; //
+import { registerUser } from "@/app/actions/register"; //
 import { Loader2, Mail, Lock, User, Eye, EyeOff, Chrome, AlertCircle, CheckCircle2 } from "lucide-react";
-// Opcjonalnie: import Turnstile jeśli już go masz
-// import { Turnstile } from '@marsidev/react-turnstile';
+import { useRouter } from "next/navigation"; // Dodajemy router do zmiany URL
+import { InteractiveLogo } from "@/components/Animation/InteractiveLogo";
+// import { Turnstile } from '@marsidev/react-turnstile'; // Odkomentuj gdy dodasz klucze
 
 interface AuthFormProps {
     initialTab?: "login" | "register";
@@ -17,7 +18,9 @@ const initialState: AuthState = {
 };
 
 export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
+    const router = useRouter(); // Inicjalizacja routera
     const [mode, setMode] = useState<"login" | "register">(initialTab);
+
     const [loginState, loginAction, isLoginPending] = useActionState(loginUser, initialState);
     const [registerState, registerAction, isRegisterPending] = useActionState(registerUser, initialState);
 
@@ -27,9 +30,24 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
     const isLogin = mode === "login";
 
     const toggleMode = () => {
-        setMode(isLogin ? "register" : "login");
-        setPasswordError("");
+        const newMode = isLogin ? "register" : "login";
+        setMode(newMode);
+        setPasswordError(""); // Czyścimy błąd hasła przy przełączeniu
+
+        // Zmieniamy URL w pasku przeglądarki bez odświeżania (Client-side navigation)
+        router.replace(`/${newMode}`, { scroll: false });
     };
+
+    // Logika wyświetlania błędu zależna od trybu
+    // Jeśli jesteśmy w Login -> pokazujemy tylko błędy logowania
+    // Jeśli jesteśmy w Register -> pokazujemy tylko błędy rejestracji + błąd hasła
+    const currentError = isLogin
+        ? loginState?.error
+        : (passwordError || registerState?.error);
+
+    const currentSuccess = isLogin
+        ? loginState?.success
+        : registerState?.success;
 
     return (
         <div className="w-full max-w-md p-6">
@@ -45,12 +63,11 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
 
             <form
                 action={isLogin ? loginAction : registerAction}
-                // ZMIANA: Dodano noValidate, żeby wyłączyć dymki przeglądarki
                 noValidate
                 onSubmit={(e) => {
-                    // Walidacja haseł nadal działa, bo jest w JS
                     if (!isLogin) {
                         const formData = new FormData(e.currentTarget);
+                        // Prosta walidacja klienta dla haseł
                         if (formData.get("password") !== formData.get("confirmPassword")) {
                             e.preventDefault();
                             setPasswordError("Hasła nie są identyczne");
@@ -128,7 +145,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     </div>
                 )}
 
-                {/* Sekcja Turnstile - odkomentuj gdy dodasz paczkę i klucze */}
+                {/* Sekcja Turnstile */}
                 {/* {!isLogin && (
                     <div className="flex justify-center">
                          <Turnstile siteKey="..." />
@@ -150,17 +167,19 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     </div>
                 )}
 
-                {(passwordError || loginState?.error || registerState?.error) && (
+                {/* ERROR MESSAGES - ZMODYFIKOWANE */}
+                {currentError && (
                     <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs animate-in fade-in slide-in-from-top-1">
                         <AlertCircle size={14} />
-                        <p>{passwordError || loginState?.error || registerState?.error}</p>
+                        <p>{currentError}</p>
                     </div>
                 )}
 
-                {(loginState?.success || registerState?.success) && (
+                {/* SUCCESS MESSAGES - ZMODYFIKOWANE */}
+                {currentSuccess && (
                     <div className="flex items-center gap-2 p-2.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-xs animate-in fade-in slide-in-from-top-1">
                         <CheckCircle2 size={14} />
-                        <p>{loginState?.success || registerState?.success}</p>
+                        <p>{currentSuccess}</p>
                     </div>
                 )}
 
