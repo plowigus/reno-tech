@@ -5,6 +5,7 @@ import { updateUserProfile, ProfileState } from "@/app/actions/user-actions";
 import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
 import { Loader2, User, Phone, MapPin, Building, Globe, CheckCircle2, AlertCircle } from "lucide-react";
+import AddressAutocomplete from "./AddressAutocomplete";
 
 interface SettingsFormProps {
     user: any; // Using any for simplicity with Drizzle type inference usually needed
@@ -18,6 +19,11 @@ const initialState: ProfileState = {
 export default function SettingsForm({ user }: SettingsFormProps) {
     const [state, action, isPending] = useActionState(updateUserProfile, initialState);
     const [imagePreview, setImagePreview] = useState(user.image || "");
+
+    // Controlled inputs for address to support autocomplete updates
+    const [city, setCity] = useState(user.city || "");
+    const [postalCode, setPostalCode] = useState(user.postalCode || "");
+    const [country, setCountry] = useState(user.country || "Poland");
 
     return (
         <form action={action} className="space-y-8">
@@ -112,16 +118,15 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2 space-y-2">
                         <label className="text-sm font-medium text-zinc-400">Ulica i numer</label>
-                        <div className="relative">
-                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                            <input
-                                name="street"
-                                defaultValue={user.street || ""}
-                                type="text"
-                                placeholder="ul. Przykładowa 1/2"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
-                            />
-                        </div>
+                        {/* Address Autocomplete Replaces Standard Input */}
+                        <AddressAutocomplete
+                            defaultValue={user.street || ""}
+                            onAddressSelect={(address) => {
+                                setCity(address.city);
+                                setPostalCode(address.postalCode);
+                                setCountry(address.country);
+                            }}
+                        />
                     </div>
 
                     <div className="space-y-2">
@@ -130,7 +135,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                             <input
                                 name="postalCode"
-                                defaultValue={user.postalCode || ""}
+                                value={postalCode}
+                                onChange={(e) => setPostalCode(e.target.value)}
                                 type="text"
                                 placeholder="00-000"
                                 className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
@@ -144,7 +150,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                             <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                             <input
                                 name="city"
-                                defaultValue={user.city || ""}
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
                                 type="text"
                                 placeholder="Warszawa"
                                 className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
@@ -158,7 +165,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                             <input
                                 name="country"
-                                defaultValue={user.country || "Poland"}
+                                value={country}
+                                onChange={(e) => setCountry(e.target.value)}
                                 type="text"
                                 placeholder="Polska"
                                 className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
