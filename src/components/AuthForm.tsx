@@ -4,7 +4,8 @@ import { useActionState, useState } from "react";
 import { loginUser, loginWithGoogle, AuthState } from "@/app/actions/auth-actions";
 import { registerUser } from "@/app/actions/register";
 import { Loader2, Mail, Lock, User, Eye, EyeOff, Chrome, AlertCircle, CheckCircle2 } from "lucide-react";
-import { InteractiveLogo } from "@/components/Animation/InteractiveLogo";
+// Opcjonalnie: import Turnstile jeśli już go masz
+// import { Turnstile } from '@marsidev/react-turnstile';
 
 interface AuthFormProps {
     initialTab?: "login" | "register";
@@ -31,8 +32,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
     };
 
     return (
-        // ZMIANA: Usunięto h-[700px], dodano style karty (bg, border, shadow)
-        <div className="w-full bg-transparent backdrop-blur-xl border border-zinc-800/50 rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8">
+        <div className="w-full max-w-md p-6">
 
             <div className="text-center mb-8">
                 <h1 className="text-2xl font-bold text-white mb-2">
@@ -45,7 +45,10 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
 
             <form
                 action={isLogin ? loginAction : registerAction}
+                // ZMIANA: Dodano noValidate, żeby wyłączyć dymki przeglądarki
+                noValidate
                 onSubmit={(e) => {
+                    // Walidacja haseł nadal działa, bo jest w JS
                     if (!isLogin) {
                         const formData = new FormData(e.currentTarget);
                         if (formData.get("password") !== formData.get("confirmPassword")) {
@@ -59,20 +62,17 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                 className="space-y-4"
             >
                 {!isLogin && (
-                    <div className="grid grid-cols-1 gap-4">
-                        {/* Zmieniłem na 1 kolumnę dla lepszej czytelności na mobile, ale można wrócić do sm:grid-cols-2 */}
-                        <div className="space-y-1.5">
-                            <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Imię</label>
-                            <div className="relative group">
-                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
-                                <input
-                                    name="name"
-                                    type="text"
-                                    placeholder="Jan Kowalski"
-                                    required
-                                    className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
-                                />
-                            </div>
+                    <div className="space-y-1.5">
+                        <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Imię</label>
+                        <div className="relative group">
+                            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
+                            <input
+                                name="name"
+                                type="text"
+                                placeholder="Jan Kowalski"
+                                required
+                                className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                            />
                         </div>
                     </div>
                 )}
@@ -128,9 +128,10 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     </div>
                 )}
 
+                {/* Sekcja Turnstile - odkomentuj gdy dodasz paczkę i klucze */}
                 {/* {!isLogin && (
-                    <div className="w-full h-10 bg-zinc-900/50 rounded flex items-center justify-center text-[10px] text-zinc-600 border border-dashed border-zinc-800">
-                        Cloudflare Turnstile Widget
+                    <div className="flex justify-center">
+                         <Turnstile siteKey="..." />
                     </div>
                 )} */}
 
@@ -180,7 +181,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     <div className="w-full border-t border-zinc-800"></div>
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-                    <span className="px-4 bg-zinc-900 text-zinc-500">lub kontynuuj z</span>
+                    <span className="px-4 bg-zinc-950 text-zinc-500">lub kontynuuj z</span>
                 </div>
             </div>
 
