@@ -1,11 +1,20 @@
-import NextAuth from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
-import { users } from "@/db/schema"; // potrzebne do szukania usera
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
+
+// Rozszerzenie typu Session o pole role
+declare module "next-auth" {
+    interface Session {
+        user: {
+            role: string;
+        } & DefaultSession["user"];
+    }
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: DrizzleAdapter(db),
@@ -24,24 +33,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 const email = credentials.email as string;
                 const password = credentials.password as string;
 
-                // 1. Pobierz usera z bazy
                 const user = await db.query.users.findFirst({
-                    where: eq(users.email, email)
+                    where: eq(users.email, email),
                 });
 
-                // 2. Jeśli nie ma usera lub nie ma hasła (bo np. logował się Googlem)
                 if (!user || !user.password) {
                     throw new Error("Nie znaleziono użytkownika lub złe hasło");
                 }
 
-                // 3. Sprawdź hasło (porównaj zaszyfrowane)
                 const passwordsMatch = await bcrypt.compare(password, user.password);
 
                 if (!passwordsMatch) {
                     throw new Error("Nieprawidłowe hasło");
                 }
 
-                // 4. Zwróć usera (sukces)
                 return user;
             },
         }),
@@ -50,12 +55,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         strategy: "jwt",
     },
     pages: {
-        signIn: "/login", // nasza własna strona logowania
+        signIn: "/login",
     },
     callbacks: {
+        async jwt({ token }) {
+            if (!token.sub) return token;
+
+            // Pobieramy rolę z bazy przy każdym odświeżeniu tokena
+            const existingUser = await db.query.users.findFirst({
+                where: eq(users.id, token.sub),
+            });
+
+            if (existingUser) {
+                token.role = existingUser.role;
+            }
+
+            return token;
+        },
         session({ session, token }) {
             if (token.sub && session.user) {
                 session.user.id = token.sub;
+                session.user.role = token.role as string;
             }
             return session;
         },

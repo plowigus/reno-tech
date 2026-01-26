@@ -9,7 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
-// --- SEKCJA 1: AUTH.JS (Standard) ---
+// --- SECTION 1: AUTH.JS (Standard) ---
 
 export const users = pgTable("user", {
     id: text("id")
@@ -75,7 +75,7 @@ export const verificationTokens = pgTable(
     ]
 );
 
-// --- SEKCJA 2: SKLEP ---
+// --- SECTION 2: SHOP ---
 
 export const products = pgTable("product", {
     id: text("id")
@@ -120,4 +120,21 @@ export const orderItems = pgTable("order_item", {
         .references(() => products.id),
     quantity: integer("quantity").notNull(),
     priceAtPurchase: decimal("price_at_purchase", { precision: 10, scale: 2 }).notNull(),
+});
+
+// --- SECTION 3: BLOG ---
+
+export const posts = pgTable("post", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    title: text("title").notNull(),
+    slug: text("slug").unique().notNull(),
+    content: text("content").notNull(),
+    excerpt: text("excerpt"),
+    coverImage: text("cover_image"),
+    published: boolean("published").default(false).notNull(),
+    authorId: text("authorId").references(() => users.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
