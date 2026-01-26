@@ -1,12 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { loginUser, loginWithGoogle, AuthState } from "@/app/actions/auth-actions"; //
-import { registerUser } from "@/app/actions/register"; //
+import { loginUser, loginWithGoogle, AuthState } from "@/app/actions/auth-actions";
+import { registerUser } from "@/app/actions/register";
 import { Loader2, Mail, Lock, User, Eye, EyeOff, Chrome, AlertCircle, CheckCircle2 } from "lucide-react";
 import { InteractiveLogo } from "@/components/Animation/InteractiveLogo";
 
-// 1. Definiujemy propsy
 interface AuthFormProps {
     initialTab?: "login" | "register";
 }
@@ -16,10 +15,8 @@ const initialState: AuthState = {
     success: "",
 };
 
-// 2. Odbieramy initialTab i ustawiamy jako domyślny stan
 export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
     const [mode, setMode] = useState<"login" | "register">(initialTab);
-
     const [loginState, loginAction, isLoginPending] = useActionState(loginUser, initialState);
     const [registerState, registerAction, isRegisterPending] = useActionState(registerUser, initialState);
 
@@ -34,21 +31,15 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
     };
 
     return (
-        <div className="w-full max-w-md p-6">
-            {/* Logo Section */}
-            <div className="flex justify-center mb-8">
-                <div className="scale-75 origin-center">
-                    <InteractiveLogo />
-                </div>
-            </div>
+        // ZMIANA: Usunięto h-[700px], dodano style karty (bg, border, shadow)
+        <div className="w-full bg-transparent backdrop-blur-xl border border-zinc-800/50 rounded-2xl shadow-2xl overflow-hidden p-6 sm:p-8">
 
-            {/* Header Text - AuthForm sam dba o nagłówki */}
-            <div className="text-center mb-10">
-                <h1 className="text-3xl font-bold text-white mb-2">
+            <div className="text-center mb-8">
+                <h1 className="text-2xl font-bold text-white mb-2">
                     {isLogin ? "Witaj z powrotem" : "Stwórz konto"}
                 </h1>
-                <p className="text-zinc-400">
-                    {isLogin ? "Zaloguj się, aby zarządzać zamówieniami" : "Dołącz do Reno Tech w kilka sekund"}
+                <p className="text-zinc-400 text-sm">
+                    {isLogin ? "Zaloguj się, aby kontynuować" : "Dołącz do Reno Tech w kilka sekund"}
                 </p>
             </div>
 
@@ -65,87 +56,90 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                         }
                     }
                 }}
-                className="space-y-5"
+                className="space-y-4"
             >
                 {!isLogin && (
-                    <div className="space-y-2">
-                        <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Imię</label>
-                        <div className="relative group">
-                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
-                            <input
-                                name="name"
-                                type="text"
-                                placeholder="Jan Kowalski"
-                                required
-                                className="w-full bg-zinc-900/80 border border-zinc-800 text-white rounded-xl py-3.5 pl-12 pr-4 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
-                            />
+                    <div className="grid grid-cols-1 gap-4">
+                        {/* Zmieniłem na 1 kolumnę dla lepszej czytelności na mobile, ale można wrócić do sm:grid-cols-2 */}
+                        <div className="space-y-1.5">
+                            <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Imię</label>
+                            <div className="relative group">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
+                                <input
+                                    name="name"
+                                    type="text"
+                                    placeholder="Jan Kowalski"
+                                    required
+                                    className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                />
+                            </div>
                         </div>
                     </div>
                 )}
 
-                <div className="space-y-2">
-                    <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Email</label>
+                <div className="space-y-1.5">
+                    <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Email</label>
                     <div className="relative group">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
                         <input
                             name="email"
                             type="email"
                             placeholder="twoj@email.com"
                             required
-                            className="w-full bg-zinc-900/80 border border-zinc-800 text-white rounded-xl py-3.5 pl-12 pr-4 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                            className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                         />
                     </div>
                 </div>
 
-                <div className="space-y-2">
-                    <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Hasło</label>
+                <div className="space-y-1.5">
+                    <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Hasło</label>
                     <div className="relative group">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
                         <input
                             name="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             required
-                            className="w-full bg-zinc-900/80 border border-zinc-800 text-white rounded-xl py-3.5 pl-12 pr-12 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                            className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-9 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
                         >
-                            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                     </div>
                 </div>
 
                 {!isLogin && (
-                    <div className="space-y-2">
-                        <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">Powtórz hasło</label>
+                    <div className="space-y-1.5">
+                        <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Powtórz hasło</label>
                         <div className="relative group">
-                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
+                            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
                             <input
                                 name="confirmPassword"
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
                                 required
-                                className="w-full bg-zinc-900/80 border border-zinc-800 text-white rounded-xl py-3.5 pl-12 pr-4 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
                 )}
 
-                {!isLogin && (
-                    <div className="w-full h-12 bg-zinc-900/50 rounded flex items-center justify-center text-xs text-zinc-600 border border-dashed border-zinc-800">
+                {/* {!isLogin && (
+                    <div className="w-full h-10 bg-zinc-900/50 rounded flex items-center justify-center text-[10px] text-zinc-600 border border-dashed border-zinc-800">
                         Cloudflare Turnstile Widget
                     </div>
-                )}
+                )} */}
 
                 {isLogin && (
-                    <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center justify-between text-xs">
                         <label className="flex items-center cursor-pointer group">
                             <input
                                 type="checkbox"
-                                className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-red-600 focus:ring-red-600 focus:ring-offset-0 cursor-pointer"
+                                className="w-3.5 h-3.5 rounded border-zinc-700 bg-zinc-900 text-red-600 focus:ring-red-600 focus:ring-offset-0 cursor-pointer"
                             />
                             <span className="ml-2 text-zinc-400 group-hover:text-zinc-300 transition-colors">Zapamiętaj mnie</span>
                         </label>
@@ -156,15 +150,15 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                 )}
 
                 {(passwordError || loginState?.error || registerState?.error) && (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm animate-in fade-in slide-in-from-top-1">
-                        <AlertCircle size={16} />
+                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs animate-in fade-in slide-in-from-top-1">
+                        <AlertCircle size={14} />
                         <p>{passwordError || loginState?.error || registerState?.error}</p>
                     </div>
                 )}
 
                 {(loginState?.success || registerState?.success) && (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-sm animate-in fade-in slide-in-from-top-1">
-                        <CheckCircle2 size={16} />
+                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-green-500/10 border border-green-500/20 text-green-500 text-xs animate-in fade-in slide-in-from-top-1">
+                        <CheckCircle2 size={14} />
                         <p>{loginState?.success || registerState?.success}</p>
                     </div>
                 )}
@@ -172,36 +166,36 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                 <button
                     type="submit"
                     disabled={isLogin ? isLoginPending : isRegisterPending}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl py-4 transition-all duration-200 shadow-lg shadow-red-600/20 hover:shadow-red-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl py-3.5 text-sm transition-all duration-200 shadow-lg shadow-red-600/20 hover:shadow-red-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {isLogin
-                        ? (isLoginPending ? <Loader2 className="animate-spin" /> : "Zaloguj się")
-                        : (isRegisterPending ? <Loader2 className="animate-spin" /> : "Zarejestruj się")
+                        ? (isLoginPending ? <Loader2 className="animate-spin w-5 h-5" /> : "Zaloguj się")
+                        : (isRegisterPending ? <Loader2 className="animate-spin w-5 h-5" /> : "Zarejestruj się")
                     }
                 </button>
             </form>
 
-            <div className="relative my-8">
+            <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-zinc-800"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase tracking-wider">
-                    <span className="px-4 bg-black text-zinc-500">lub kontynuuj z</span>
+                <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
+                    <span className="px-4 bg-zinc-900 text-zinc-500">lub kontynuuj z</span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-3">
                 <button
                     type="button"
                     onClick={() => loginWithGoogle()}
-                    className="flex items-center justify-center gap-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-white rounded-xl py-3 transition-all group"
+                    className="flex items-center justify-center gap-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-white rounded-xl py-2.5 text-sm transition-all group"
                 >
-                    <Chrome className="w-5 h-5 text-zinc-400 group-hover:text-white transition-colors" />
+                    <Chrome className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
                     <span>Google</span>
                 </button>
             </div>
 
-            <p className="mt-8 text-center text-zinc-400">
+            <p className="mt-6 text-center text-zinc-400 text-sm">
                 {isLogin ? "Nie masz konta?" : "Masz już konto?"}{" "}
                 <button
                     onClick={toggleMode}
