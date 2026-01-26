@@ -25,29 +25,15 @@ export default async function DashboardPage() {
     }
 
     return (
-        <main className="min-h-screen bg-black text-white pt-32 px-4 pb-20">
-            <div className="max-w-4xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-3xl font-bold">Ustawienia konta</h1>
-
-                    {/* Przycisk Wylogowania (Server Action) */}
-                    <form
-                        action={async () => {
-                            "use server";
-                            await signOut({ redirectTo: "/" });
-                        }}
-                    >
-                        <button
-                            type="submit"
-                            className="bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-lg font-medium transition-colors border border-zinc-800"
-                        >
-                            Wyloguj się
-                        </button>
-                    </form>
+        <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold">Edytuj Profil</h1>
+                    <p className="text-zinc-400 mt-1">Zarządzaj swoimi danymi osobowymi i adresem dostawy.</p>
                 </div>
-
-                <SettingsForm user={userData} />
             </div>
-        </main>
+
+            <SettingsForm user={userData} />
+        </div>
     );
 }
