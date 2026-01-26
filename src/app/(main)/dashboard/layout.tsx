@@ -9,7 +9,7 @@ export default function DashboardLayout({
         <div className="min-h-screen bg-black pt-32 pb-12 px-4">
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
                 {/* Sidebar */}
-                <aside className="hidden lg:block w-64 flex-shrink-0">
+                <aside className="hidden lg:block w-64 shrink-0">
                     <DashboardNav />
                 </aside>
 

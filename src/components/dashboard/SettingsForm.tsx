@@ -23,7 +23,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
         <form action={action} className="space-y-8">
             {/* Sekcja Avatara */}
             <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-                <h2 className="text-xl font-semibold mb-6">Zdjęcie profilowe</h2>
+                <h2 className="text-xl text-white font-semibold mb-6">Zdjęcie profilowe</h2>
                 <div className="flex items-center gap-8">
                     <div className="relative group">
                         <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-zinc-700 bg-zinc-800 relative">
@@ -72,7 +72,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
 
             {/* Dane osobowe */}
             <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-                <h2 className="text-xl font-semibold mb-6">Dane osobowe</h2>
+                <h2 className="text-xl text-white font-semibold mb-6">Dane osobowe</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -107,7 +107,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
 
             {/* Adres */}
             <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-                <h2 className="text-xl font-semibold mb-6">Adres dostawy</h2>
+                <h2 className="text-xl text-white font-semibold mb-6">Adres dostawy</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2 space-y-2">

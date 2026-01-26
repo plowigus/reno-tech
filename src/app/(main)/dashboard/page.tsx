@@ -28,7 +28,7 @@ export default async function DashboardPage() {
         <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold">Edytuj Profil</h1>
+                    <h1 className="text-3xl text-white font-bold">Edytuj Profil</h1>
                     <p className="text-zinc-400 mt-1">Zarządzaj swoimi danymi osobowymi i adresem dostawy.</p>
                 </div>
             </div>
