@@ -5,6 +5,8 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+// ZMIANA IMPORTU: Bierzemy typ z auth-actions
+import { AuthState } from "@/app/actions/auth-actions";
 
 const RegisterSchema = z.object({
     email: z.string().email(),
@@ -12,8 +14,8 @@ const RegisterSchema = z.object({
     name: z.string().min(2, "Imię jest wymagane"),
 });
 
-export async function registerUser(formData: FormData) {
-    // 1. Walidacja danych
+export async function registerUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    // ... (reszta kodu bez zmian)
     const rawData = Object.fromEntries(formData.entries());
     const validated = RegisterSchema.safeParse(rawData);
 
@@ -23,24 +25,26 @@ export async function registerUser(formData: FormData) {
 
     const { email, password, name } = validated.data;
 
-    // 2. Sprawdź czy użytkownik już istnieje
-    const existingUser = await db.query.users.findFirst({
-        where: eq(users.email, email),
-    });
+    try {
+        const existingUser = await db.query.users.findFirst({
+            where: eq(users.email, email),
+        });
 
-    if (existingUser) {
-        return { error: "Taki użytkownik już istnieje!" };
+        if (existingUser) {
+            return { error: "Taki użytkownik już istnieje!" };
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await db.insert(users).values({
+            email,
+            name,
+            password: hashedPassword,
+        });
+
+        return { success: "Konto utworzone! Możesz się zalogować." };
+    } catch (err) {
+        console.error(err);
+        return { error: "Wystąpił błąd serwera." };
     }
-
-    // 3. Zaszyfruj hasło
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 4. Zapisz w bazie
-    await db.insert(users).values({
-        email,
-        name,
-        password: hashedPassword,
-    });
-
-    return { success: "Konto utworzone! Możesz się zalogować." };
 }
