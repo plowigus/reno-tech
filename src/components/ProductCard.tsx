@@ -22,7 +22,7 @@ export function ProductCard({ product }: ProductCardProps) {
             href={`/shop/${product.category}/${product.slug}`}
             className="group relative block bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-red-500/50 transition-colors duration-300"
         >
-            <div className="aspect-[4/5] w-full bg-black/50 relative flex items-center justify-center overflow-hidden">
+            <div className="aspect-4/5 w-full bg-black/50 relative flex items-center justify-center overflow-hidden">
                 {/* Image */}
                 <Image
                     src={product.image}
@@ -31,7 +31,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60" />
 
                 <div className="absolute bottom-4 right-4 bg-red-600 p-3 rounded-full translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     <ShoppingBag size={20} className="text-white" />

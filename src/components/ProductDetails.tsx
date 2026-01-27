@@ -38,7 +38,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 key={idx}
                                 onClick={() => setSelectedImage(img)}
                                 className={cn(
-                                    "relative aspect-[3/4] w-20 lg:w-full rounded-lg overflow-hidden border transition-all duration-300 shrink-0",
+                                    "relative aspect-3/4 w-20 lg:w-full rounded-lg overflow-hidden border transition-all duration-300 shrink-0",
                                     selectedImage === img
                                         ? "border-red-600 opacity-100 ring-2 ring-red-600/30"
                                         : "border-white/10 opacity-50 hover:opacity-100 hover:border-white/30"
@@ -66,7 +66,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                         priority
                         sizes="(max-width: 1024px) 100vw, 50vw"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-linear-to-tr from-black/20 to-transparent pointer-events-none" />
                 </div>
             </div>
 

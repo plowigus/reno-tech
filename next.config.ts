@@ -5,35 +5,35 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "images.unsplash.com",
+        hostname: "utfs.io", // UploadThing
       },
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-      },
-      {
-        protocol: "https",
-        hostname: "utfs.io",
+        hostname: "img.clerk.com", // Opcjonalnie, jeśli kiedyś wrócisz do Clerk
       },
     ],
   },
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: "/(.*)",
         headers: [
           {
-            key: 'Content-Security-Policy',
+            key: "Content-Security-Policy",
             value: `
               default-src 'self';
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com;
+              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
               style-src 'self' 'unsafe-inline';
-              img-src 'self' blob: data: https://utfs.io https://images.unsplash.com https://lh3.googleusercontent.com;
+              img-src 'self' blob: data: https://utfs.io https://vercel.live;
               font-src 'self';
-              frame-src https://challenges.cloudflare.com;
-              connect-src 'self' https://utfs.io;
-            `.replace(/\s{2,}/g, ' ').trim()
-          }
+              object-src 'none';
+              base-uri 'self';
+              form-action 'self';
+              frame-ancestors 'none';
+              connect-src 'self' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
+              upgrade-insecure-requests;
+            `.replace(/\s{2,}/g, " ").trim(),
+          },
         ],
       },
     ];
