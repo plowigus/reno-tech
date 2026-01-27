@@ -33,9 +33,6 @@ export default async function CheckoutPage() {
     return (
         <main className="min-h-screen pt-32 pb-20 px-4">
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-4xl md:text-5xl font-black text-white mb-10 tracking-tight">
-                    Kasa
-                </h1>
                 <CheckoutForm user={user} initialCart={cart || null} />
             </div>
         </main>

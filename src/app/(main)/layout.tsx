@@ -10,7 +10,7 @@ export default function MainLayout({
     return (
         <>
             <Navbar />
-            <main className="min-h-screen relative">
+            <main className="min-h-screen bg-black relative">
                 {children}
             </main>
             <Footer />
