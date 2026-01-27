@@ -3,7 +3,7 @@ import { products } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, Package } from "lucide-react";
+import { Plus, Package, Pencil } from "lucide-react";
 
 export default async function ProductsPage() {
     const allProducts = await db
@@ -94,9 +94,12 @@ export default async function ProductsPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <button className="text-zinc-500 hover:text-white transition-colors">
-                                                Edytuj
-                                            </button>
+                                            <Link
+                                                href={`/dashboard/admin/products/${product.id}/edit`}
+                                                className="inline-flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                                            >
+                                                <Pencil size={18} />
+                                            </Link>
                                         </td>
                                     </tr>
                                 ))}
