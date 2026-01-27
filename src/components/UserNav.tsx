@@ -35,25 +35,27 @@ export default function UserNav({ user }: UserNavProps) {
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-2 focus:outline-none"
             >
-                <div className={`relative w-8 h-8 rounded-full overflow-hidden border border-white/20 ${user.role === "admin" ? "ring-2 ring-yellow-500 ring-offset-2 ring-offset-black" : ""}`}>
-                    {user.image ? (
-                        <Image
-                            src={user.image}
-                            alt={user.name || "Avatar użytkownika"}
-                            fill
-                            className="object-cover"
-                        />
-                    ) : (
-                        <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-white">
-                            <span className="text-sm font-bold">
-                                {user.name?.charAt(0) || "U"}
-                            </span>
-                        </div>
-                    )}
+                <div className="relative">
+                    <div className="w-9 h-9 rounded-full overflow-hidden border border-zinc-700 bg-zinc-800">
+                        {user.image ? (
+                            <Image
+                                src={user.image}
+                                alt={user.name || "Avatar użytkownika"}
+                                fill
+                                className="object-cover rounded-full"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-zinc-500">
+                                <span className="text-sm font-bold">
+                                    {user.name?.charAt(0) || "U"}
+                                </span>
+                            </div>
+                        )}
+                    </div>
 
                     {user.role === "admin" && (
-                        <div className="absolute -bottom-1 z-20 -right-1 bg-yellow-500 text-black rounded-full p-[2px] border-2 border-zinc-900 flex items-center justify-center ">
-                            <Crown size={10} strokeWidth={3} />
+                        <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-zinc-900 text-yellow-500 rounded-full p-0.5 border border-zinc-800 shadow-sm z-10">
+                            <Crown size={10} className="fill-yellow-500/10" strokeWidth={2.5} />
                         </div>
                     )}
                 </div>
