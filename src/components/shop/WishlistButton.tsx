@@ -1,65 +1,89 @@
+"use client";
+
+import { useState, useOptimistic, useTransition } from "react";
+import { Heart } from "lucide-react";
+import { toggleWishlist } from "@/app/actions/wishlist-actions";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useWishlistStore } from "@/store/use-wishlist-store";
 
-// ... inside component ...
-const { increment, decrement } = useWishlistStore(); // Simplified destructuring if allowed or state selector
+interface WishlistButtonProps {
+    productId: string;
+    initialIsWishlisted: boolean;
+    className?: string;
+}
 
-// ... or ...
-const increment = useWishlistStore((state) => state.increment);
-const decrement = useWishlistStore((state) => state.decrement);
+export function WishlistButton({
+    productId,
+    initialIsWishlisted,
+    className,
+}: WishlistButtonProps) {
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const [optimisticIsWishlisted, toggleOptimisticWishlist] = useOptimistic(
+        initialIsWishlisted,
+        (state, newState: boolean) => newState
+    );
 
-const handleToggle = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    // We can't easily destructure store selectors like { increment } = useWishlistStore() because it returns the state directly if no selector
+    // So distinct selectors are safer:
+    const increment = useWishlistStore((state) => state.increment);
+    const decrement = useWishlistStore((state) => state.decrement);
 
-    const willBeWishlisted = !optimisticIsWishlisted;
+    const handleToggle = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
 
-    startTransition(async () => {
-        toggleOptimisticWishlist(willBeWishlisted);
+        const willBeWishlisted = !optimisticIsWishlisted;
 
-        // Update global store instantly
-        if (willBeWishlisted) {
-            increment();
-        } else {
-            decrement();
-        }
+        startTransition(async () => {
+            toggleOptimisticWishlist(willBeWishlisted);
 
-        const result = await toggleWishlist(productId);
+            // Update global store instantly
+            if (willBeWishlisted) {
+                increment();
+            } else {
+                decrement();
+            }
 
-        if (result.requiresAuth) {
-            // Revert if auth required (since we redirected)
-            if (willBeWishlisted) decrement(); else increment();
+            const result = await toggleWishlist(productId);
 
-            router.push("/login");
-            return;
-        }
+            if (result.requiresAuth) {
+                // Revert if auth required (since we redirected)
+                if (willBeWishlisted) decrement(); else increment();
 
-        if (!result.success) {
-            // Revert on failure
-            if (willBeWishlisted) decrement(); else increment();
-            toast.error("Wystąpił błąd");
-        }
-    });
-};
+                router.push("/login");
+                return;
+            }
 
-return (
-    <button
-        onClick={handleToggle}
-        className={cn(
-            "group/btn transition-all duration-300 hover:scale-110 active:scale-95",
-            className
-        )}
-        disabled={isPending}
-        aria-label={optimisticIsWishlisted ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-    >
-        <Heart
-            size={22}
+            if (!result.success) {
+                // Revert on failure
+                if (willBeWishlisted) decrement(); else increment();
+                toast.error("Wystąpił błąd");
+            }
+        });
+    };
+
+    return (
+        <button
+            onClick={handleToggle}
             className={cn(
-                "transition-colors duration-300",
-                optimisticIsWishlisted
-                    ? "fill-red-600 text-red-600"
-                    : "text-white group-hover/btn:text-red-500"
+                "group/btn transition-all duration-300 hover:scale-110 active:scale-95",
+                className
             )}
-        />
-    </button>
-);
+            disabled={isPending}
+            aria-label={optimisticIsWishlisted ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+        >
+            <Heart
+                size={22}
+                className={cn(
+                    "transition-colors duration-300",
+                    optimisticIsWishlisted
+                        ? "fill-red-600 text-red-600"
+                        : "text-white group-hover/btn:text-red-500"
+                )}
+            />
+        </button>
+    );
 }
