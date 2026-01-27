@@ -14,7 +14,7 @@ export const productSchema = z.object({
     images: z.array(z.string()).min(1, {
         message: "Przynajmniej jedno zdjęcie jest wymagane.",
     }),
-    sizes: z.array(z.string()).default([]),
+    sizes: z.array(z.string()).optional().default([]),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;

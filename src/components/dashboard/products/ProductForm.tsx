@@ -1,20 +1,47 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema, ProductFormValues } from "@/lib/validators/product-schema";
 import { createProduct } from "@/app/actions/product-actions";
-import { UploadDropzone } from "@/lib/uploadthing";
+import { useUploadThing } from "@/lib/uploadthing";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Loader2, X, Plus, DollarSign, Layers, AlignLeft } from "lucide-react";
+import { Loader2, X, Plus, DollarSign, Layers, AlignLeft, UploadCloud, Check } from "lucide-react";
 import { clsx } from "clsx";
+import { useDropzone } from "@uploadthing/react";
 
 export function ProductForm() {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const [error, setError] = useState<string | undefined>("");
+
+    // Custom upload hook
+    const { startUpload, isUploading } = useUploadThing("productImages", {
+        onClientUploadComplete: (res) => {
+            if (res && res.length > 0) {
+                const newImages = res.map((r) => r.url);
+                form.setValue("images", [...images, ...newImages]);
+            }
+        },
+        onUploadError: (e) => {
+            setError(`Upload failed: ${e.message}`);
+        },
+    });
+
+    const onDrop = useCallback((acceptedFiles: File[]) => {
+        if (acceptedFiles.length > 0) {
+            startUpload(acceptedFiles);
+        }
+    }, [startUpload]);
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: { 'image/*': [] },
+        multiple: true,
+        disabled: isUploading
+    });
 
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema) as any,
@@ -34,7 +61,12 @@ export function ProductForm() {
         "Programatory",
         "Akcesoria",
         "Usługi",
+        "Odzież", // Added 'Odzież' as requested
     ];
+
+    const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
+    const currentCategory = form.watch("category");
+    const currentSizes = form.watch("sizes") || [];
 
     function onSubmit(data: ProductFormValues) {
         setError("");
@@ -50,6 +82,13 @@ export function ProductForm() {
 
     // use watch to get reactive updates
     const images = form.watch("images") || [];
+
+    const handleSizeToggle = (size: string) => {
+        const newSizes = currentSizes.includes(size)
+            ? currentSizes.filter((s) => s !== size)
+            : [...currentSizes, size];
+        form.setValue("sizes", newSizes);
+    };
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -129,23 +168,38 @@ export function ProductForm() {
                                 </div>
                             )}
 
+                            {/* Custom Upload Area */}
                             {images.length < 4 && (
-                                <UploadDropzone
-                                    endpoint="productImages"
-                                    onClientUploadComplete={(res: { url: string }[]) => {
-                                        if (res && res.length > 0) {
-                                            const newImages = res.map((r) => r.url);
-                                            // Append new images to existing ones (up to logic handled by user/max files, but UI hides dropzone if fully matched)
-                                            // Better safety: spread the new URLs
-                                            form.setValue("images", [...images, ...newImages]);
-                                        }
-                                    }}
-                                    onUploadError={(error: Error) => {
-                                        alert(`ERROR! ${error.message}`);
-                                    }}
-                                    className="ut-label:text-zinc-400 ut-allowed-content:text-zinc-500 border-zinc-700 bg-zinc-800/20 hover:bg-zinc-800/40 transition-colors"
-                                />
+                                <div
+                                    {...getRootProps()}
+                                    className={clsx(
+                                        "border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer flex flex-col items-center justify-center gap-2",
+                                        isDragActive ? "border-red-600 bg-red-600/5" : "border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/50",
+                                        isUploading && "opacity-50 cursor-not-allowed"
+                                    )}
+                                >
+                                    <input {...getInputProps()} />
+                                    {isUploading ? (
+                                        <div className="flex flex-col items-center gap-2 text-zinc-400">
+                                            <Loader2 className="animate-spin text-red-600" size={32} />
+                                            <span className="text-sm">Przesyłanie zdjęć...</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-2 text-zinc-400">
+                                            <div className="p-3 bg-zinc-800 rounded-full mb-1">
+                                                <UploadCloud size={24} className="text-zinc-300" />
+                                            </div>
+                                            <p className="text-sm font-medium text-zinc-300">
+                                                Kliknij lub upuść zdjęcia tutaj
+                                            </p>
+                                            <p className="text-xs text-zinc-500">
+                                                Maksymalnie 4 zdjęcia (4MB każde)
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             )}
+
                             {form.formState.errors.images && (
                                 <p className="text-sm text-red-500">
                                     {form.formState.errors.images.message}
@@ -165,9 +219,10 @@ export function ProductForm() {
                                 <input
                                     type="number"
                                     step="0.01"
+                                    onWheel={(e) => e.currentTarget.blur()}
                                     // Zod coercion handles number conversion
                                     {...form.register("price")}
-                                    className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all"
+                                    className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                                 {form.formState.errors.price && (
                                     <p className="text-sm text-red-500">
@@ -223,6 +278,36 @@ export function ProductForm() {
                                     </p>
                                 )}
                             </div>
+
+                            {/* Conditional Sizes */}
+                            {currentCategory === "Odzież" && (
+                                <div className="space-y-2 pt-2 border-t border-zinc-800/50">
+                                    <label className="text-sm font-medium text-zinc-300">
+                                        Dostępne rozmiary
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {availableSizes.map((size) => {
+                                            const isSelected = currentSizes.includes(size);
+                                            return (
+                                                <button
+                                                    key={size}
+                                                    type="button"
+                                                    onClick={() => handleSizeToggle(size)}
+                                                    className={clsx(
+                                                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
+                                                        isSelected
+                                                            ? "bg-red-600 text-white border-red-600"
+                                                            : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+                                                    )}
+                                                >
+                                                    {size}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
                         </div>
 
                         {/* Error Message */}
@@ -235,13 +320,13 @@ export function ProductForm() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isPending}
+                            disabled={isPending || isUploading}
                             className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isPending ? (
+                            {isPending || isUploading ? (
                                 <>
                                     <Loader2 className="animate-spin" size={20} />
-                                    Dodawanie...
+                                    {isUploading ? "Wysyłanie..." : "Dodawanie..."}
                                 </>
                             ) : (
                                 <>
