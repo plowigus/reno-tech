@@ -82,16 +82,20 @@ export async function createOrder(data: CheckoutFormValues) {
                 currency: "PLN",
                 description: `Zamówienie ${newOrder.id}`,
                 email: customerEmail,
-                urlReturn: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`, // define this later
-                urlStatus: `${process.env.NEXT_PUBLIC_APP_URL}/api/p24/status`, // define this later
+                urlReturn: `${process.env.NEXT_PUBLIC_APP_URL}/order-success`,
+                urlStatus: `${process.env.NEXT_PUBLIC_APP_URL}/api/p24/status`,
             });
 
             if (p24Result.error || !p24Result.redirectUrl) {
-                // If P24 fails, we might want to rollback or keep order as 'failed'? 
-                // Currently inside transaction, throwing error rolls back.
-                // But mock implementation is robust. 
-                // Let's assume robustness.
                 throw new Error("P24 Registration Failed");
+            }
+
+            // --- SIMULATION MODE CHECK ---
+            if (p24Result.redirectUrl.includes("mock=true")) {
+                console.log("Detecting Simulation Mode - Mark order as PAID");
+                await tx.update(orders)
+                    .set({ status: "paid" })
+                    .where(eq(orders.id, newOrder.id));
             }
 
             return p24Result.redirectUrl;

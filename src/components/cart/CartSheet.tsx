@@ -3,6 +3,7 @@
 import { useCartStore } from "@/store/use-cart-store";
 import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { getCart, removeFromCart, updateItemQuantity } from "@/app/actions/cart-actions";
 import { toast } from "sonner";
@@ -194,9 +195,13 @@ export function CartSheet() {
                                 {total.toFixed(2)} PLN
                             </span>
                         </div>
-                        <button className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide">
+                        <Link
+                            href="/checkout"
+                            onClick={onClose}
+                            className="block w-full text-center bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
+                        >
                             Przejdź do kasy
-                        </button>
+                        </Link>
                     </div>
                 )}
             </div>
