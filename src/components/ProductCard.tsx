@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { WishlistButton } from "@/components/shop/WishlistButton";
 
 interface Product {
     id: string;
@@ -14,9 +14,10 @@ interface Product {
 
 interface ProductCardProps {
     product: Product;
+    isWishlisted?: boolean;
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, isWishlisted = false }: ProductCardProps) {
     return (
         <Link
             href={`/shop/${product.category}/${product.slug}`}
@@ -33,9 +34,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60" />
 
-                <AddToCartButton
+                <WishlistButton
                     productId={product.id}
-                    className="absolute bottom-4 right-4 bg-red-600 p-3 rounded-full translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-700"
+                    initialIsWishlisted={isWishlisted}
+                    className="absolute top-4 right-4 bg-black/40 p-2 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60"
                 />
             </div>
 

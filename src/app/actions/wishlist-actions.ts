@@ -44,3 +44,24 @@ export async function toggleWishlist(productId: string) {
         return { success: false, error: "Failed to update wishlist" };
     }
 }
+
+export async function getUserWishlistIds() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return [];
+        }
+
+        const data = await db.query.wishlists.findMany({
+            where: eq(wishlists.userId, session.user.id),
+            columns: {
+                productId: true,
+            },
+        });
+
+        return data.map((item) => item.productId);
+    } catch (error) {
+        console.error("Error fetching wishlist IDs:", error);
+        return [];
+    }
+}

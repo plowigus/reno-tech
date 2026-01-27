@@ -14,8 +14,11 @@ interface ShopPageProps {
   }>;
 }
 
+import { getUserWishlistIds } from "@/app/actions/wishlist-actions";
+
 async function ProductGrid({ search, category }: { search?: string, category?: string }) {
   const products = await getProducts({ search, category });
+  const wishlistIds = await getUserWishlistIds();
   const isFiltered = !!search || !!category;
 
   if (products.length === 0) {
@@ -47,7 +50,11 @@ async function ProductGrid({ search, category }: { search?: string, category?: s
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard
+          key={product.id}
+          product={product}
+          isWishlisted={wishlistIds.includes(product.id)}
+        />
       ))}
     </div>
   );
