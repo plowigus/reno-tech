@@ -106,7 +106,7 @@ export function ProductForm() {
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
                             {/* Name */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-300">
+                                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                                     Nazwa produktu
                                 </label>
                                 <input
@@ -124,7 +124,7 @@ export function ProductForm() {
                             {/* Description */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
-                                    <AlignLeft size={16} /> Opis
+                                    Opis
                                 </label>
                                 <textarea
                                     {...form.register("description")}
@@ -141,7 +141,7 @@ export function ProductForm() {
 
                         {/* Images */}
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
-                            <label className="text-sm font-medium text-zinc-300">Zdjęcia</label>
+                            <p className="text-sm font-medium text-zinc-300 flex items-center gap-1">Zdjęcia</p>
 
                             {images.length > 0 && (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -282,7 +282,7 @@ export function ProductForm() {
                             {/* Conditional Sizes */}
                             {currentCategory === "Odzież" && (
                                 <div className="space-y-2 pt-2 border-t border-zinc-800/50">
-                                    <label className="text-sm font-medium text-zinc-300">
+                                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                                         Dostępne rozmiary
                                     </label>
                                     <div className="flex flex-wrap gap-2">
