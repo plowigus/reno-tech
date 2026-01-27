@@ -23,11 +23,9 @@ export function TurnstileWidget({ onVerify, onError }: TurnstileWidgetProps) {
                         onVerify(token);
                     }}
                     onError={(error) => {
-
                         if (onError) onError();
                     }}
                     onExpire={() => {
-
                         if (onError) onError();
                     }}
                     theme="dark"
