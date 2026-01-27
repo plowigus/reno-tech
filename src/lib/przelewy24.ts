@@ -33,14 +33,14 @@ export async function registerP24Transaction(params: P24TransactionParams): Prom
         : "https://sandbox.przelewy24.pl";
 
     // For now, if ENV are missing, mock a successful response or a specific mock URL
-    if (!P24_MERCHANT_ID || !P24_CRC) {
+    if (!P24_MERCHANT_ID || !P24_CRC || P24_MERCHANT_ID === "12345") {
         console.warn("Przelewy24 ENV variables missing. Returning MOCK URL.");
         // Simulate a delay
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         return {
             token: "mock_token_" + params.sessionId,
-            redirectUrl: "/checkout/success?mock=true&session=" + params.sessionId, // Mock success page
+            redirectUrl: `/order-success?mock=true&session=${params.sessionId}`,
         };
     }
 

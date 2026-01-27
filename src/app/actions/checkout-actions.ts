@@ -59,6 +59,7 @@ export async function createOrder(data: CheckoutFormValues) {
                 status: "pending",
                 totalAmount: String(totalAmount), // check decimal handling
                 p24SessionId,
+                p24OrderId: 0, // Pending real ID, will be updated or kept 0 if mock
             }).returning();
 
             // Create Order Items
