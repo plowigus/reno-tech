@@ -177,7 +177,7 @@ export function Services() {
   return (
     <section
       ref={containerRef}
-      className="bg-black text-white min-h-screen flex items-start relative select-none pb-24 z-10"
+      className="bg-background text-foreground min-h-screen flex items-start relative select-none pb-24 z-10"
     >
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 px-4 w-full h-full pt-32 lg:pt-40">
         {/* Left: Why us */}
@@ -192,7 +192,7 @@ export function Services() {
                 <span className="text-red-500"> elektroniki</span> Renault
               </h3>
             </div>
-            <p className="text-gray-300 text-lg leading-relaxed">
+            <p className="text-muted-foreground text-lg leading-relaxed">
               Mobilnie lub stacjonarnie. Szybka diagnostyka, programowanie
               sterowników, multimedia, karty HF i doposażenie.
             </p>
@@ -202,7 +202,7 @@ export function Services() {
                   <div className="mt-1 p-1.5 bg-red-600/15 rounded-md">
                     <Check size={16} className="text-red-500" />
                   </div>
-                  <p className="text-gray-200 text-base md:text-lg leading-relaxed">
+                  <p className="text-foreground/80 text-base md:text-lg leading-relaxed">
                     {item}
                   </p>
                 </div>
@@ -235,7 +235,7 @@ export function Services() {
         </div>
       </div>
       {/* Background overlay to hide any ScrollTrigger pin seams */}
-      <div className="absolute inset-0 bg-black -z-50 pointer-events-none" />
+      <div className="absolute inset-0 bg-background -z-50 pointer-events-none" />
     </section>
   );
 }
@@ -252,7 +252,7 @@ function ServiceItem({
   isActive,
 }: ServiceItemProps) {
   return (
-    <div className="service-item-wrapper border-b border-red-600/15 last:border-0 backdrop-blur-md bg-black/40 rounded-3xl border border-red-600/10">
+    <div className="service-item-wrapper border-b border-red-600/15 last:border-0 backdrop-blur-md bg-background/40 rounded-3xl border border-red-600/10">
       <div className="flex gap-6 md:gap-10 items-center">
         {/* Number & Icon */}
         <div className="shrink-0 relative">
@@ -274,10 +274,10 @@ function ServiceItem({
 
         {/* Content */}
         <div className="flex-1 flex flex-col justify-center">
-          <h3 className="text-xl md:text-3xl font-black mb-4 text-white tracking-tight">
+          <h3 className="text-xl md:text-3xl font-black mb-4 text-foreground tracking-tight">
             {service.title}
           </h3>
-          <p className="text-base md:text-lg leading-relaxed text-gray-300">
+          <p className="text-base md:text-lg leading-relaxed text-muted-foreground">
             {service.description}
           </p>
         </div>

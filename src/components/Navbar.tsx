@@ -47,7 +47,7 @@ export default async function Navbar() {
   return (
     <header className="absolute top-0 left-0 right-0 z-50 px-4 py-4 transition-all duration-300">
       <WishlistCounterSync initialCount={wishlistCount} />
-      <div className="max-w-7xl mx-auto backdrop-blur-md bg-black/40 border border-white/10 rounded-2xl px-6 py-3 flex justify-between items-center shadow-lg shadow-black/20">
+      <div className="max-w-7xl mx-auto backdrop-blur-md bg-background/40 border border-border rounded-2xl px-6 py-3 flex justify-between items-center shadow-lg shadow-black/20">
         <Link href="/" className="px-4 py-2 cursor-pointer block">
           <Image src={Logo} alt="Logo firmy Renotech" />
         </Link>
@@ -56,7 +56,7 @@ export default async function Navbar() {
             <Link
               key={label}
               href={href}
-              className="group px-3 py-1 text-sm font-medium text-white tracking-wide transition-colors duration-150 hover:text-white cursor-pointer"
+              className="group px-3 py-1 text-sm font-medium text-foreground tracking-wide transition-colors duration-150 hover:text-foreground cursor-pointer"
             >
               <span className="relative z-50 inline-block">
                 {label}
@@ -64,13 +64,13 @@ export default async function Navbar() {
               </span>
             </Link>
           ))}
-          <div className="ml-4 pl-4 border-l border-white/20 flex items-center gap-4">
+          <div className="ml-4 pl-4 border-l border-border flex items-center gap-4">
             <WishlistButton />
             <CartTrigger count={cartCount} />
             <UserNav user={user} />
           </div>
         </nav>
-        <div className="border border-white px-4 py-2 md:hidden">Menu</div>
+        <div className="border border-border px-4 py-2 md:hidden">Menu</div>
       </div>
     </header>
   );

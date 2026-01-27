@@ -22,7 +22,7 @@ export default function UserNav({ user }: UserNavProps) {
         return (
             <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-medium text-white tracking-wide border border-red-600 rounded-md hover:bg-red-600/10 transition-colors duration-200"
+                className="px-4 py-2 text-sm font-medium text-foreground tracking-wide border border-red-600 rounded-md hover:bg-red-600/10 transition-colors duration-200"
             >
                 Zaloguj
             </Link>
@@ -36,7 +36,7 @@ export default function UserNav({ user }: UserNavProps) {
                 className="flex items-center gap-2 focus:outline-none"
             >
                 <div className="relative">
-                    <div className="w-9 h-9 rounded-full overflow-hidden border border-zinc-700 bg-zinc-800">
+                    <div className="w-9 h-9 rounded-full overflow-hidden border border-border bg-card">
                         {user.image ? (
                             <Image
                                 src={user.image}
@@ -45,7 +45,7 @@ export default function UserNav({ user }: UserNavProps) {
                                 className="object-cover rounded-full"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-zinc-500">
+                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
                                 <span className="text-sm font-bold">
                                     {user.name?.charAt(0) || "U"}
                                 </span>
@@ -54,7 +54,7 @@ export default function UserNav({ user }: UserNavProps) {
                     </div>
 
                     {user.role === "admin" && (
-                        <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-zinc-900 text-yellow-500 rounded-full p-0.5 border border-zinc-800 shadow-sm z-10">
+                        <div className="absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 bg-popover text-yellow-500 rounded-full p-0.5 border border-border shadow-sm z-10">
                             <Crown size={10} className="fill-yellow-500/10" strokeWidth={2.5} />
                         </div>
                     )}
@@ -67,19 +67,19 @@ export default function UserNav({ user }: UserNavProps) {
                         className="fixed inset-0 z-40"
                         onClick={() => setIsOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-zinc-900 border border-white/10 ring-1 ring-black ring-opacity-5 z-50 overflow-hidden">
-                        <div className="py-2 px-4 border-b border-white/5">
-                            <p className="text-sm font-medium text-white">
+                    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-popover border border-border ring-1 ring-black ring-opacity-5 z-50 overflow-hidden">
+                        <div className="py-2 px-4 border-b border-border">
+                            <p className="text-sm font-medium text-foreground">
                                 {user.name || "Użytkownik"}
                             </p>
-                            <p className="text-xs text-zinc-400 truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                                 {user.email || ""}
                             </p>
                         </div>
                         <div className="py-1">
                             <Link
                                 href="/dashboard"
-                                className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
                                 onClick={() => setIsOpen(false)}
                             >
                                 <UserIcon size={16} />

@@ -7,7 +7,7 @@ import { Facebook, Instagram, Phone, ChevronDown } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="min-h-screen relative bg-black text-white overflow-hidden">
+    <section className="min-h-screen relative bg-background text-foreground overflow-hidden">
 
       {/* 1. Tło 3D (Client) */}
       <HeroBackground />
@@ -32,23 +32,23 @@ export function Hero() {
       <footer className="absolute bottom-0 left-0 right-0 p-4 z-20">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center text-sm relative">
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center font-mono text-white text-base md:text-md tracking-wide">
+            <div className="hidden md:flex items-center font-mono text-foreground text-base md:text-md tracking-wide">
               <Clock />
             </div>
           </div>
 
-          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-gray-400">
-            <ChevronDown size={24} className="text-white/50 animate-bounce" />
+          <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground">
+            <ChevronDown size={24} className="text-foreground/50 animate-bounce" />
           </div>
 
           <div className="flex items-center gap-6 pointer-events-auto">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
               <Facebook size={20} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-600 transition-colors">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-red-600 transition-colors">
               <Instagram size={20} />
             </a>
-            <a href="tel:+48123456789" className="text-gray-400 hover:text-white transition-colors">
+            <a href="tel:+48123456789" className="text-muted-foreground hover:text-foreground transition-colors">
               <Phone size={20} />
             </a>
           </div>

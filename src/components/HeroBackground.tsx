@@ -5,7 +5,7 @@ import { memo } from "react";
 
 const FloatingLines = dynamic(() => import("./FloatingLines"), {
     ssr: false,
-    loading: () => <div className="absolute inset-0 bg-black" />,
+    loading: () => <div className="absolute inset-0 bg-background" />,
 });
 
 export const HeroBackground = memo(function HeroBackground() {
