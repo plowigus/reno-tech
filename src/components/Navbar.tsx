@@ -7,6 +7,7 @@ import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { CartTrigger } from "@/components/cart/CartTrigger";
+import { WishlistButton } from "@/components/nav/WishlistButton";
 
 const links = [
   { label: "O nas", href: "/#about" },
@@ -54,6 +55,7 @@ export default async function Navbar() {
             </Link>
           ))}
           <div className="ml-4 pl-4 border-l border-white/20 flex items-center gap-4">
+            <WishlistButton />
             <CartTrigger />
             <UserNav user={user} />
           </div>

@@ -65,3 +65,42 @@ export async function getUserWishlistIds() {
         return [];
     }
 }
+
+export async function getWishlistCount() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return 0;
+        }
+
+        const count = await db.query.wishlists.findMany({
+            where: eq(wishlists.userId, session.user.id),
+        });
+
+        return count.length;
+    } catch (error) {
+        console.error("Error fetching wishlist count:", error);
+        return 0;
+    }
+}
+
+export async function getWishlistItems() {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return [];
+        }
+
+        const items = await db.query.wishlists.findMany({
+            where: eq(wishlists.userId, session.user.id),
+            with: {
+                product: true,
+            },
+        });
+
+        return items.map((item) => item.product);
+    } catch (error) {
+        console.error("Error fetching wishlist items:", error);
+        return [];
+    }
+}
