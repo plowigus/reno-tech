@@ -66,18 +66,8 @@ export const AlertModal: React.FC<AlertModalProps> = ({
                     </p>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 w-full pt-4">
-                    <button
-                        disabled={loading}
-                        onClick={onClose}
-                        className={clsx(
-                            "px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-zinc-700",
-                            "text-zinc-300 hover:bg-zinc-800 hover:text-white",
-                            loading && "opacity-50 cursor-not-allowed"
-                        )}
-                    >
-                        Anuluj
-                    </button>
+                <div className="flex items-center justify-start gap-2 w-full pt-4">
+
                     <button
                         disabled={loading}
                         onClick={onConfirm}
@@ -89,6 +79,17 @@ export const AlertModal: React.FC<AlertModalProps> = ({
                     >
                         {loading && <Loader2 size={16} className="animate-spin" />}
                         Kontynuuj
+                    </button>
+                    <button
+                        disabled={loading}
+                        onClick={onClose}
+                        className={clsx(
+                            "px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-zinc-700",
+                            "text-zinc-300 hover:bg-zinc-800 hover:text-white",
+                            loading && "opacity-50 cursor-not-allowed"
+                        )}
+                    >
+                        Anuluj
                     </button>
                 </div>
             </div>
