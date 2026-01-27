@@ -1,11 +1,10 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
-import { X, Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { useCartStore } from "@/store/use-cart-store";
+import { X, Minus, Plus, ShoppingBag } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState, useOptimistic, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { getCart, removeFromCart, updateItemQuantity } from "@/app/actions/cart-actions";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface CartItem {
@@ -27,7 +26,7 @@ interface CartData {
 }
 
 export function CartSheet() {
-    const { isOpen, closeCart, refreshCart } = useCart();
+    const { isOpen, onClose } = useCartStore();
     const [cart, setCart] = useState<CartData | null>(null);
     const [isPending, startTransition] = useTransition();
 
@@ -38,16 +37,20 @@ export function CartSheet() {
         }
     }, [isOpen]);
 
-    const calculateTotal = (items: CartItem[]) => {
+    const calculateSubtotal = (items: CartItem[]) => {
         return items.reduce((total, item) => {
             return total + Number(item.product.price) * item.quantity;
         }, 0);
     };
 
+    const shippingCost = 9.99;
+    const subtotal = cart?.items ? calculateSubtotal(cart.items) : 0;
+    const total = subtotal + shippingCost;
+
     const handleUpdateQuantity = async (itemId: string, newQty: number) => {
         if (!cart) return;
 
-        // Optimistic update logic could go here, but for now simple state update
+        // Optimistic update
         const updatedItems = cart.items.map(item =>
             item.id === itemId ? { ...item, quantity: newQty } : item
         ).filter(item => item.quantity > 0);
@@ -55,11 +58,13 @@ export function CartSheet() {
         setCart({ ...cart, items: updatedItems });
 
         const result = await updateItemQuantity(itemId, newQty);
-        refreshCart(); // Update global count
+
         if (!result.success) {
             toast.error("Błąd aktualizacji koszyka");
-            // Revert would be needed here ideally
             getCart().then((data: any) => setCart(data));
+        } else {
+            // In a real app we might re-fetch here to be safe, but optimistic is fine for now
+            // Badge updates via revalidatePath("/") in action
         }
     };
 
@@ -70,7 +75,7 @@ export function CartSheet() {
         setCart({ ...cart, items: updatedItems });
 
         const result = await removeFromCart(itemId);
-        refreshCart(); // Update global count
+
         if (!result.success) {
             toast.error("Błąd usuwania produktu");
             getCart().then((data: any) => setCart(data));
@@ -84,7 +89,7 @@ export function CartSheet() {
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-                onClick={closeCart}
+                onClick={onClose}
             />
 
             {/* Sheet */}
@@ -94,7 +99,7 @@ export function CartSheet() {
                         <ShoppingBag className="text-red-500" />
                         Twój Koszyk
                     </h2>
-                    <button onClick={closeCart} className="text-zinc-400 hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors">
                         <X size={24} />
                     </button>
                 </div>
@@ -155,7 +160,7 @@ export function CartSheet() {
                             <ShoppingBag size={48} className="opacity-20" />
                             <p>Twój koszyk jest pusty</p>
                             <button
-                                onClick={closeCart}
+                                onClick={onClose}
                                 className="text-red-500 hover:text-red-400 text-sm font-medium"
                             >
                                 Wróć do sklepu
@@ -166,11 +171,19 @@ export function CartSheet() {
 
                 {/* Footer */}
                 {cart?.items && cart.items.length > 0 && (
-                    <div className="p-6 border-t border-white/10 bg-zinc-900">
-                        <div className="flex justify-between items-center mb-4 text-white">
-                            <span className="text-zinc-400">Suma</span>
-                            <span className="text-xl font-bold font-mono">
-                                {calculateTotal(cart.items).toFixed(2)} PLN
+                    <div className="p-6 border-t border-white/10 bg-zinc-900 space-y-4">
+                        <div className="flex justify-between items-center text-sm text-zinc-400">
+                            <span>Suma częściowa</span>
+                            <span>{subtotal.toFixed(2)} PLN</span>
+                        </div>
+                        <div className="flex justify-between items-center text-sm text-zinc-400">
+                            <span>Dostawa</span>
+                            <span>{shippingCost.toFixed(2)} PLN</span>
+                        </div>
+                        <div className="flex justify-between items-center text-white pt-4 border-t border-white/10">
+                            <span className="font-bold">Do zapłaty</span>
+                            <span className="text-xl font-bold font-mono text-red-500">
+                                {total.toFixed(2)} PLN
                             </span>
                         </div>
                         <button className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide">

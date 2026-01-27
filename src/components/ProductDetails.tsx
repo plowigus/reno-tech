@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ShoppingCart, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AddToCartButton } from "./cart/AddToCartButton";
 
 interface Product {
     id: string;
@@ -127,12 +128,16 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                         )}
                     </div>
 
+
+
                     {/* Actions */}
                     <div className="flex gap-4 mb-8">
-                        <button className="flex-1 bg-white hover:bg-gray-200 text-black font-black uppercase tracking-wide py-4 px-8 rounded-lg flex items-center justify-center gap-3 transition-colors">
-                            <ShoppingCart size={20} />
-                            Dodaj do koszyka
-                        </button>
+                        <AddToCartButton
+                            productId={product.id}
+                            className="flex-1 bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-wide py-4 px-8 rounded-lg flex items-center justify-center gap-3 transition-colors"
+                            showText={true}
+                            iconSize={20}
+                        />
                     </div>
 
                     {/* Info Blocks */}

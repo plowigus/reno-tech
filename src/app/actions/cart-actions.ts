@@ -53,7 +53,8 @@ export async function addToCart(productId: string, quantity: number = 1) {
         }
 
         revalidatePath("/cart");
-        revalidatePath("/shop"); // Optional: if we show cart count in header everywhere
+        revalidatePath("/shop");
+        revalidatePath("/", "layout");
 
         return { success: true };
     } catch (error) {
@@ -94,6 +95,7 @@ export async function removeFromCart(itemId: string) {
         await db.delete(cartItems).where(eq(cartItems.id, itemId));
         revalidatePath("/cart");
         revalidatePath("/shop");
+        revalidatePath("/", "layout");
         return { success: true };
     } catch (error) {
         console.error("Error removing from cart:", error);
@@ -114,6 +116,7 @@ export async function updateItemQuantity(itemId: string, newQuantity: number) {
 
         revalidatePath("/cart");
         revalidatePath("/shop");
+        revalidatePath("/", "layout");
         return { success: true };
     } catch (error) {
         console.error("Error updating cart quantity:", error);

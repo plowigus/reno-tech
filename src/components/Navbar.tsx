@@ -11,6 +11,7 @@ import { WishlistButton } from "@/components/nav/WishlistButton";
 
 import { getWishlistCount } from "@/app/actions/wishlist-actions";
 import { WishlistCounterSync } from "@/components/nav/WishlistCounterSync";
+import { getCart } from "@/app/actions/cart-actions";
 
 const links = [
   { label: "O nas", href: "/#about" },
@@ -23,6 +24,10 @@ const links = [
 export default async function Navbar() {
   const session = await auth();
   const wishlistCount = await getWishlistCount();
+  const cart = await getCart();
+
+  const cartCount = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
+
   let user = session?.user;
 
   if (session?.user?.id) {
@@ -61,7 +66,7 @@ export default async function Navbar() {
           ))}
           <div className="ml-4 pl-4 border-l border-white/20 flex items-center gap-4">
             <WishlistButton />
-            <CartTrigger />
+            <CartTrigger count={cartCount} />
             <UserNav user={user} />
           </div>
         </nav>
