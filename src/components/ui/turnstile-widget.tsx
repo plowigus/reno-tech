@@ -20,18 +20,16 @@ export function TurnstileWidget({ onVerify, onError }: TurnstileWidgetProps) {
                 <Turnstile
                     sitekey={siteKey}
                     onVerify={(token) => {
-                        console.log("✅ SUKCES! Mamy token Turnstile:", token)
                         onVerify(token);
                     }}
                     onError={(error) => {
-                        console.error("Turnstile Error:", error);
+
                         if (onError) onError();
                     }}
                     onExpire={() => {
-                        console.warn("Turnstile Token Expired");
+
                         if (onError) onError();
                     }}
-                    // theme="dark" - wymuszamy ciemny motyw, żeby pasował do reszty
                     theme="dark"
                 />
             </div>
