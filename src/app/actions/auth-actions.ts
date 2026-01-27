@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 // 1. Definiujemy i eksportujemy typ TUTAJ (to jest bezpieczne miejsce)
 export interface AuthState {
@@ -11,6 +12,13 @@ export interface AuthState {
 
 // 2. Logika logowania hasłem
 export async function loginUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    const turnstileToken = formData.get("turnstileToken") as string;
+    const isHuman = await verifyTurnstile(turnstileToken);
+
+    if (!isHuman) {
+        return { error: "Weryfikacja anty-botowa nie powiodła się." };
+    }
+
     try {
         await signIn("credentials", {
             email: formData.get("email"),

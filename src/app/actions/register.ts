@@ -5,7 +5,9 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
-import { AuthState } from "@/app/actions/auth-actions"; // Upewnij się, że ścieżka jest OK
+import { verifyTurnstile } from "@/lib/turnstile";
+
+import { AuthState } from "@/app/actions/auth-actions";
 
 const RegisterSchema = z.object({
     email: z.string().email({ message: "Nieprawidłowy adres email" }),
@@ -18,6 +20,13 @@ const RegisterSchema = z.object({
 });
 
 export async function registerUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    const turnstileToken = formData.get("turnstileToken") as string;
+    const isHuman = await verifyTurnstile(turnstileToken);
+
+    if (!isHuman) {
+        return { error: "Weryfikacja anty-botowa nie powiodła się." };
+    }
+
     // 1. Walidacja danych
     const rawData = Object.fromEntries(formData.entries());
     const validated = RegisterSchema.safeParse(rawData);

@@ -6,7 +6,7 @@ import { registerUser } from "@/app/actions/register"; //
 import { Loader2, Mail, Lock, User, Eye, EyeOff, Chrome, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation"; // Dodajemy router do zmiany URL
 import { InteractiveLogo } from "@/components/Animation/InteractiveLogo";
-// import { Turnstile } from '@marsidev/react-turnstile'; // Odkomentuj gdy dodasz klucze
+import { TurnstileWidget } from "@/components/ui/turnstile-widget";
 
 interface AuthFormProps {
     initialTab?: "login" | "register";
@@ -20,6 +20,7 @@ const initialState: AuthState = {
 export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
     const router = useRouter(); // Inicjalizacja routera
     const [mode, setMode] = useState<"login" | "register">(initialTab);
+    const [turnstileToken, setTurnstileToken] = useState<string>("");
 
     const [loginState, loginAction, isLoginPending] = useActionState(loginUser, initialState);
     const [registerState, registerAction, isRegisterPending] = useActionState(registerUser, initialState);
@@ -146,11 +147,8 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                 )}
 
                 {/* Sekcja Turnstile */}
-                {/* {!isLogin && (
-                    <div className="flex justify-center">
-                         <Turnstile siteKey="..." />
-                    </div>
-                )} */}
+                <input type="hidden" name="turnstileToken" value={turnstileToken} />
+                <TurnstileWidget onVerify={setTurnstileToken} />
 
                 {isLogin && (
                     <div className="flex items-center justify-between text-xs">
