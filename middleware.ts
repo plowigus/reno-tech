@@ -10,7 +10,7 @@ export function middleware(req: NextRequest) {
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data: https://utfs.io https://vercel.live https://lh3.googleusercontent.com;
+    img-src 'self' blob: data: https://utfs.io https://vercel.live https://lh3.googleusercontent.com https://images.unsplash.com;
     font-src 'self';
     object-src 'none';
     base-uri 'self';
