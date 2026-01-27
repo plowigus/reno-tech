@@ -14,6 +14,7 @@ export function TurnstileWidget({ onVerify }: TurnstileWidgetProps) {
             <Turnstile
                 sitekey={siteKey}
                 onVerify={onVerify}
+                size="invisible"
 
             />
         </div>
