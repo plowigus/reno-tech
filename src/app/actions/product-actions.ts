@@ -134,3 +134,20 @@ export async function updateProduct(id: string, data: ProductFormValues) {
         };
     }
 }
+
+export async function deleteProduct(id: string) {
+    try {
+        await db.delete(products).where(eq(products.id, id));
+
+        revalidatePath("/dashboard/admin/products");
+        revalidatePath("/shop");
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting product:", error);
+        return {
+            success: false,
+            error: "Wystąpił błąd podczas usuwania produktu.",
+        };
+    }
+}

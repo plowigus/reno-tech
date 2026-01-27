@@ -4,6 +4,7 @@ import { desc } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { Plus, Package, Pencil } from "lucide-react";
+import { DeleteProductButton } from "@/components/dashboard/products/DeleteProductButton";
 
 export default async function ProductsPage() {
     const allProducts = await db
@@ -94,12 +95,15 @@ export default async function ProductsPage() {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <Link
-                                                href={`/dashboard/admin/products/${product.id}/edit`}
-                                                className="inline-flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                                            >
-                                                <Pencil size={18} />
-                                            </Link>
+                                            <div className="flex items-center gap-2 justify-end">
+                                                <Link
+                                                    href={`/dashboard/admin/products/${product.id}/edit`}
+                                                    className="inline-flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                                                >
+                                                    <Pencil size={18} />
+                                                </Link>
+                                                <DeleteProductButton id={product.id} />
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
