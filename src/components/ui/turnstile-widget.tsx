@@ -19,7 +19,10 @@ export function TurnstileWidget({ onVerify, onError }: TurnstileWidgetProps) {
             <div className="pointer-events-auto">
                 <Turnstile
                     sitekey={siteKey}
-                    onVerify={onVerify}
+                    onVerify={(token) => {
+                        console.log("✅ SUKCES! Mamy token Turnstile:", token)
+                        onVerify(token);
+                    }}
                     onError={(error) => {
                         console.error("Turnstile Error:", error);
                         if (onError) onError();
