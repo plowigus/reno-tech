@@ -26,21 +26,26 @@ export function CategoryFilter() {
                 Kategorie
             </h3>
             <div className="space-y-2">
-                {categories.map((cat) => (
-                    <Link
-                        key={cat.name}
-                        href={cat.value ? `/shop?category=${cat.value}` : "/shop"}
-                        scroll={false}
-                        className={cn(
-                            "block px-4 py-2 rounded-lg text-sm transition-colors",
-                            (currentCategory === cat.value)
-                                ? "bg-red-600 text-white font-medium"
-                                : "text-zinc-400 hover:text-white hover:bg-zinc-800"
-                        )}
-                    >
-                        {cat.name}
-                    </Link>
-                ))}
+                {categories.map((cat) => {
+                    const valueLower = cat.value.toLowerCase();
+                    const isActive = currentCategory.toLowerCase() === valueLower;
+
+                    return (
+                        <Link
+                            key={cat.name}
+                            href={cat.value ? `/shop?category=${valueLower}` : "/shop"}
+                            scroll={false}
+                            className={cn(
+                                "block px-4 py-2 rounded-lg text-sm transition-colors",
+                                isActive
+                                    ? "bg-red-600 text-white font-medium"
+                                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                            )}
+                        >
+                            {cat.name}
+                        </Link>
+                    );
+                })}
             </div>
         </div>
     );

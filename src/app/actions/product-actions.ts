@@ -169,7 +169,8 @@ export async function getProducts(filters?: { search?: string; category?: string
         }
 
         if (filters?.category) {
-            conditions.push(eq(products.category, filters.category));
+            const normalizedCategory = filters.category.toLowerCase();
+            conditions.push(eq(products.category, normalizedCategory));
         }
 
         const data = await db.query.products.findMany({
