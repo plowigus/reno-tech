@@ -5,6 +5,7 @@ import { ShoppingBag, Loader2 } from "lucide-react";
 import { addToCart } from "@/app/actions/cart-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 import { cn } from "@/lib/utils";
 
 interface AddToCartButtonProps {
@@ -22,6 +23,7 @@ export function AddToCartButton({
 }: AddToCartButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { refreshCart, openCart } = useCart();
 
     const handleAddToCart = async (e: React.MouseEvent) => {
         e.preventDefault(); // Prevent navigating to product page if button is inside a Link
@@ -48,6 +50,8 @@ export function AddToCartButton({
 
             if (result.success) {
                 toast.success("Dodano do koszyka");
+                await refreshCart();
+                openCart();
             } else {
                 toast.error(result.error || "Wystąpił błąd");
             }

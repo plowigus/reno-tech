@@ -88,3 +88,35 @@ export async function getCart() {
         return null;
     }
 }
+
+export async function removeFromCart(itemId: string) {
+    try {
+        await db.delete(cartItems).where(eq(cartItems.id, itemId));
+        revalidatePath("/cart");
+        revalidatePath("/shop");
+        return { success: true };
+    } catch (error) {
+        console.error("Error removing from cart:", error);
+        return { success: false, error: "Failed to remove item" };
+    }
+}
+
+export async function updateItemQuantity(itemId: string, newQuantity: number) {
+    try {
+        if (newQuantity < 1) {
+            return await removeFromCart(itemId);
+        }
+
+        await db
+            .update(cartItems)
+            .set({ quantity: newQuantity })
+            .where(eq(cartItems.id, itemId));
+
+        revalidatePath("/cart");
+        revalidatePath("/shop");
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating cart quantity:", error);
+        return { success: false, error: "Failed to update quantity" };
+    }
+}

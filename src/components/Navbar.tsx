@@ -6,6 +6,7 @@ import UserNav from "./UserNav";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { CartTrigger } from "@/components/cart/CartTrigger";
 
 const links = [
   { label: "O nas", href: "/#about" },
@@ -52,7 +53,8 @@ export default async function Navbar() {
               </span>
             </Link>
           ))}
-          <div className="ml-4 pl-4 border-l border-white/20">
+          <div className="ml-4 pl-4 border-l border-white/20 flex items-center gap-4">
+            <CartTrigger />
             <UserNav user={user} />
           </div>
         </nav>
