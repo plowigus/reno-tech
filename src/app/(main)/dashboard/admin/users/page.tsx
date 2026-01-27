@@ -4,6 +4,9 @@ import { users } from "@/db/schema";
 import { redirect } from "next/navigation";
 import { desc } from "drizzle-orm";
 import Image from "next/image";
+import Link from "next/link";
+import { Pencil } from "lucide-react";
+import { DeleteUserButton } from "@/components/dashboard/users/DeleteUserButton";
 
 export default async function UsersPage() {
     const session = await auth();
@@ -36,6 +39,7 @@ export default async function UsersPage() {
                                 <th className="px-6 py-4">Rola</th>
                                 <th className="px-6 py-4">Email</th>
                                 <th className="px-6 py-4">Dołączył</th>
+                                <th className="px-6 py-4 text-right">Akcje</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800">
@@ -86,6 +90,17 @@ export default async function UsersPage() {
                                                 year: "numeric",
                                             })
                                             : "-"}
+                                    </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center gap-2 justify-end">
+                                            <Link
+                                                href={`/dashboard/admin/users/${user.id}/edit`}
+                                                className="inline-flex items-center justify-center p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                                            >
+                                                <Pencil size={18} />
+                                            </Link>
+                                            <DeleteUserButton id={user.id} />
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

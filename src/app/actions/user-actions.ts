@@ -6,6 +6,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { userSchema, UserFormValues } from "@/lib/validators/user-schema";
 
 const profileSchema = z.object({
     name: z.string().min(2, "Imię musi mieć co najmniej 2 znaki"),
@@ -70,5 +71,72 @@ export async function updateUserProfile(prevState: ProfileState, formData: FormD
     } catch (error) {
         console.error("Profile update error:", error);
         return { error: "Wystąpił błąd podczas aktualizacji profilu" };
+    }
+}
+
+
+
+// --- Admin Actions ---
+
+export async function getUserById(id: string) {
+    try {
+        const user = await db.query.users.findFirst({
+            where: (users, { eq }) => eq(users.id, id),
+        });
+
+        return user || null;
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        return null;
+    }
+}
+
+export async function updateUser(id: string, data: UserFormValues) {
+    try {
+        const validatedFields = userSchema.safeParse(data);
+
+        if (!validatedFields.success) {
+            return {
+                success: false,
+                error: "Błąd walidacji danych.",
+            };
+        }
+
+        const { name, email, role } = validatedFields.data;
+
+        await db
+            .update(users)
+            .set({
+                name,
+                email,
+                role,
+            })
+            .where(eq(users.id, id));
+
+        revalidatePath("/dashboard/admin/users");
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating user:", error);
+        return {
+            success: false,
+            error: "Wystąpił błąd podczas aktualizacji użytkownika.",
+        };
+    }
+}
+
+export async function deleteUser(id: string) {
+    try {
+        await db.delete(users).where(eq(users.id, id));
+
+        revalidatePath("/dashboard/admin/users");
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        return {
+            success: false,
+            error: "Wystąpił błąd podczas usuwania użytkownika.",
+        };
     }
 }
