@@ -1,18 +1,24 @@
 "use client";
 
-import { useState, useTransition, useCallback } from "react";
+import { useState, useTransition, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema, ProductFormValues } from "@/lib/validators/product-schema";
-import { createProduct } from "@/app/actions/product-actions";
+import { createProduct, updateProduct } from "@/app/actions/product-actions";
 import { useUploadThing } from "@/lib/uploadthing";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Loader2, X, Plus, DollarSign, Layers, AlignLeft, UploadCloud, Check } from "lucide-react";
+import { Loader2, X, Plus, DollarSign, Layers, AlignLeft, UploadCloud, Check, Save } from "lucide-react";
 import { clsx } from "clsx";
 import { useDropzone } from "@uploadthing/react";
+import { products } from "@/db/schema";
+import { toast } from "sonner";
 
-export function ProductForm() {
+type ProductFormProps = {
+    initialData?: typeof products.$inferSelect;
+};
+
+export function ProductForm({ initialData }: ProductFormProps) {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
     const [error, setError] = useState<string | undefined>("");
@@ -46,12 +52,12 @@ export function ProductForm() {
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema) as any,
         defaultValues: {
-            name: "",
-            category: "",
-            description: "",
-            price: 0,
-            images: [],
-            sizes: [],
+            name: initialData?.name || "",
+            category: initialData?.category || "",
+            description: initialData?.description || "",
+            price: initialData ? parseFloat(initialData.price) : 0,
+            images: initialData?.images || [],
+            sizes: initialData?.sizes || [],
         },
     });
 
@@ -61,7 +67,7 @@ export function ProductForm() {
         "Programatory",
         "Akcesoria",
         "Usługi",
-        "Odzież", // Added 'Odzież' as requested
+        "Odzież",
     ];
 
     const availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
@@ -71,10 +77,21 @@ export function ProductForm() {
     function onSubmit(data: ProductFormValues) {
         setError("");
         startTransition(async () => {
-            const result = await createProduct(data);
-            if (result.success) {
-                router.push("/dashboard/admin/products");
+            let result;
+            if (initialData) {
+                result = await updateProduct(initialData.id, data);
             } else {
+                result = await createProduct(data);
+            }
+
+            if (result.success) {
+                // Ideally we would show a toast here.
+                const message = initialData ? "Zaktualizowano produkt" : "Dodano produkt";
+                toast.success(message);
+                router.push("/dashboard/admin/products");
+                router.refresh();
+            } else {
+                toast.error(result.error);
                 setError(result.error);
             }
         });
@@ -93,9 +110,13 @@ export function ProductForm() {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">Dodaj nowy produkt</h1>
+                <h1 className="text-2xl font-bold text-white mb-2">
+                    {initialData ? "Edytuj produkt" : "Dodaj nowy produkt"}
+                </h1>
                 <p className="text-zinc-400">
-                    Wypełnij formularz, aby dodać nowy produkt do sklepu.
+                    {initialData
+                        ? "Wprowadź zmiany w formularzu poniżej."
+                        : "Wypełnij formularz, aby dodać nowy produkt do sklepu."}
                 </p>
             </div>
 
@@ -106,7 +127,7 @@ export function ProductForm() {
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
                             {/* Name */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                                <label className="text-sm font-medium text-zinc-300">
                                     Nazwa produktu
                                 </label>
                                 <input
@@ -124,7 +145,7 @@ export function ProductForm() {
                             {/* Description */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
-                                    Opis
+                                    <AlignLeft size={16} /> Opis
                                 </label>
                                 <textarea
                                     {...form.register("description")}
@@ -141,7 +162,7 @@ export function ProductForm() {
 
                         {/* Images */}
                         <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
-                            <p className="text-sm font-medium text-zinc-300 flex items-center gap-1">Zdjęcia</p>
+                            <label className="text-sm font-medium text-zinc-300">Zdjęcia</label>
 
                             {images.length > 0 && (
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -282,7 +303,7 @@ export function ProductForm() {
                             {/* Conditional Sizes */}
                             {currentCategory === "Odzież" && (
                                 <div className="space-y-2 pt-2 border-t border-zinc-800/50">
-                                    <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+                                    <label className="text-sm font-medium text-zinc-300">
                                         Dostępne rozmiary
                                     </label>
                                     <div className="flex flex-wrap gap-2">
@@ -326,12 +347,17 @@ export function ProductForm() {
                             {isPending || isUploading ? (
                                 <>
                                     <Loader2 className="animate-spin" size={20} />
-                                    {isUploading ? "Wysyłanie..." : "Dodawanie..."}
+                                    {isUploading
+                                        ? "Wysyłanie..."
+                                        : initialData
+                                            ? "Zapisywanie..."
+                                            : "Dodawanie..."
+                                    }
                                 </>
                             ) : (
                                 <>
-                                    <Plus size={20} />
-                                    Dodaj produkt
+                                    {initialData ? <Save size={20} /> : <Plus size={20} />}
+                                    {initialData ? "Zapisz zmiany" : "Dodaj produkt"}
                                 </>
                             )}
                         </button>
