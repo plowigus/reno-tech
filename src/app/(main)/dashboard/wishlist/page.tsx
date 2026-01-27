@@ -3,6 +3,8 @@ import { WishlistItemCard } from "@/components/dashboard/WishlistItemCard";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function WishlistPage() {
     const items = await getWishlistItems();
 
