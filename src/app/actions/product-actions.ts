@@ -159,16 +159,10 @@ export async function getProducts(filters?: { search?: string; category?: string
         const conditions = [];
 
         if (filters?.search) {
-            const searchTerm = `%${filters.search}%`;
-            conditions.push(
-                or(
-                    ilike(products.name, searchTerm),
-                    ilike(products.description, searchTerm)
-                )
-            );
+            conditions.push(ilike(products.name, `%${filters.search}%`));
         }
 
-        if (filters?.category) {
+        if (filters?.category && filters.category !== "all") {
             const normalizedCategory = filters.category.toLowerCase();
             conditions.push(eq(products.category, normalizedCategory));
         }

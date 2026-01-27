@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+
+import { useSearchParams, useRouter } from "next/navigation";
 import { Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ const categories = [
 ];
 
 export function CategoryFilter() {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const currentCategory = searchParams.get("category") || "";
 
@@ -31,19 +32,26 @@ export function CategoryFilter() {
                     const isActive = currentCategory.toLowerCase() === valueLower;
 
                     return (
-                        <Link
+                        <button
                             key={cat.name}
-                            href={cat.value ? `/shop?category=${valueLower}` : "/shop"}
-                            scroll={false}
+                            onClick={() => {
+                                const params = new URLSearchParams(searchParams);
+                                if (cat.value) {
+                                    params.set("category", valueLower);
+                                } else {
+                                    params.delete("category");
+                                }
+                                router.replace(`/shop?${params.toString()}`, { scroll: false });
+                            }}
                             className={cn(
-                                "block px-4 py-2 rounded-lg text-sm transition-colors",
+                                "block w-full text-left px-4 py-2 rounded-lg text-sm transition-colors",
                                 isActive
                                     ? "bg-red-600 text-white font-medium"
                                     : "text-zinc-400 hover:text-white hover:bg-zinc-800"
                             )}
                         >
                             {cat.name}
-                        </Link>
+                        </button>
                     );
                 })}
             </div>
