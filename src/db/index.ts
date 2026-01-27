@@ -1,9 +1,11 @@
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
-import * as schema from "./schema"; // 1. Importujemy nasz schemat
 
-const sql = neon(process.env.DATABASE_URL!);
+import { Pool, neonConfig } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import ws from "ws";
+import * as schema from "./schema";
 
-// 2. Przekazujemy schemat do Drizzle. 
-// Dzięki temu zadziała 'db.query.users' i autocomplete!
-export const db = drizzle(sql, { schema });
+neonConfig.webSocketConstructor = ws;
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+export const db = drizzle(pool, { schema });

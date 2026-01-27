@@ -50,13 +50,12 @@ export async function createOrder(data: CheckoutFormValues) {
         const p24SessionId = `order_${uuidv4()}`;
 
         // 4. DB Transaction
-        // 4. Create Order & Process Payment (Sequential, No Transaction)
-        console.log("createOrder: Inserting order...");
-        let newOrder;
-
-        try {
-            // A. Create Order
-            const [createdOrder] = await db.insert(orders).values({
+        // 4. DB Transaction (Restored)
+        console.log("createOrder: Starting DB transaction...");
+        const redirectUrl = await db.transaction(async (tx) => {
+            // Create Order
+            console.log("createOrder: Inserting order...");
+            const [newOrder] = await tx.insert(orders).values({
                 userId,
                 customerName,
                 customerEmail,
@@ -69,12 +68,11 @@ export async function createOrder(data: CheckoutFormValues) {
                 p24SessionId,
                 p24OrderId: 0,
             }).returning();
-            newOrder = createdOrder;
             console.log("createOrder: Order inserted", newOrder.id);
 
-            // B. Create Order Items
+            // Create Order Items
             for (const item of cart.items) {
-                await db.insert(orderItems).values({
+                await tx.insert(orderItems).values({
                     orderId: newOrder.id,
                     productId: item.productId,
                     quantity: item.quantity,
@@ -84,11 +82,11 @@ export async function createOrder(data: CheckoutFormValues) {
             }
             console.log("createOrder: Order items inserted");
 
-            // C. Clear Cart
-            await db.delete(cartItems).where(eq(cartItems.cartId, cart.id));
+            // Clear Cart
+            await tx.delete(cartItems).where(eq(cartItems.cartId, cart.id));
             console.log("createOrder: Cart cleared");
 
-            // D. Register Payment
+            // 5. Register Payment
             console.log("createOrder: Registering P24 transaction...");
             const p24Result = await registerP24Transaction({
                 sessionId: p24SessionId,
@@ -106,31 +104,19 @@ export async function createOrder(data: CheckoutFormValues) {
                 throw new Error("P24 Registration Failed");
             }
 
-            // E. Simulation Mode Check
+            // --- SIMULATION MODE CHECK ---
             if (p24Result.redirectUrl.includes("mock=true")) {
                 console.log("Detecting Simulation Mode - Mark order as PAID");
-                await db.update(orders)
+                await tx.update(orders)
                     .set({ status: "paid" })
                     .where(eq(orders.id, newOrder.id));
             }
 
-            console.log("createOrder: Success, redirecting to:", p24Result.redirectUrl);
-            return { success: true, redirectUrl: p24Result.redirectUrl };
+            return p24Result.redirectUrl;
+        });
 
-        } catch (innerError) {
-            console.error("createOrder: Error during sequential operations, attempting rollback...", innerError);
-
-            // Manual Rollback: Delete the order if it was created
-            if (newOrder?.id) {
-                try {
-                    await db.delete(orders).where(eq(orders.id, newOrder.id));
-                    console.log("createOrder: Rollback successful (Order deleted)");
-                } catch (rollbackError) {
-                    console.error("createOrder: CRITICAL - Rollback failed", rollbackError);
-                }
-            }
-            throw innerError; // Re-throw to be caught by outer try/catch
-        }
+        console.log("createOrder: Transaction successful, redirecting to:", redirectUrl);
+        return { success: true, redirectUrl };
 
 
 
