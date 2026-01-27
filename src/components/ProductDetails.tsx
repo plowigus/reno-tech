@@ -5,6 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ShoppingCart, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+
+// ... previous imports
 import { AddToCartButton } from "./cart/AddToCartButton";
 
 interface Product {
@@ -26,6 +29,7 @@ interface ProductDetailsProps {
 export function ProductDetails({ product }: ProductDetailsProps) {
     const [selectedImage, setSelectedImage] = useState(product.images[0] || product.image);
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [showError, setShowError] = useState(false);
 
     return (
         <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 min-h-[600px]">
@@ -107,12 +111,17 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                     {product.sizes.map((size) => (
                                         <button
                                             key={size}
-                                            onClick={() => setSelectedSize(size)}
+                                            onClick={() => {
+                                                setSelectedSize(size);
+                                                setShowError(false);
+                                            }}
                                             className={cn(
                                                 "h-12 rounded-md font-bold text-sm flex items-center justify-center transition-all duration-200 border",
                                                 selectedSize === size
                                                     ? "bg-white text-black border-white"
-                                                    : "bg-transparent border-white/20 text-gray-400 hover:border-white hover:text-white"
+                                                    : showError
+                                                        ? "bg-transparent border-red-500 text-red-500 hover:border-red-400"
+                                                        : "bg-transparent border-white/20 text-gray-400 hover:border-white hover:text-white"
                                             )}
                                         >
                                             {size}
@@ -134,6 +143,16 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     <div className="flex gap-4 mb-8">
                         <AddToCartButton
                             productId={product.id}
+                            size={selectedSize}
+                            onValidate={() => {
+                                if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                                    setShowError(true);
+                                    toast.error("Proszę wybrać rozmiar!");
+                                    return false;
+                                }
+                                setShowError(false);
+                                return true;
+                            }}
                             className="flex-1 bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-wide py-4 px-8 rounded-lg flex items-center justify-center gap-3 transition-colors"
                             showText={true}
                             iconSize={20}

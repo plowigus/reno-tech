@@ -163,6 +163,7 @@ export const cartItems = pgTable("cart_item", {
         .notNull()
         .references(() => products.id, { onDelete: "cascade" }),
     quantity: integer("quantity").default(1).notNull(),
+    size: text("size"),
 });
 
 export const wishlists = pgTable("wishlist", {

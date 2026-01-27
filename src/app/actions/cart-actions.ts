@@ -6,7 +6,9 @@ import { auth } from "@/auth";
 import { eq, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-export async function addToCart(productId: string, quantity: number = 1) {
+import { isNull } from "drizzle-orm";
+
+export async function addToCart(productId: string, quantity: number = 1, size?: string | null) {
     try {
         const session = await auth();
 
@@ -29,11 +31,12 @@ export async function addToCart(productId: string, quantity: number = 1) {
             cart = newCart;
         }
 
-        // 2. Check if item exists in cart
+        // 2. Check if item exists in cart (same product AND same size)
         const existingItem = await db.query.cartItems.findFirst({
             where: and(
                 eq(cartItems.cartId, cart.id),
-                eq(cartItems.productId, productId)
+                eq(cartItems.productId, productId),
+                size ? eq(cartItems.size, size) : isNull(cartItems.size)
             ),
         });
 
@@ -49,6 +52,7 @@ export async function addToCart(productId: string, quantity: number = 1) {
                 cartId: cart.id,
                 productId,
                 quantity,
+                size: size || null,
             });
         }
 

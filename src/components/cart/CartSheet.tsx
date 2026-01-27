@@ -10,6 +10,7 @@ import { toast } from "sonner";
 interface CartItem {
     id: string;
     quantity: number;
+    size: string | null;
     product: {
         id: string;
         name: string;
@@ -119,9 +120,16 @@ export function CartSheet() {
                                 <div className="flex-1 flex flex-col justify-between">
                                     <div>
                                         <div className="flex justify-between items-start">
-                                            <h3 className="text-white font-medium text-sm line-clamp-2">
-                                                {item.product.name}
-                                            </h3>
+                                            <div>
+                                                <h3 className="text-white font-medium text-sm line-clamp-2">
+                                                    {item.product.name}
+                                                </h3>
+                                                {item.size && (
+                                                    <p className="text-xs text-zinc-500 mt-1 font-mono">
+                                                        Rozmiar: {item.size}
+                                                    </p>
+                                                )}
+                                            </div>
                                             <button
                                                 onClick={() => handleRemove(item.id)}
                                                 className="text-zinc-500 hover:text-red-500 transition-colors ml-2"

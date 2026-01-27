@@ -13,13 +13,17 @@ interface AddToCartButtonProps {
     className?: string;
     iconSize?: number;
     showText?: boolean;
+    size?: string | null;
+    onValidate?: () => boolean;
 }
 
 export function AddToCartButton({
     productId,
     className,
     iconSize = 20,
-    showText = false
+    showText = false,
+    size = null,
+    onValidate
 }: AddToCartButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -29,17 +33,22 @@ export function AddToCartButton({
         e.preventDefault(); // Prevent navigating to product page if button is inside a Link
         e.stopPropagation();
 
+        if (onValidate && !onValidate()) {
+            return;
+        }
+
         setIsLoading(true);
 
         try {
-            const result = await addToCart(productId, 1);
+            const result = await addToCart(productId, 1, size);
 
             if (result.requiresAuth) {
                 // Set Intent Cookie
                 const intent = JSON.stringify({
                     type: "cart",
                     productId,
-                    quantity: 1
+                    quantity: 1,
+                    size // Save size in intent as well
                 });
                 document.cookie = `cart_intent=${encodeURIComponent(intent)}; path=/; max-age=3600`;
 
