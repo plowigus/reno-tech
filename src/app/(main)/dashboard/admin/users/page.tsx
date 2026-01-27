@@ -22,7 +22,7 @@ export default async function UsersPage() {
                 <div>
                     <h1 className="text-2xl font-bold text-white">Użytkownicy</h1>
                     <p className="text-zinc-400 mt-1">
-                        Lista wszystkich zarejestrowanych użytkowników ({allUsers.length})
+                        Lista wszystkich zarejestrowanych użytkowników
                     </p>
                 </div>
             </div>
@@ -46,7 +46,7 @@ export default async function UsersPage() {
                                 >
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0">
+                                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800 shrink-0">
                                                 {user.image ? (
                                                     <Image
                                                         src={user.image}
@@ -68,8 +68,8 @@ export default async function UsersPage() {
                                     <td className="px-6 py-4">
                                         <span
                                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === "admin"
-                                                    ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                                                    : "bg-zinc-800 text-zinc-400 border border-zinc-700"
+                                                ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                                                : "bg-zinc-800 text-zinc-400 border border-zinc-700"
                                                 }`}
                                         >
                                             {user.role === "admin" ? "Admin" : "User"}
