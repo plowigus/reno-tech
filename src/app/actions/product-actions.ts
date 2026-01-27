@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { products } from "@/db/schema";
 import { productSchema, ProductFormValues } from "@/lib/validators/product-schema";
 import { revalidatePath } from "next/cache";
-import { eq, and, like, desc } from "drizzle-orm";
+import { eq, and, like, desc, or, ilike } from "drizzle-orm";
 
 function generateSlug(name: string): string {
     return name
@@ -152,12 +152,20 @@ export async function deleteProduct(id: string) {
     }
 }
 
+
+
 export async function getProducts(filters?: { search?: string; category?: string }) {
     try {
         const conditions = [];
 
         if (filters?.search) {
-            conditions.push(like(products.name, `%${filters.search}%`));
+            const searchTerm = `%${filters.search}%`;
+            conditions.push(
+                or(
+                    ilike(products.name, searchTerm),
+                    ilike(products.description, searchTerm)
+                )
+            );
         }
 
         if (filters?.category) {

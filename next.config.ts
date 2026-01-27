@@ -5,40 +5,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "utfs.io", // UploadThing
+        hostname: "utfs.io", // UploadThing (Produkty)
       },
       {
         protocol: "https",
-        hostname: "img.clerk.com",
+        hostname: "lh3.googleusercontent.com", // Google Auth (Awatary użytkowników)
       },
     ],
   },
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value: `
-              default-src 'self';
-              script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
-              style-src 'self' 'unsafe-inline';
-              img-src 'self' blob: data: https://utfs.io https://vercel.live;
-              font-src 'self';
-              object-src 'none';
-              base-uri 'self';
-              form-action 'self';
-              frame-ancestors 'none';
-              frame-src 'self' https://challenges.cloudflare.com https://vercel.live; 
-              connect-src 'self' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
-              upgrade-insecure-requests;
-            `.replace(/\s{2,}/g, " ").trim(),
-          },
-        ],
-      },
-    ];
-  },
+
 };
 
 export default nextConfig;

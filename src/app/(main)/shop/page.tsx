@@ -53,8 +53,8 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                     key={cat.name}
                     href={cat.value ? `/shop?category=${cat.value}` : "/shop"}
                     className={`block px-4 py-2 rounded-lg text-sm transition-colors ${(category === cat.value) || (!category && !cat.value)
-                        ? "bg-red-600 text-white font-medium"
-                        : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                      ? "bg-red-600 text-white font-medium"
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-800"
                       }`}
                   >
                     {cat.name}
@@ -104,9 +104,13 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Brak produktów</h3>
                 <p className="text-zinc-400 max-w-sm mx-auto">
-                  Nie znaleźliśmy produktów spełniających Twoje kryteria wyszukiwania. Spróbuj zmienić filtry.
+                  {search
+                    ? `Brak wyników wyszukiwania dla: "${search}"`
+                    : category
+                      ? `Nie znaleziono produktów w kategorii: ${category}`
+                      : "Nie znaleziono produktów spełniających Twoje kryteria."}
                 </p>
-                {isFiltered && (
+                {(search || category) && (
                   <Link
                     href="/shop"
                     className="inline-block mt-6 px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg transition-colors text-sm font-medium"
