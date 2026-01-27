@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/components/SmoothScroll";
+import { CartSyncer } from "@/components/cart/CartSyncer";
+import { auth } from "@/auth";
+import { Toaster } from "sonner";
 
 
 const geistSans = Geist({
@@ -19,17 +22,20 @@ export const metadata: Metadata = {
   description: "Profesjonalna elektronika samochodowa",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html lang="pl">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <SmoothScroll>
-          {/* Tu już nie ma Navbara ani Footera */}
+          <CartSyncer userId={session?.user?.id} />
           {children}
+          <Toaster richColors position="top-center" />
         </SmoothScroll>
       </body>
     </html>

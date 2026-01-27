@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag } from "lucide-react";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 
 interface Product {
     id: string;
@@ -33,9 +33,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent opacity-60" />
 
-                <div className="absolute bottom-4 right-4 bg-red-600 p-3 rounded-full translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                    <ShoppingBag size={20} className="text-white" />
-                </div>
+                <AddToCartButton
+                    productId={product.id}
+                    className="absolute bottom-4 right-4 bg-red-600 p-3 rounded-full translate-y-12 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-700"
+                />
             </div>
 
             <div className="p-5">

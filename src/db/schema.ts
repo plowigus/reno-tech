@@ -138,3 +138,89 @@ export const posts = pgTable("post", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// --- SECTION 4: USER INTERACTIONS (Cart & Wishlist) ---
+
+export const carts = pgTable("cart", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const cartItems = pgTable("cart_item", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    cartId: text("cartId")
+        .notNull()
+        .references(() => carts.id, { onDelete: "cascade" }),
+    productId: text("productId")
+        .notNull()
+        .references(() => products.id, { onDelete: "cascade" }),
+    quantity: integer("quantity").default(1).notNull(),
+});
+
+export const wishlists = pgTable("wishlist", {
+    id: text("id")
+        .primaryKey()
+        .$defaultFn(() => crypto.randomUUID()),
+    userId: text("userId")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    productId: text("productId")
+        .notNull()
+        .references(() => products.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- RELATIONS ---
+import { relations } from "drizzle-orm";
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+    cart: one(carts, {
+        fields: [users.id],
+        references: [carts.userId],
+    }),
+    wishlist: many(wishlists),
+    orders: many(orders),
+}));
+
+export const cartsRelations = relations(carts, ({ one, many }) => ({
+    user: one(users, {
+        fields: [carts.userId],
+        references: [users.id],
+    }),
+    items: many(cartItems),
+}));
+
+export const cartItemsRelations = relations(cartItems, ({ one }) => ({
+    cart: one(carts, {
+        fields: [cartItems.cartId],
+        references: [carts.id],
+    }),
+    product: one(products, {
+        fields: [cartItems.productId],
+        references: [products.id],
+    }),
+}));
+
+export const wishlistsRelations = relations(wishlists, ({ one }) => ({
+    user: one(users, {
+        fields: [wishlists.userId],
+        references: [users.id],
+    }),
+    product: one(products, {
+        fields: [wishlists.productId],
+        references: [products.id],
+    }),
+}));
+
+export const productsRelations = relations(products, ({ many }) => ({
+    cartItems: many(cartItems),
+    wishlistedBy: many(wishlists),
+}));
