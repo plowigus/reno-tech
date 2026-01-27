@@ -105,6 +105,8 @@ export const orders = pgTable("order", {
     shippingCountry: text("shipping_country").default("PL").notNull(),
     status: text("status").default("pending").notNull(),
     totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+    p24SessionId: text("p24_session_id").unique(),
+    p24OrderId: integer("p24_order_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -119,6 +121,7 @@ export const orderItems = pgTable("order_item", {
         .notNull()
         .references(() => products.id),
     quantity: integer("quantity").notNull(),
+    size: text("size"),
     priceAtPurchase: decimal("price_at_purchase", { precision: 10, scale: 2 }).notNull(),
 });
 
