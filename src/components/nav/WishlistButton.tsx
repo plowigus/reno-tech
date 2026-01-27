@@ -1,9 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { Heart } from "lucide-react";
-import { getWishlistCount } from "@/app/actions/wishlist-actions";
+import { useWishlistStore } from "@/store/use-wishlist-store";
 
-export async function WishlistButton() {
-    const count = await getWishlistCount();
+export function WishlistButton() {
+    const count = useWishlistStore((state) => state.count);
 
     return (
         <Link

@@ -9,6 +9,9 @@ import { eq } from "drizzle-orm";
 import { CartTrigger } from "@/components/cart/CartTrigger";
 import { WishlistButton } from "@/components/nav/WishlistButton";
 
+import { getWishlistCount } from "@/app/actions/wishlist-actions";
+import { WishlistCounterSync } from "@/components/nav/WishlistCounterSync";
+
 const links = [
   { label: "O nas", href: "/#about" },
   { label: "Usługi", href: "/#services" },
@@ -19,6 +22,7 @@ const links = [
 
 export default async function Navbar() {
   const session = await auth();
+  const wishlistCount = await getWishlistCount();
   let user = session?.user;
 
   if (session?.user?.id) {
@@ -37,6 +41,7 @@ export default async function Navbar() {
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50 px-4 py-4 transition-all duration-300">
+      <WishlistCounterSync initialCount={wishlistCount} />
       <div className="max-w-7xl mx-auto backdrop-blur-md bg-black/40 border border-white/10 rounded-2xl px-6 py-3 flex justify-between items-center shadow-lg shadow-black/20">
         <Link href="/" className="px-4 py-2 cursor-pointer block">
           <Image src={Logo} alt="Logo firmy Renotech" />

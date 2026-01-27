@@ -1,74 +1,65 @@
-"use client";
+import { useWishlistStore } from "@/store/use-wishlist-store";
 
-import { useState, useOptimistic, useTransition } from "react";
-import { Heart } from "lucide-react";
-import { toggleWishlist } from "@/app/actions/wishlist-actions";
-import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+// ... inside component ...
+const { increment, decrement } = useWishlistStore(); // Simplified destructuring if allowed or state selector
 
-interface WishlistButtonProps {
-    productId: string;
-    initialIsWishlisted: boolean;
-    className?: string;
-}
+// ... or ...
+const increment = useWishlistStore((state) => state.increment);
+const decrement = useWishlistStore((state) => state.decrement);
 
-export function WishlistButton({
-    productId,
-    initialIsWishlisted,
-    className,
-}: WishlistButtonProps) {
-    const router = useRouter();
-    const [isPending, startTransition] = useTransition();
-    const [optimisticIsWishlisted, toggleOptimisticWishlist] = useOptimistic(
-        initialIsWishlisted,
-        (state, newState: boolean) => newState
-    );
+const handleToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-    const handleToggle = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const willBeWishlisted = !optimisticIsWishlisted;
 
-        startTransition(async () => {
-            toggleOptimisticWishlist(!optimisticIsWishlisted);
+    startTransition(async () => {
+        toggleOptimisticWishlist(willBeWishlisted);
 
-            const result = await toggleWishlist(productId);
+        // Update global store instantly
+        if (willBeWishlisted) {
+            increment();
+        } else {
+            decrement();
+        }
 
-            if (result.requiresAuth) {
-                // Determine logic for auth redirect if needed, currently prompting user
-                // Could also redirect via router.push as requested
-                router.push("/login");
-                return;
-            }
+        const result = await toggleWishlist(productId);
 
-            // If server action fails, we might want to revert, but useOptimistic handles display.
-            // Since we revalidatePath in action, the real state will sync on next refresh.
-            if (!result.success) {
-                // Silently failing or reverting logic?
-                // For now, trusting optimistic UI + revalidation
-            }
-        });
-    };
+        if (result.requiresAuth) {
+            // Revert if auth required (since we redirected)
+            if (willBeWishlisted) decrement(); else increment();
 
-    return (
-        <button
-            onClick={handleToggle}
+            router.push("/login");
+            return;
+        }
+
+        if (!result.success) {
+            // Revert on failure
+            if (willBeWishlisted) decrement(); else increment();
+            toast.error("Wystąpił błąd");
+        }
+    });
+};
+
+return (
+    <button
+        onClick={handleToggle}
+        className={cn(
+            "group/btn transition-all duration-300 hover:scale-110 active:scale-95",
+            className
+        )}
+        disabled={isPending}
+        aria-label={optimisticIsWishlisted ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+    >
+        <Heart
+            size={22}
             className={cn(
-                "group/btn transition-all duration-300 hover:scale-110 active:scale-95",
-                className
+                "transition-colors duration-300",
+                optimisticIsWishlisted
+                    ? "fill-red-600 text-red-600"
+                    : "text-white group-hover/btn:text-red-500"
             )}
-            disabled={isPending}
-            aria-label={optimisticIsWishlisted ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-        >
-            <Heart
-                size={22}
-                className={cn(
-                    "transition-colors duration-300",
-                    optimisticIsWishlisted
-                        ? "fill-red-600 text-red-600"
-                        : "text-white group-hover/btn:text-red-500"
-                )}
-            />
-        </button>
-    );
+        />
+    </button>
+);
 }

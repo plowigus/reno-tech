@@ -1,5 +1,5 @@
 import { getWishlistItems } from "@/app/actions/wishlist-actions";
-import { ProductCard } from "@/components/ProductCard";
+import { WishlistItemCard } from "@/components/dashboard/WishlistItemCard";
 import { Heart } from "lucide-react";
 import Link from "next/link";
 
@@ -16,12 +16,11 @@ export default async function WishlistPage() {
             </div>
 
             {items.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="flex flex-col space-y-4">
                     {items.map((product) => (
-                        <ProductCard
+                        <WishlistItemCard
                             key={product.id}
                             product={product}
-                            isWishlisted={true}
                         />
                     ))}
                 </div>
