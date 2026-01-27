@@ -4,8 +4,19 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ShoppingCart, Check } from "lucide-react";
-import { Product } from "@/data/products";
 import { cn } from "@/lib/utils";
+
+interface Product {
+    id: string;
+    name: string;
+    category: string;
+    slug: string;
+    description: string;
+    price: string | number;
+    image: string;
+    images: string[];
+    sizes: string[] | null;
+}
 
 interface ProductDetailsProps {
     product: Product;
@@ -75,7 +86,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     </div>
 
                     <div className="text-2xl font-mono text-white mb-8 flex items-center gap-4">
-                        <span>{product.price.toFixed(2)} PLN</span>
+                        <span>{Number(product.price).toFixed(2)} PLN</span>
                         <span className="text-sm text-gray-500 font-sans">w tym VAT</span>
                     </div>
 
@@ -85,7 +96,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
 
                     {/* Size Selector */}
                     <div className="mb-8">
-                        {product.category === "odziez" && product.sizes && product.sizes.length > 0 ? (
+                        {product.sizes && product.sizes.length > 0 ? (
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="font-bold text-gray-200">Rozmiar</span>

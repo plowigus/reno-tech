@@ -1,7 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Product } from "@/data/products";
 import { ShoppingBag } from "lucide-react";
+
+interface Product {
+    id: string;
+    name: string;
+    category: string;
+    slug: string;
+    description: string;
+    price: string | number;
+    image: string;
+}
 
 interface ProductCardProps {
     product: Product;
@@ -41,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 </p>
                 <div className="flex items-center justify-between">
                     <span className="text-white font-mono text-lg">
-                        {product.price.toFixed(2)} PLN
+                        {Number(product.price).toFixed(2)} PLN
                     </span>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-import { products } from "@/data/products";
+import { getProductBySlug } from "@/app/actions/product-actions";
 import { notFound } from "next/navigation";
 import { ProductDetails } from "@/components/ProductDetails";
 
@@ -9,18 +9,9 @@ interface PageProps {
     }>;
 }
 
-export async function generateStaticParams() {
-    return products.map((product) => ({
-        category: product.category,
-        slug: product.slug,
-    }));
-}
-
 export default async function ProductPage({ params }: PageProps) {
-    const { category, slug } = await params;
-    const product = products.find(
-        (p) => p.slug === slug && p.category === category
-    );
+    const { slug } = await params;
+    const product = await getProductBySlug(slug);
 
     if (!product) {
         notFound();

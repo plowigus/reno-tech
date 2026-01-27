@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { products } from "@/db/schema";
 import { productSchema, ProductFormValues } from "@/lib/validators/product-schema";
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
+import { eq, and, like, desc } from "drizzle-orm";
 
 function generateSlug(name: string): string {
     return name
@@ -149,5 +149,42 @@ export async function deleteProduct(id: string) {
             success: false,
             error: "Wystąpił błąd podczas usuwania produktu.",
         };
+    }
+}
+
+export async function getProducts(filters?: { search?: string; category?: string }) {
+    try {
+        const conditions = [];
+
+        if (filters?.search) {
+            conditions.push(like(products.name, `%${filters.search}%`));
+        }
+
+        if (filters?.category) {
+            conditions.push(eq(products.category, filters.category));
+        }
+
+        const data = await db.query.products.findMany({
+            where: conditions.length > 0 ? and(...conditions) : undefined,
+            orderBy: [desc(products.createdAt)],
+        });
+
+        return data;
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        return [];
+    }
+}
+
+export async function getProductBySlug(slug: string) {
+    try {
+        const product = await db.query.products.findFirst({
+            where: eq(products.slug, slug),
+        });
+
+        return product || null;
+    } catch (error) {
+        console.error("Error fetching product by slug:", error);
+        return null;
     }
 }
