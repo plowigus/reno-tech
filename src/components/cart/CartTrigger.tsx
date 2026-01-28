@@ -6,17 +6,27 @@ import { cn } from "@/lib/utils";
 
 export const CartTrigger = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>((props, ref) => {
     const items = useCartStore((state) => state.items);
+    const onOpen = useCartStore((state) => state.onOpen);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => { setMounted(true); }, []);
 
     const count = mounted ? items?.length || 0 : 0;
 
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (props.onClick) {
+            props.onClick(e);
+        } else {
+            onOpen();
+        }
+    };
+
     return (
         <button
             ref={ref}
             className={cn("group relative p-2 hover:bg-white/10 rounded-full transition-colors", props.className)}
             {...props}
+            onClick={handleClick}
         >
             <ShoppingCart className="text-white transition-colors group-hover:text-red-500" size={20} />
             {count > 0 && (

@@ -6,7 +6,7 @@ import UserNav from "./UserNav";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { CartSheet } from "@/components/cart/CartSheet";
+import { CartTrigger } from "@/components/cart/CartTrigger";
 import { WishlistButton } from "@/components/nav/WishlistButton";
 import { getWishlistCount } from "@/app/actions/wishlist-actions";
 import { WishlistCounterSync } from "@/components/nav/WishlistCounterSync";
@@ -63,7 +63,7 @@ export default async function Navbar() {
           <div className="ml-4 pl-4 border-l border-border flex items-center gap-4">
             <WishlistButton />
             <CartSyncer userId={user?.id} />
-            <CartSheet />
+            <CartTrigger />
             <UserNav user={user} />
           </div>
         </nav>

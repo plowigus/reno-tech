@@ -1,5 +1,6 @@
 import { Footer } from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import { CartSheet } from "@/components/cart/CartSheet";
 
 
 export default function MainLayout({
@@ -10,6 +11,7 @@ export default function MainLayout({
     return (
         <>
             <Navbar />
+            <CartSheet />
             <main className="min-h-screen bg-background relative">
                 {children}
             </main>
