@@ -83,12 +83,25 @@ export function CartSheet() {
         }
     };
 
+    // Prevent body scroll when cart is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     return (
         <>
             <CartTrigger onClick={onOpen} />
 
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex justify-end">
+                <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
                     {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-background/50 backdrop-blur-sm transition-opacity"
