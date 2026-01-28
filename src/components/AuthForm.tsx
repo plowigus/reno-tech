@@ -89,7 +89,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                                 type="text"
                                 placeholder="Jan Kowalski"
                                 required
-                                className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-background/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -140,7 +140,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                                 type={showPassword ? "text" : "password"}
                                 placeholder="••••••••"
                                 required
-                                className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-background/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
                             />
                         </div>
                     </div>
@@ -198,7 +198,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     <div className="w-full border-t border-zinc-800"></div>
                 </div>
                 <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-                    <span className="px-4 bg-zinc-950 text-zinc-500">lub kontynuuj z</span>
+                    <span className="px-4 bg-background text-zinc-500">lub kontynuuj z</span>
                 </div>
             </div>
 
@@ -206,7 +206,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                 <button
                     type="button"
                     onClick={() => loginWithGoogle()}
-                    className="flex items-center justify-center gap-3 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-white rounded-xl py-2.5 text-sm transition-all group"
+                    className="flex items-center justify-center gap-3 bg-background hover:bg-zinc-900 border border-zinc-800 text-white rounded-xl py-2.5 text-sm transition-all group"
                 >
                     <Chrome className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
                     <span>Google</span>

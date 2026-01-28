@@ -214,7 +214,7 @@ export function Services() {
         {/* Right: Rolling List */}
         <div className="relative h-full w-full flex items-start justify-center">
           <div className="relative w-full max-w-xl">
-            <div className="relative w-full h-[0px]">
+            <div className="relative w-full h-0">
               {services.map((service, index) => (
                 <div
                   key={service.number}

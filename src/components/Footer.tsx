@@ -5,14 +5,14 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-black pt-20 pb-10 px-4">
-      <div className="max-w-7xl mx-auto border-t border-white/10 pt-10 px-6 z-20 relative">
+    <footer className="relative bg-background pt-20 pb-10 px-4">
+      <div className="max-w-7xl mx-auto border-t border-border pt-10 px-6 z-20 relative">
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-16">
           {/* Brand */}
           <div>
             <a href="#home" className="inline-flex items-baseline mb-6 group">
-              <span className="font-display text-4xl font-bold tracking-tighter text-white">
+              <span className="font-display text-4xl font-bold tracking-tighter text-foreground">
                 RENO
               </span>
               <span className="font-display text-4xl font-bold tracking-tighter text-red-500">
@@ -85,7 +85,7 @@ export function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400 font-light">
             © {currentYear} RenoTech. Wszystkie prawa zastrzeżone.
           </p>

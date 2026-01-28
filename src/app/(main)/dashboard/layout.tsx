@@ -14,7 +14,7 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen bg-black pt-32 pb-12 px-4">
+        <div className="min-h-screen bg-background pt-32 pb-12 px-4">
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
                 {/* Sidebar */}
                 <aside className="hidden lg:block w-64 shrink-0">

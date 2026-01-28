@@ -54,9 +54,9 @@ export function WishlistItemCard({ product }: WishlistItemCardProps) {
     if (isRemoving) return null;
 
     return (
-        <div className="flex flex-col sm:flex-row items-center gap-4 border border-white/10 bg-white/5 p-4 rounded-xl transition-all hover:bg-white/10">
+        <div className="flex flex-col sm:flex-row items-center gap-4 border border-border bg-foreground/5 p-4 rounded-xl transition-all hover:bg-foreground/10">
             {/* Left: Image */}
-            <div className="relative w-full sm:w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-black/20">
+            <div className="relative w-full sm:w-24 h-24 shrink-0 rounded-lg overflow-hidden bg-background/20">
                 <Image
                     src={product.image}
                     alt={product.name}
@@ -68,7 +68,7 @@ export function WishlistItemCard({ product }: WishlistItemCardProps) {
 
             {/* Middle: Info */}
             <div className="flex-1 text-center sm:text-left w-full sm:w-auto">
-                <h3 className="font-bold text-white text-lg">{product.name}</h3>
+                <h3 className="font-bold text-foreground text-lg">{product.name}</h3>
                 <p className="text-zinc-400 text-xs uppercase tracking-wider mb-1">{product.category}</p>
                 <div className="font-mono text-red-500 font-medium">
                     {Number(product.price).toFixed(2)} PLN
@@ -79,7 +79,7 @@ export function WishlistItemCard({ product }: WishlistItemCardProps) {
             <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-end">
                 <Link
                     href={`/shop/${product.category}/${product.slug}`}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-foreground/10 hover:bg-foreground/20 text-foreground text-sm font-medium rounded-lg transition-colors"
                 >
                     <ExternalLink size={16} />
                     Zobacz

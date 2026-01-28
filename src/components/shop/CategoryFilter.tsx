@@ -21,8 +21,8 @@ export function CategoryFilter() {
     const currentCategory = searchParams.get("category") || "";
 
     return (
-        <div className="bg-zinc-900/50 border border-zinc-800 p-6 rounded-2xl">
-            <h3 className="text-white font-bold mb-6 flex items-center gap-2">
+        <div className="bg-secondary/50 border border-border p-6 rounded-2xl">
+            <h3 className="text-foreground font-bold mb-6 flex items-center gap-2">
                 <Filter size={20} className="text-red-500" />
                 Kategorie
             </h3>
@@ -46,8 +46,8 @@ export function CategoryFilter() {
                             className={cn(
                                 "block w-full text-left px-4 py-2 rounded-lg text-sm transition-colors",
                                 isActive
-                                    ? "bg-red-600 text-white font-medium"
-                                    : "text-zinc-400 hover:text-white hover:bg-zinc-800"
+                                    ? "bg-red-600 text-foreground font-medium"
+                                    : "text-zinc-400 hover:text-foreground hover:bg-secondary"
                             )}
                         >
                             {cat.name}

@@ -46,7 +46,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                     "relative aspect-3/4 w-20 lg:w-full rounded-lg overflow-hidden border transition-all duration-300 shrink-0",
                                     selectedImage === img
                                         ? "border-red-600 opacity-100 ring-2 ring-red-600/30"
-                                        : "border-white/10 opacity-50 hover:opacity-100 hover:border-white/30"
+                                        : "border-border opacity-50 hover:opacity-100 hover:border-white/30"
                                 )}
                             >
                                 <Image
@@ -62,7 +62,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                 )}
 
                 {/* Main Image */}
-                <div className="relative flex-1 aspect-square bg-white/5 border border-white/10 rounded-2xl overflow-hidden group">
+                <div className="relative flex-1 aspect-square bg-foreground/5 border border-border rounded-2xl overflow-hidden group">
                     <Image
                         src={selectedImage}
                         alt={product.name}
@@ -83,14 +83,14 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                             <span className="text-red-500 font-bold tracking-widest uppercase mb-2 block text-xs">
                                 {product.category}
                             </span>
-                            <h1 className="text-3xl md:text-5xl font-black text-white leading-none">
+                            <h1 className="text-3xl md:text-5xl font-black text-foreground leading-none">
                                 {product.name}
                             </h1>
                         </div>
                         {/* Wishlist Icon placeholder if needed */}
                     </div>
 
-                    <div className="text-2xl font-mono text-white mb-8 flex items-center gap-4">
+                    <div className="text-2xl font-mono text-foreground mb-8 flex items-center gap-4">
                         <span>{Number(product.price).toFixed(2)} PLN</span>
                         <span className="text-sm text-gray-500 font-sans">w tym VAT</span>
                     </div>
@@ -130,7 +130,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                             </div>
                         ) : (
-                            <div className="text-gray-300 font-medium flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-3 rounded-lg w-full">
+                            <div className="text-gray-300 font-medium flex items-center gap-2 bg-foreground/5 border border-border px-4 py-3 rounded-lg w-full">
                                 <Check size={16} className="text-red-500" />
                                 <span>Rozmiar Uniwersalny</span>
                             </div>
@@ -160,13 +160,13 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     </div>
 
                     {/* Info Blocks */}
-                    <div className="border border-white/10 rounded-xl divide-y divide-white/10">
+                    <div className="border border-border rounded-xl divide-y divide-border">
                         <div className="p-4 flex items-center gap-4">
                             <div className="p-2 bg-white/5 rounded-full">
                                 <Check size={20} className="text-green-500" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-white">Darmowa dostawa</p>
+                                <p className="text-sm font-bold text-foreground">Darmowa dostawa</p>
                                 <p className="text-xs text-gray-400">Dla zamówień powyżej 200 PLN</p>
                             </div>
                         </div>
@@ -175,7 +175,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 <ArrowLeft size={20} className="text-gray-400" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-white">30 dni na zwrot</p>
+                                className="inline-flex items-center gap-2 text-gray-500 hover:text-foreground transition-colors mt-8 group text-sm"
                                 <p className="text-xs text-gray-400">Bezproblemowy zwrot towaru</p>
                             </div>
                         </div>

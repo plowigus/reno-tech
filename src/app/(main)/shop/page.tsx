@@ -65,7 +65,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
   const isFiltered = !!search || !!category;
 
   return (
-    <main className="min-h-screen bg-black pt-32 pb-20 px-4">
+    <main className="min-h-screen bg-background pt-32 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">

@@ -28,8 +28,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
     return (
         <form action={action} className="space-y-8">
             {/* Sekcja Avatara */}
-            <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-                <h2 className="text-xl text-white font-semibold mb-6">Zdjęcie profilowe</h2>
+            <div className="bg-secondary/50 p-6 rounded-2xl border border-border">
+                <h2 className="text-xl text-foreground font-semibold mb-6">Zdjęcie profilowe</h2>
                 <div className="flex items-center gap-8">
                     <div className="relative group">
                         <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-zinc-700 bg-zinc-800 relative">
@@ -82,8 +82,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
             </div>
 
             {/* Dane osobowe */}
-            <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-                <h2 className="text-xl text-white font-semibold mb-6">Dane osobowe</h2>
+            <div className="bg-secondary/50 p-6 rounded-2xl border border-border">
+                <h2 className="text-xl text-foreground font-semibold mb-6">Dane osobowe</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -117,8 +117,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
             </div>
 
             {/* Adres */}
-            <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800/50">
-                <h2 className="text-xl text-white font-semibold mb-6">Adres dostawy</h2>
+            <div className="bg-secondary/50 p-6 rounded-2xl border border-border">
+                <h2 className="text-xl text-foreground font-semibold mb-6">Adres dostawy</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2 space-y-2">
@@ -174,7 +174,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                 onChange={(e) => setCountry(e.target.value)}
                                 type="text"
                                 placeholder="Polska"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="w-full bg-secondary border border-border rounded-lg py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-muted-foreground"
                             />
                         </div>
                     </div>

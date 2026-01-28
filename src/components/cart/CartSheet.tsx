@@ -90,13 +90,13 @@ export function CartSheet() {
         <div className="fixed inset-0 z-50 flex justify-end">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                className="absolute inset-0 bg-background/50 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
             {/* Sheet */}
-            <div className="relative w-full max-w-md bg-zinc-900 h-full border-l border-white/10 shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-                <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="relative w-full max-w-md bg-card h-full border-l border-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                <div className="flex items-center justify-between p-6 border-b border-border">
                     <h2 className="text-xl font-bold text-white flex items-center gap-2">
                         <ShoppingBag className="text-red-500" />
                         Twój Koszyk
@@ -110,7 +110,7 @@ export function CartSheet() {
                     {cart?.items && cart.items.length > 0 ? (
                         cart.items.map((item) => (
                             <div key={item.id} className="flex gap-4">
-                                <div className="relative w-20 h-24 bg-white/5 rounded-md overflow-hidden shrink-0 border border-white/10">
+                                <div className="relative w-20 h-24 bg-foreground/5 rounded-md overflow-hidden shrink-0 border border-border">
                                     <Image
                                         src={item.product.image}
                                         alt={item.product.name}
@@ -144,7 +144,7 @@ export function CartSheet() {
                                     </div>
 
                                     <div className="flex items-center gap-3">
-                                        <div className="flex items-center border border-white/10 rounded-lg bg-black/20">
+                                        <div className="flex items-center border border-white/10 rounded-lg bg-background/20">
                                             <button
                                                 onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                                                 className="p-1 hover:text-red-500 transition-colors disabled:opacity-50"
@@ -180,7 +180,7 @@ export function CartSheet() {
 
                 {/* Footer */}
                 {cart?.items && cart.items.length > 0 && (
-                    <div className="p-6 border-t border-white/10 bg-zinc-900 space-y-4">
+                    <div className="p-6 border-t border-border bg-card space-y-4">
                         <div className="flex justify-between items-center text-sm text-zinc-400">
                             <span>Suma częściowa</span>
                             <span>{subtotal.toFixed(2)} PLN</span>
@@ -189,7 +189,7 @@ export function CartSheet() {
                             <span>Dostawa</span>
                             <span>{shippingCost.toFixed(2)} PLN</span>
                         </div>
-                        <div className="flex justify-between items-center text-white pt-4 border-t border-white/10">
+                        <div className="flex justify-between items-center text-foreground pt-4 border-t border-border">
                             <span className="font-bold">Do zapłaty</span>
                             <span className="text-xl font-bold font-mono text-red-500">
                                 {total.toFixed(2)} PLN

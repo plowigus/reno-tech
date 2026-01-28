@@ -21,9 +21,9 @@ export function ProductCard({ product, isWishlisted = false }: ProductCardProps)
     return (
         <Link
             href={`/shop/${product.category}/${product.slug}`}
-            className="group relative block bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-red-500/50 transition-colors duration-300"
+            className="group relative block bg-foreground/5 border border-border rounded-2xl overflow-hidden hover:border-red-500/50 transition-colors duration-300"
         >
-            <div className="aspect-4/5 w-full bg-black/50 relative flex items-center justify-center overflow-hidden">
+            <div className="aspect-4/5 w-full bg-background/50 relative flex items-center justify-center overflow-hidden">
                 {/* Image */}
                 <Image
                     src={product.image}
@@ -37,7 +37,7 @@ export function ProductCard({ product, isWishlisted = false }: ProductCardProps)
                 <WishlistButton
                     productId={product.id}
                     initialIsWishlisted={isWishlisted}
-                    className="absolute top-4 right-4 bg-black/40 p-2 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-black/60"
+                    className="absolute top-4 right-4 bg-background/40 p-2 rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-background/60"
                 />
             </div>
 
@@ -45,14 +45,14 @@ export function ProductCard({ product, isWishlisted = false }: ProductCardProps)
                 <p className="text-red-500 text-xs font-bold tracking-wider uppercase mb-2">
                     {product.category}
                 </p>
-                <h3 className="text-white text-lg font-bold mb-2 group-hover:text-red-500 transition-colors">
+                <h3 className="text-foreground text-lg font-bold mb-2 group-hover:text-red-500 transition-colors">
                     {product.name}
                 </h3>
                 <p className="text-gray-400 text-sm line-clamp-2 mb-4">
                     {product.description}
                 </p>
                 <div className="flex items-center justify-between">
-                    <span className="text-white font-mono text-lg">
+                    <span className="text-foreground font-mono text-lg">
                         {Number(product.price).toFixed(2)} PLN
                     </span>
                 </div>

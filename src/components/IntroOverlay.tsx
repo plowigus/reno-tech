@@ -39,7 +39,7 @@ export function IntroOverlay() {
         <AnimatePresence>
             {showIntro && (
                 <motion.div
-                    className="absolute inset-0 z-50 flex items-center justify-center bg-black"
+                    className="absolute inset-0 z-50 flex items-center justify-center bg-background"
                     // initial={{ opacity: 1 }} sprawia, że jest czarno od pierwszej milisekundy
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}

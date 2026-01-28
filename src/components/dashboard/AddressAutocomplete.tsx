@@ -84,7 +84,7 @@ export default function AddressAutocomplete({
                     if (suggestions.length > 0) setShowSuggestions(true);
                 }}
                 placeholder="Zacznij wpisywać adres..."
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                className="w-full bg-secondary border border-border rounded-lg py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-muted-foreground"
                 autoComplete="off"
             />
 
@@ -95,7 +95,7 @@ export default function AddressAutocomplete({
             )}
 
             {showSuggestions && suggestions.length > 0 && (
-                <ul className="absolute z-50 w-full mt-1 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl max-h-60 overflow-auto">
+                <ul className="absolute z-50 w-full mt-1 bg-secondary border border-border rounded-lg shadow-xl max-h-60 overflow-auto">
                     {suggestions.map((suggestion) => (
                         <li
                             key={suggestion.id}

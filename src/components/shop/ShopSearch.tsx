@@ -27,7 +27,7 @@ export function ShopSearch() {
                 defaultValue={currentSearch}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder="Szukaj produktów..."
-                className="w-full bg-zinc-900/50 border border-zinc-800 text-white rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-red-600 transition-colors placeholder:text-zinc-600"
+                className="w-full bg-secondary border border-border text-foreground rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:border-red-600 transition-colors placeholder:text-muted-foreground"
             />
         </div>
     );

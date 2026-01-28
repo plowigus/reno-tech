@@ -110,7 +110,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">
+                <h1 className="text-2xl font-bold text-foreground mb-2">
                     {initialData ? "Edytuj produkt" : "Dodaj nowy produkt"}
                 </h1>
                 <p className="text-zinc-400">
@@ -124,7 +124,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                 <div className="grid gap-8 lg:grid-cols-3">
                     {/* Left Column - Main Info */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
+                        <div className="bg-secondary/50 border border-border rounded-2xl p-6 space-y-6">
                             {/* Name */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-300">
@@ -161,7 +161,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         </div>
 
                         {/* Images */}
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
+                        <div className="bg-secondary/50 border border-border rounded-2xl p-6 space-y-6">
                             <label className="text-sm font-medium text-zinc-300">Zdjęcia</label>
 
                             {images.length > 0 && (
@@ -180,7 +180,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                     const newImages = images.filter((_, i) => i !== index);
                                                     form.setValue("images", newImages);
                                                 }}
-                                                className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100"
+                                                className="absolute top-2 right-2 p-1.5 bg-background/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100"
                                             >
                                                 <X size={14} />
                                             </button>
@@ -231,7 +231,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
                     {/* Right Column - Details */}
                     <div className="space-y-6">
-                        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
+                        <div className="bg-secondary/50 border border-border rounded-2xl p-6 space-y-6">
                             {/* Price */}
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
@@ -302,7 +302,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
 
                             {/* Conditional Sizes */}
                             {currentCategory === "Odzież" && (
-                                <div className="space-y-2 pt-2 border-t border-zinc-800/50">
+                                <div className="space-y-2 pt-2 border-t border-border">
                                     <label className="text-sm font-medium text-zinc-300">
                                         Dostępne rozmiary
                                     </label>

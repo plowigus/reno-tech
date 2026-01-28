@@ -47,7 +47,7 @@ export function UserForm({ initialData }: UserFormProps) {
     return (
         <div className="max-w-2xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white mb-2">
+                <h1 className="text-2xl font-bold text-foreground mb-2">
                     Edytuj użytkownika
                 </h1>
                 <p className="text-zinc-400">
@@ -56,7 +56,7 @@ export function UserForm({ initialData }: UserFormProps) {
             </div>
 
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 space-y-6">
+                <div className="bg-secondary/50 border border-border rounded-2xl p-6 space-y-6">
                     {/* Name */}
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
@@ -101,7 +101,7 @@ export function UserForm({ initialData }: UserFormProps) {
                             <label className={`
                                 relative flex items-center justify-center gap-2 p-4 rounded-xl border cursor-pointer transition-all
                                 ${form.watch("role") === "user"
-                                    ? "bg-zinc-800 border-red-600 text-white"
+                                    ? "bg-secondary border-red-600 text-foreground"
                                     : "bg-zinc-800/30 border-zinc-700 text-zinc-400 hover:bg-zinc-800/50"}
                             `}>
                                 <input
@@ -116,7 +116,7 @@ export function UserForm({ initialData }: UserFormProps) {
                             <label className={`
                                 relative flex items-center justify-center gap-2 p-4 rounded-xl border cursor-pointer transition-all
                                 ${form.watch("role") === "admin"
-                                    ? "bg-zinc-800 border-red-600 text-white"
+                                    ? "bg-secondary border-red-600 text-foreground"
                                     : "bg-zinc-800/30 border-zinc-700 text-zinc-400 hover:bg-zinc-800/50"}
                             `}>
                                 <input
@@ -146,7 +146,7 @@ export function UserForm({ initialData }: UserFormProps) {
                     <button
                         type="submit"
                         disabled={isPending}
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium px-8 py-3 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-red-600 hover:bg-red-700 text-foreground font-medium px-8 py-3 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isPending ? (
                             <Loader2 size={20} className="animate-spin" />

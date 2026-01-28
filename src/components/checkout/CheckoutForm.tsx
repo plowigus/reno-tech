@@ -84,7 +84,7 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
             {/* LEFT: Address Form */}
             <div className="lg:col-span-7">
                 <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-white mb-2">Dane do wysyłki</h2>
+                    <h2 className="text-2xl font-bold text-foreground mb-2">Dane do wysyłki</h2>
                     <p className="text-zinc-500 text-sm">Wypełnij poniższe dane, abyśmy mogli zrealizować zamówienie.</p>
                 </div>
 
@@ -142,7 +142,7 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                             <label className="text-sm font-medium text-zinc-400">Miasto</label>
                             <input
                                 {...form.register("shippingCity")}
-                                className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-red-500 transition-colors"
                                 placeholder="Warszawa"
                             />
                             {form.formState.errors.shippingCity && (
@@ -155,7 +155,7 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
 
             {/* RIGHT: Summary */}
             <div className="lg:col-span-5 space-y-8">
-                <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 lg:p-8 sticky top-32">
+                <div className="bg-card border border-border rounded-2xl p-6 lg:p-8 sticky top-32">
                     <h3 className="text-xl font-bold text-white mb-6">Podsumowanie</h3>
 
                     {/* Items List */}
@@ -178,7 +178,7 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                     </div>
 
                     {/* Costs */}
-                    <div className="space-y-3 pt-6 border-t border-white/10">
+                    <div className="space-y-3 pt-6 border-t border-border">
                         <div className="flex justify-between text-sm text-zinc-400">
                             <span>Suma częściowa</span>
                             <span>{subtotal.toFixed(2)} PLN</span>
@@ -187,7 +187,7 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                             <span>Dostawa</span>
                             <span>{shippingCost.toFixed(2)} PLN</span>
                         </div>
-                        <div className="flex justify-between text-lg font-bold text-white pt-3 border-t border-white/10">
+                        <div className="flex justify-between text-lg font-bold text-foreground pt-3 border-t border-border">
                             <span>Do zapłaty</span>
                             <span className="text-red-500">{total.toFixed(2)} PLN</span>
                         </div>
