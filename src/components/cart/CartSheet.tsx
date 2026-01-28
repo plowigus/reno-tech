@@ -7,8 +7,9 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { getCart, removeFromCart, updateItemQuantity } from "@/app/actions/cart-actions";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CartTrigger } from "@/components/cart/CartTrigger";
+import { cn } from "@/lib/utils";
 
 interface CartItem {
     id: string;
@@ -202,17 +203,13 @@ export function CartSheet() {
                                         {total.toFixed(2)} PLN
                                     </span>
                                 </div>
-                                <Button
-                                    asChild
-                                    className="w-full text-center bg-white text-black font-bold py-6 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
+                                <Link
+                                    href="/checkout"
+                                    onClick={onClose}
+                                    className={cn(buttonVariants(), "w-full text-center bg-white text-black font-bold py-6 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide")}
                                 >
-                                    <Link
-                                        href="/checkout"
-                                        onClick={onClose}
-                                    >
-                                        Przejdź do kasy
-                                    </Link>
-                                </Button>
+                                    Przejdź do kasy
+                                </Link>
                             </div>
                         )}
                     </div>
