@@ -46,7 +46,7 @@ export default async function ForumPage() {
         orderBy: [asc(forumCategories.order)],
         with: {
             posts: {
-                orderBy: [desc(forumPosts.createdAt)],
+                orderBy: [desc(forumPosts.updatedAt)],
                 with: {
                     author: true,
                     comments: true,
@@ -115,7 +115,7 @@ export default async function ForumPage() {
                                             {lastPost ? (
                                                 <div className="flex flex-col items-end gap-1.5">
                                                     <span className="text-xs text-zinc-400">
-                                                        {lastPost.createdAt ? formatDate(lastPost.createdAt) : ""}
+                                                        {lastPost.updatedAt ? formatDate(lastPost.updatedAt) : ""}
                                                     </span>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs font-medium text-zinc-300">

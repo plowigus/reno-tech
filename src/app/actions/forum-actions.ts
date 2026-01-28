@@ -102,6 +102,11 @@ export async function createCommentAction(postId: string, formData: FormData) {
             postId,
             authorId: session.user.id,
         });
+
+        // BUMP LOGIC: Update the parent post's timestamp
+        await db.update(forumPosts)
+            .set({ updatedAt: new Date() })
+            .where(eq(forumPosts.id, postId));
     } catch (error) {
         console.error("Error creating comment:", error);
         return { error: "Wystąpił błąd podczas dodawania komentarza." };

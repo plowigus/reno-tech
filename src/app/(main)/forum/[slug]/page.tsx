@@ -43,7 +43,7 @@ export default async function ForumCategoryPage({
 
     const posts = await db.query.forumPosts.findMany({
         where: eq(forumPosts.categoryId, category.id),
-        orderBy: [desc(forumPosts.createdAt)],
+        orderBy: [desc(forumPosts.updatedAt)],
         with: {
             author: true,
             comments: true,
@@ -130,7 +130,7 @@ export default async function ForumCategoryPage({
                                         <TableCell className="text-right align-middle pr-6">
                                             <div className="flex flex-col items-end gap-1">
                                                 <span className="text-xs text-zinc-400">
-                                                    {post.createdAt ? formatDate(post.createdAt) : '--:--'}
+                                                    {post.updatedAt ? formatDate(post.updatedAt) : '--:--'}
                                                 </span>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-xs text-zinc-500 font-medium">Autor: {post.author?.name || "Anonim"}</span>
