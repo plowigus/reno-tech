@@ -30,6 +30,11 @@ interface CartItem {
 export function CartSheet() {
     const { isOpen, onOpen, onClose, items, setItems } = useCartStore(); // Use global items
     const [isPending, startTransition] = useTransition();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Fetch cart when opened to ensure freshness
     useEffect(() => {
@@ -83,33 +88,47 @@ export function CartSheet() {
         }
     };
 
-    // Prevent body scroll when cart is open
+    const [isVisible, setIsVisible] = useState(false);
+
     useEffect(() => {
         if (isOpen) {
+            setIsVisible(true);
+            // Lock scroll on both html and body to ensure it works across all browsers/OS
             document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = '';
+            // Wait for animation to finish before hiding
+            const timer = setTimeout(() => {
+                setIsVisible(false);
+                document.body.style.overflow = '';
+                document.documentElement.style.overflow = '';
+            }, 300);
+            return () => clearTimeout(timer);
         }
-
-        return () => {
-            document.body.style.overflow = '';
-        };
     }, [isOpen]);
+
+    if (!mounted) return null; // or just <> <CartTrigger ... /> </> if hydration issue, but logic below handles trigger safely
 
     return (
         <>
             <CartTrigger onClick={onOpen} />
 
-            {isOpen && (
+            {isVisible && (
                 <div className="fixed inset-0 z-50 flex justify-end overflow-hidden">
                     {/* Backdrop */}
                     <div
-                        className="absolute inset-0 bg-background/50 backdrop-blur-sm transition-opacity"
+                        className={cn(
+                            "absolute inset-0 bg-background/50 backdrop-blur-sm transition-opacity",
+                            isOpen ? "animate-in fade-in duration-300" : "animate-out fade-out duration-300"
+                        )}
                         onClick={onClose}
                     />
 
                     {/* Sheet */}
-                    <div className="relative w-full max-w-md bg-card h-full border-l border-border shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                    <div className={cn(
+                        "relative w-full max-w-md bg-card h-full border-l border-border shadow-2xl flex flex-col duration-300",
+                        isOpen ? "animate-in slide-in-from-right" : "animate-out slide-out-to-right"
+                    )}>
                         <div className="flex items-center justify-between p-6 border-b border-border">
                             <h2 className="text-xl font-bold text-white flex items-center gap-2">
                                 <ShoppingBag className="text-red-500" />
