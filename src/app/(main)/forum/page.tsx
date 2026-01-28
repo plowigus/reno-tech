@@ -18,7 +18,12 @@ export default async function ForumPage() {
             posts: {
                 orderBy: (posts, { desc }) => [desc(posts.updatedAt)],
                 with: {
-                    comments: true, // Or specific columns if supported
+                    // We need all comments to count them for "Posty", 
+                    // and we need them sorted to find the latest author.
+                    comments: {
+                        orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+                        with: { author: true }
+                    },
                     author: true
                 }
             }
@@ -54,7 +59,19 @@ export default async function ForumPage() {
                                 const postsCount = topicsCount + category.posts.reduce((acc, p) => acc + p.comments.length, 0);
 
                                 // Last Activity Logic
-                                const lastPost = category.posts[0]; // Since we ordered by updatedAt DESC
+                                const lastPost = category.posts[0]; // Ordered by updatedAt DESC
+
+                                // Determine who was actually active (Commenter OR Thread Author)
+                                let lastActiveUser = lastPost?.author;
+                                let lastActiveDate = lastPost?.updatedAt;
+
+                                if (lastPost) {
+                                    const lastComment = lastPost.comments[0]; // Ordered by createdAt DESC
+                                    if (lastComment) {
+                                        lastActiveUser = lastComment.author;
+                                        lastActiveDate = lastComment.createdAt;
+                                    }
+                                }
 
                                 return (
                                     <TableRow key={category.id} className="border-zinc-800 hover:bg-zinc-900/60 transition-colors group">
@@ -83,13 +100,13 @@ export default async function ForumPage() {
                                         </TableCell>
 
                                         <TableCell className="text-right pr-6">
-                                            {lastPost ? (
+                                            {lastPost && lastActiveUser ? (
                                                 <div className="flex flex-col items-end gap-1">
                                                     <span className="text-xs font-bold text-red-500">
-                                                        {lastPost.author?.name || "Użytkownik"}
+                                                        {lastActiveUser.name || "Użytkownik"}
                                                     </span>
                                                     <span className="text-[10px] text-zinc-500">
-                                                        {lastPost.updatedAt ? format(lastPost.updatedAt, "dd MMM yyyy, HH:mm", { locale: pl }) : ""}
+                                                        {lastActiveDate ? format(lastActiveDate, "dd MMM yyyy, HH:mm", { locale: pl }) : ""}
                                                     </span>
                                                 </div>
                                             ) : (
