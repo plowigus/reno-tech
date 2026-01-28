@@ -1,11 +1,10 @@
 "use client";
 import { forwardRef, useEffect, useState } from "react";
-import { Button, ButtonProps } from "@/components/ui/button";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/store/use-cart-store";
 import { cn } from "@/lib/utils";
 
-export const CartTrigger = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+export const CartTrigger = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>((props, ref) => {
     const items = useCartStore((state) => state.items);
     const [mounted, setMounted] = useState(false);
 
@@ -14,21 +13,19 @@ export const CartTrigger = forwardRef<HTMLButtonElement, ButtonProps>((props, re
     const count = mounted ? items?.length || 0 : 0;
 
     return (
-        <Button
+        <button
             ref={ref}
-            variant="ghost"
-            size="icon"
-            className={cn("relative rounded-full hover:bg-zinc-800 transition-colors", props.className)}
+            className={cn("group relative p-2 hover:bg-white/10 rounded-full transition-colors", props.className)}
             {...props}
         >
-            <ShoppingBag className="w-6 h-6 text-white" />
+            <ShoppingCart className="text-white transition-colors group-hover:text-red-500" size={20} />
             {count > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-black">
-                    {count}
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-foreground shadow-sm ring-2 ring-black">
+                    {count > 99 ? "99+" : count}
                 </span>
             )}
             <span className="sr-only">Otwórz koszyk</span>
-        </Button>
+        </button>
     );
 });
 CartTrigger.displayName = "CartTrigger";
