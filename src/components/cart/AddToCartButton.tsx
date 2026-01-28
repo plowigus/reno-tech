@@ -13,15 +13,7 @@ interface AddToCartButtonProps extends ButtonProps {
     productId: string;
     iconSize?: number;
     showText?: boolean;
-    valsize?: string | null; // Renaming to avoid conflict if ButtonProps has size (it does)
-    // Actually, ButtonProps has 'size' (default | sm | lg | icon).
-    // Our 'size' prop is likely product size (S, M, L).
-    // This naming collision needs resolution. The component uses 'size' for product size.
-    // I should probably rename the product size prop to 'selectedSize' or similar, OR omit 'size' from ButtonProps.
-    // However, the user wants me to accept ButtonProps.
-    // If I Omit size from ButtonProps, I can't control button size.
-    // If I rename product size, I break callsites.
-    // Let's check callsites. It is used in ProductDetails.
+    valsize?: string | null;
     selectedSize?: string | null;
     onValidate?: () => boolean;
 }
@@ -89,10 +81,9 @@ export function AddToCartButton({
             variant={props.variant || "ghost"}
             size={size}
             className={cn(
-                "flex items-center justify-center transition-all duration-300 hover:bg-transparent group relative overflow-hidden",
-                // Default primary styling if no specific variant override is provided (though we defaults to ghost above, we might want to change that or just append these classes)
-                // Actually, the user wants to unify it. Let's make this the default look for the component when used in this context.
-                showText && "w-full text-center bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 uppercase tracking-wide",
+                showText
+                    ? "inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden shadow h-auto px-4 w-full text-center bg-white text-black font-bold py-6 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
+                    : "flex items-center justify-center transition-all duration-300 hover:bg-transparent group relative overflow-hidden",
                 className
             )}
             {...props}
