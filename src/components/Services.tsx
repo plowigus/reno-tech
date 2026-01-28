@@ -256,9 +256,7 @@ function ServiceItem({
       <div className="flex gap-6 md:gap-10 items-center">
         {/* Number & Icon */}
         <div className="shrink-0 relative">
-          <div className="absolute -top-8 -left-6 text-7xl md:text-9xl font-black text-red-600/4 leading-none pointer-events-none select-none">
-            {service.number}
-          </div>
+
           <div
             className={cn(
               "relative z-10 p-5 rounded-2xl transition-colors duration-500",

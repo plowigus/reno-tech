@@ -17,6 +17,7 @@ const links = [
   { label: "Usługi", href: "/#services" },
   { label: "Opinie", href: "/#reviews" },
   { label: "Sklep", href: "/shop" },
+  { label: "Forum", href: "/forum" },
   { label: "Kontakt", href: "/#contact" },
 ];
 
