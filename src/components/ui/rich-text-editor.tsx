@@ -3,30 +3,38 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
+import Youtube from "@tiptap/extension-youtube";
 import { Button } from "@/components/ui/button";
-import { Bold, Italic, Strikethrough, Code, List, ListOrdered, Quote, Heading2, Link as LinkIcon, Unlink } from "lucide-react";
-import { useState, useEffect } from "react";
+import {
+    Bold, Italic, Strikethrough, Code, List, ListOrdered,
+    Quote, Heading2, Link as LinkIcon, Youtube as YoutubeIcon, Unlink
+} from "lucide-react";
 
 const Toolbar = ({ editor }: { editor: any }) => {
     if (!editor) return null;
 
-    const setLink = () => {
-        const previousUrl = editor.getAttributes("link").href;
-        const url = window.prompt("URL", previousUrl);
+    const addLink = () => {
+        const previousUrl = editor.getAttributes('link').href;
+        const url = window.prompt('Wklej adres URL:', previousUrl);
 
         // cancelled
-        if (url === null) {
-            return;
-        }
+        if (url === null) return;
 
         // empty
-        if (url === "") {
-            editor.chain().focus().extendMarkRange("link").unsetLink().run();
+        if (url === '') {
+            editor.chain().focus().extendMarkRange('link').unsetLink().run();
             return;
         }
 
         // update
-        editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+        editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    };
+
+    const addYoutube = () => {
+        const url = window.prompt('Wklej link do YouTube:');
+        if (url) {
+            editor.commands.setYoutubeVideo({ src: url });
+        }
     };
 
     const buttons = [
@@ -38,11 +46,8 @@ const Toolbar = ({ editor }: { editor: any }) => {
         { icon: List, action: () => editor.chain().focus().toggleBulletList().run(), active: "bulletList" },
         { icon: ListOrdered, action: () => editor.chain().focus().toggleOrderedList().run(), active: "orderedList" },
         { icon: Quote, action: () => editor.chain().focus().toggleBlockquote().run(), active: "blockquote" },
-        {
-            icon: LinkIcon,
-            action: setLink,
-            active: "link"
-        },
+        { icon: LinkIcon, action: addLink, active: "link" },
+        { icon: YoutubeIcon, action: addYoutube, active: "youtube" },
     ];
 
     return (
@@ -50,16 +55,27 @@ const Toolbar = ({ editor }: { editor: any }) => {
             {buttons.map((btn, idx) => (
                 <Button
                     key={idx}
-                    type="button" // Prevent form submission
+                    type="button"
                     variant="ghost"
                     size="sm"
                     onClick={btn.action}
                     className={`h-8 w-8 p-0 ${editor.isActive(btn.active, btn.level) ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-white hover:bg-zinc-800"}`}
-                    title={btn.active}
                 >
                     <btn.icon className="w-4 h-4" />
                 </Button>
             ))}
+            {editor.isActive('link') && (
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor.chain().focus().unsetLink().run()}
+                    className="h-8 w-8 p-0 text-red-400 hover:bg-zinc-800"
+                    title="Usuń link"
+                >
+                    <Unlink className="w-4 h-4" />
+                </Button>
+            )}
         </div>
     );
 };
@@ -71,39 +87,26 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
             Underline,
             Link.configure({
                 openOnClick: false,
-                HTMLAttributes: {
-                    class: 'text-red-500 underline hover:text-red-400',
-                }
-            })
+                autolink: true,
+                defaultProtocol: 'https',
+            }),
+            Youtube.configure({
+                controls: false,
+                nocookie: true,
+            }),
         ],
         content: value,
         editorProps: {
             attributes: {
-                class: "prose prose-invert max-w-none min-h-[200px] p-4 focus:outline-none text-zinc-300 text-sm",
+                // Added prose-a styles for visibility
+                class: "prose prose-invert max-w-none min-h-[200px] p-4 focus:outline-none text-zinc-300 text-sm prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline",
             },
         },
         onUpdate: ({ editor }) => {
             onChange(editor.getHTML());
         },
-        immediatelyRender: false // Fixes some SSR hydration mismatches
+        immediatelyRender: false
     });
-
-    // Handle external value changes (e.g. form reset) if needed, 
-    // but usually for a controlled input like this we rely on the parent or initial value.
-    // Ideally if `value` changes from parent we should update editor, 
-    // but that can cause loops if not careful. For this simple case, `initialContent` is enough usually,
-    // OR we use a useEffect.
-    useEffect(() => {
-        if (editor && value !== editor.getHTML()) {
-            // Check if content is truly different to avoid cursor jumps or re-renders?
-            // For now, assume this is mostly for Initial render or Reset.
-            if (editor.getText() === "" && value === "") {
-                // do nothing
-            } else if (value === "" && editor.getText() !== "") {
-                editor.commands.clearContent();
-            }
-        }
-    }, [value, editor]);
 
     return (
         <div className="border border-zinc-800 rounded-md overflow-hidden bg-zinc-950 focus-within:ring-1 focus-within:ring-red-600 transition-all">
