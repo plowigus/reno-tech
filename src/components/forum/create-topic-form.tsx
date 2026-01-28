@@ -5,10 +5,11 @@ import { createPostAction } from "@/app/actions/forum-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/ui/rich-text-editor"; // Import Editor
 import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
+import { useState } from "react";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -28,6 +29,7 @@ function SubmitButton() {
 }
 
 export function CreateTopicForm({ categoryId, slug }: { categoryId: string, slug: string }) {
+    const [content, setContent] = useState(""); // State for editor content
 
     async function clientAction(formData: FormData) {
         const result = await createPostAction(categoryId, formData);
@@ -53,15 +55,15 @@ export function CreateTopicForm({ categoryId, slug }: { categoryId: string, slug
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="content" className="text-zinc-300">Treść wiadomości</Label>
-                <Textarea
-                    id="content"
-                    name="content"
-                    placeholder="Opisz dokładnie o co chodzi..."
-                    className="min-h-[300px] bg-zinc-950 border-zinc-800 focus-visible:ring-red-600 text-white placeholder:text-zinc-600 font-mono text-sm"
-                    required
-                    minLength={10}
+                <Label className="text-zinc-300">Treść wiadomości</Label>
+                {/* Hidden Input for Server Action */}
+                <input type="hidden" name="content" value={content} />
+
+                <RichTextEditor
+                    value={content}
+                    onChange={setContent}
                 />
+
                 <p className="text-[10px] text-zinc-500">Możesz używać Markdown.</p>
             </div>
 

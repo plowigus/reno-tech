@@ -11,6 +11,7 @@ import { MessageSquare, Quote, Flag } from "lucide-react";
 import { ReplyForm } from "@/components/forum/reply-form";
 import { forumPosts, forumComments } from "@/db/schema";
 import { sql, eq } from "drizzle-orm";
+import { RichTextRenderer } from "@/components/ui/rich-text-renderer"; // Import Renderer
 
 // --- HELPER COMPONENT: THE CLASSIC FORUM POST ---
 const ForumPostBlock = ({
@@ -79,8 +80,8 @@ const ForumPostBlock = ({
                     </div>
 
                     {/* Main Content */}
-                    <div className="p-6 text-zinc-300 leading-relaxed whitespace-pre-wrap flex-1">
-                        {content}
+                    <div className="p-6 text-zinc-300 leading-relaxed min-h-[100px] flex-1">
+                        <RichTextRenderer content={content} />
                     </div>
 
                     {/* Footer / Actions */}

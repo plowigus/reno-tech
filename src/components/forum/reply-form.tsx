@@ -3,9 +3,10 @@
 
 import { createCommentAction } from "@/app/actions/forum-actions";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/ui/rich-text-editor";
 import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
+import { useState } from "react";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -29,6 +30,8 @@ function SubmitButton() {
 }
 
 export function ReplyForm({ postId }: { postId: string }) {
+    const [content, setContent] = useState("");
+
 
     async function clientAction(formData: FormData) {
         const result = await createCommentAction(postId, formData);
@@ -42,16 +45,16 @@ export function ReplyForm({ postId }: { postId: string }) {
             // To be nice, let's reset the form.
             const form = document.getElementById("reply-form") as HTMLFormElement;
             if (form) form.reset();
+            setContent(""); // Reset editor content on success
         }
     }
 
     return (
         <form id="reply-form" action={clientAction} className="space-y-4">
-            <Textarea
-                name="content"
-                placeholder="Napisz swoją odpowiedź..."
-                className="bg-zinc-950 border-zinc-800 min-h-[150px] focus-visible:ring-red-600 font-mono text-sm"
-                required
+            <input type="hidden" name="content" value={content} />
+            <RichTextEditor
+                value={content}
+                onChange={setContent}
             />
             <div className="flex justify-end">
                 <SubmitButton />
