@@ -87,7 +87,7 @@ export default async function ForumCategoryPage({
                                 <TableHead className="w-12 text-center h-12"></TableHead>
                                 <TableHead className="text-zinc-400 font-medium w-full">Temat / Autor</TableHead>
                                 <TableHead className="text-center text-zinc-400 font-medium w-[150px] whitespace-nowrap">Statystyki</TableHead>
-                                <TableHead className="text-right text-zinc-400 font-medium w-[300px] whitespace-nowrap pr-6">Ostatni post</TableHead>
+                                <TableHead className="text-right text-zinc-400 font-medium w-[200px] whitespace-nowrap pr-6">Ostatni post</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -140,19 +140,13 @@ export default async function ForumCategoryPage({
                                                 </div>
                                             </TableCell>
                                             <TableCell className="text-right align-middle pr-6">
-                                                <div className="flex flex-col items-end gap-1">
-                                                    <span className="text-xs text-zinc-400">
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-xs font-bold text-red-500">
+                                                        {lastActiveUser?.name || "Użytkownik"}
+                                                    </span>
+                                                    <span className="text-[10px] text-zinc-500">
                                                         {lastActiveDate ? formatDate(lastActiveDate) : '--:--'}
                                                     </span>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="text-xs text-zinc-500 font-medium">Autor: {lastActiveUser?.name || "Anonim"}</span>
-                                                        <Avatar className="h-5 w-5 border border-white/10">
-                                                            <AvatarImage src={lastActiveUser?.image || undefined} />
-                                                            <AvatarFallback className="text-[9px] bg-zinc-800 text-zinc-400">
-                                                                {(lastActiveUser?.name || "U")[0].toUpperCase()}
-                                                            </AvatarFallback>
-                                                        </Avatar>
-                                                    </div>
                                                 </div>
                                             </TableCell>
                                         </TableRow>
