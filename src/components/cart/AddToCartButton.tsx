@@ -7,14 +7,22 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/use-cart-store";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 
-interface AddToCartButtonProps {
+interface AddToCartButtonProps extends ButtonProps {
     productId: string;
-    className?: string;
     iconSize?: number;
     showText?: boolean;
-    size?: string | null;
+    valsize?: string | null; // Renaming to avoid conflict if ButtonProps has size (it does)
+    // Actually, ButtonProps has 'size' (default | sm | lg | icon).
+    // Our 'size' prop is likely product size (S, M, L).
+    // This naming collision needs resolution. The component uses 'size' for product size.
+    // I should probably rename the product size prop to 'selectedSize' or similar, OR omit 'size' from ButtonProps.
+    // However, the user wants me to accept ButtonProps.
+    // If I Omit size from ButtonProps, I can't control button size.
+    // If I rename product size, I break callsites.
+    // Let's check callsites. It is used in ProductDetails.
+    selectedSize?: string | null;
     onValidate?: () => boolean;
 }
 
@@ -23,8 +31,10 @@ export function AddToCartButton({
     className,
     iconSize = 20,
     showText = false,
-    size = null,
-    onValidate
+    selectedSize = null,
+    size, // This is now ButtonProps size
+    onValidate,
+    ...props
 }: AddToCartButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -41,7 +51,7 @@ export function AddToCartButton({
         setIsLoading(true);
 
         try {
-            const result = await addToCart(productId, 1, size);
+            const result = await addToCart(productId, 1, selectedSize);
 
             if (result.requiresAuth) {
                 // Set Intent Cookie
@@ -49,7 +59,7 @@ export function AddToCartButton({
                     type: "cart",
                     productId,
                     quantity: 1,
-                    size // Save size in intent as well
+                    size: selectedSize // Save size in intent as well
                 });
                 document.cookie = `cart_intent=${encodeURIComponent(intent)}; path=/; max-age=3600`;
 
@@ -75,12 +85,14 @@ export function AddToCartButton({
     return (
         <Button
             onClick={handleAddToCart}
-            disabled={isLoading}
-            variant="ghost"
+            disabled={isLoading || props.disabled}
+            variant={props.variant || "ghost"}
+            size={size}
             className={cn(
-                "flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent group relative overflow-hidden",
+                "flex items-center justify-center transition-all duration-300 hover:bg-transparent group relative overflow-hidden",
                 className
             )}
+            {...props}
         >
             {isLoading ? (
                 <Loader2 size={iconSize} className="animate-spin text-white" />

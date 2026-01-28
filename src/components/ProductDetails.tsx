@@ -146,7 +146,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     <div className="flex gap-4 mb-8">
                         <AddToCartButton
                             productId={product.id}
-                            size={selectedSize}
+                            selectedSize={selectedSize}
                             onValidate={() => {
                                 if (product.sizes && product.sizes.length > 0 && !selectedSize) {
                                     setShowError(true);
