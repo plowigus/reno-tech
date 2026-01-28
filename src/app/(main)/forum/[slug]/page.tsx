@@ -48,7 +48,7 @@ export default async function ForumCategoryPage({
             author: true,
             comments: {
                 orderBy: (comments, { desc }) => [desc(comments.createdAt)],
-                limit: 1,
+                // limit: 1, // REMOVED to get correct count of comments
                 with: {
                     author: true,
                 },
@@ -103,7 +103,7 @@ export default async function ForumCategoryPage({
                             ) : (
                                 posts.map((post) => {
                                     // Determine last activity info
-                                    const lastComment = post.comments[0];
+                                    const lastComment = post.comments[0]; // First comment since we order by createdAt DESC
                                     const lastActiveUser = lastComment ? lastComment.author : post.author;
                                     const lastActiveDate = lastComment ? lastComment.createdAt : post.updatedAt;
 
@@ -132,13 +132,15 @@ export default async function ForumCategoryPage({
                                                     </div>
                                                 </Link>
                                             </TableCell>
+
+                                            {/* STATS COLUMN - REPLIES ONLY */}
                                             <TableCell className="text-center align-middle">
                                                 <div className="flex flex-col gap-1">
-                                                    <span className="text-sm font-medium text-zinc-300">{post.comments.length}</span>
+                                                    <span className="text-base font-bold text-zinc-200">{post.comments.length}</span>
                                                     <span className="text-xs text-zinc-500">odpowiedzi</span>
-                                                    <span className="text-xs text-zinc-600 border-t border-zinc-800/50 pt-1 mt-1 block">{post.views || 0} wyśw.</span>
                                                 </div>
                                             </TableCell>
+
                                             <TableCell className="text-right align-middle pr-6">
                                                 <div className="flex flex-col items-end">
                                                     <span className="text-xs font-bold text-red-500">
