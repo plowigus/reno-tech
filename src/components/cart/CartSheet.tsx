@@ -30,6 +30,7 @@ interface CartData {
 
 export function CartSheet() {
     const { isOpen, onClose } = useCartStore();
+    const items = useCartStore((state) => state.items) || [];
     const [cart, setCart] = useState<CartData | null>(null);
     const [isPending, startTransition] = useTransition();
 
