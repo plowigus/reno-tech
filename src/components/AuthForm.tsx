@@ -7,6 +7,8 @@ import { Loader2, Mail, Lock, User, Eye, EyeOff, Chrome, AlertCircle, CheckCircl
 import { useRouter } from "next/navigation"; // Dodajemy router do zmiany URL
 import { InteractiveLogo } from "@/components/Animation/InteractiveLogo";
 import { TurnstileWidget } from "@/components/ui/turnstile-widget";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface AuthFormProps {
     initialTab?: "login" | "register";
@@ -84,12 +86,12 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                         <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Imię</label>
                         <div className="relative group">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
-                            <input
+                            <Input
                                 name="name"
                                 type="text"
                                 placeholder="Jan Kowalski"
                                 required
-                                className="w-full bg-background/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="bg-background/50 border-zinc-800 text-white pl-9 pr-3 focus:border-red-600 focus:ring-red-600"
                             />
                         </div>
                     </div>
@@ -99,12 +101,12 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Email</label>
                     <div className="relative group">
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
-                        <input
+                        <Input
                             name="email"
                             type="email"
                             placeholder="twoj@email.com"
                             required
-                            className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                            className="bg-zinc-950/50 border-zinc-800 text-white pl-9 pr-3 focus:border-red-600 focus:ring-red-600"
                         />
                     </div>
                 </div>
@@ -113,12 +115,12 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Hasło</label>
                     <div className="relative group">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-red-500 transition-colors" />
-                        <input
+                        <Input
                             name="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             required
-                            className="w-full bg-zinc-950/50 border border-zinc-800 text-white rounded-lg py-2.5 pl-9 pr-9 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                            className="bg-zinc-950/50 border-zinc-800 text-white pl-9 pr-9 focus:border-red-600 focus:ring-red-600"
                         />
                         <button
                             type="button"
@@ -181,16 +183,16 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
                     </div>
                 )}
 
-                <button
+                <Button
                     type="submit"
                     disabled={isLogin ? isLoginPending : isRegisterPending}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl py-3.5 text-sm transition-all duration-200 shadow-lg shadow-red-600/20 hover:shadow-red-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl py-6 text-sm transition-all duration-200 shadow-lg shadow-red-600/20 hover:shadow-red-600/40"
                 >
                     {isLogin
                         ? (isLoginPending ? <Loader2 className="animate-spin w-5 h-5" /> : "Zaloguj się")
                         : (isRegisterPending ? <Loader2 className="animate-spin w-5 h-5" /> : "Zarejestruj się")
                     }
-                </button>
+                </Button>
             </form>
 
             <div className="relative my-6">
@@ -203,24 +205,26 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
             </div>
 
             <div className="grid grid-cols-1 gap-3">
-                <button
+                <Button
                     type="button"
+                    variant="outline"
                     onClick={() => loginWithGoogle()}
-                    className="flex items-center justify-center gap-3 bg-background hover:bg-zinc-900 border border-zinc-800 text-white rounded-xl py-2.5 text-sm transition-all group"
+                    className="w-full flex items-center justify-center gap-3 bg-background hover:bg-zinc-900 border border-zinc-800 text-white rounded-xl py-6 text-sm transition-all group"
                 >
                     <Chrome className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
                     <span>Google</span>
-                </button>
+                </Button>
             </div>
 
             <p className="mt-6 text-center text-zinc-400 text-sm">
                 {isLogin ? "Nie masz konta?" : "Masz już konto?"}{" "}
-                <button
+                <Button
+                    variant="link"
                     onClick={toggleMode}
-                    className="text-red-600 hover:text-red-500 font-semibold transition-colors hover:underline decoration-red-600/30 underline-offset-4"
+                    className="text-red-600 hover:text-red-500 font-semibold transition-colors hover:underline decoration-red-600/30 underline-offset-4 p-0 h-auto"
                 >
                     {isLogin ? "Zarejestruj się" : "Zaloguj się"}
-                </button>
+                </Button>
             </p>
         </div>
     );

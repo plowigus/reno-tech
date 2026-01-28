@@ -10,6 +10,8 @@ import Image from "next/image";
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface CartItem {
     id: string;
@@ -74,7 +76,7 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[50vh] text-zinc-400">
                 <p>Twój koszyk jest pusty.</p>
-                <button onClick={() => router.push("/shop")} className="text-white underline mt-4">Wróć do sklepu</button>
+                <Button variant="link" onClick={() => router.push("/shop")} className="text-white underline mt-4">Wróć do sklepu</Button>
             </div>
         );
     }
@@ -92,9 +94,9 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-zinc-400">Imię i Nazwisko</label>
-                            <input
+                            <Input
                                 {...form.register("customerName")}
-                                className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                className="bg-zinc-900 border-white/10 text-white focus:border-red-500"
                                 placeholder="Jan Kowalski"
                             />
                             {form.formState.errors.customerName && (
@@ -103,9 +105,9 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                         </div>
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-zinc-400">Email</label>
-                            <input
+                            <Input
                                 {...form.register("customerEmail")}
-                                className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                className="bg-zinc-900 border-white/10 text-white focus:border-red-500"
                                 placeholder="jan@example.com"
                             />
                             {form.formState.errors.customerEmail && (
@@ -116,9 +118,9 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-zinc-400">Ulica i numer</label>
-                        <input
+                        <Input
                             {...form.register("shippingStreet")}
-                            className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                            className="bg-zinc-900 border-white/10 text-white focus:border-red-500"
                             placeholder="ul. Przykładowa 1/2"
                         />
                         {form.formState.errors.shippingStreet && (
@@ -129,9 +131,9 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-zinc-400">Kod pocztowy</label>
-                            <input
+                            <Input
                                 {...form.register("shippingPostalCode")}
-                                className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 transition-colors"
+                                className="bg-zinc-900 border-white/10 text-white focus:border-red-500"
                                 placeholder="00-000"
                             />
                             {form.formState.errors.shippingPostalCode && (
@@ -140,9 +142,9 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label className="text-sm font-medium text-zinc-400">Miasto</label>
-                            <input
+                            <Input
                                 {...form.register("shippingCity")}
-                                className="w-full bg-secondary border border-border rounded-lg px-4 py-3 text-foreground focus:outline-none focus:border-red-500 transition-colors"
+                                className="bg-secondary border-border text-foreground focus:border-red-500"
                                 placeholder="Warszawa"
                             />
                             {form.formState.errors.shippingCity && (
@@ -207,15 +209,15 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                     </div>
 
                     {/* Submit Button */}
-                    <button
+                    <Button
                         type="submit"
                         form="checkout-form"
                         disabled={isSubmitting}
-                        className="w-full mt-6 bg-white hover:bg-zinc-200 text-black font-black uppercase py-4 rounded-lg transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full mt-6 bg-white hover:bg-zinc-200 text-black font-black uppercase py-4 rounded-lg transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed h-auto"
                     >
                         {isSubmitting ? <Loader2 className="animate-spin" /> : <Lock size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />}
                         {isSubmitting ? "Przetwarzanie..." : "Zamawiam i płacę"}
-                    </button>
+                    </Button>
 
                     <div className="mt-4 flex items-center justify-center gap-2 text-xs text-zinc-600">
                         <Lock size={12} />

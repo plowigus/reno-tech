@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { getCart, removeFromCart, updateItemQuantity } from "@/app/actions/cart-actions";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 interface CartItem {
     id: string;
@@ -101,9 +102,9 @@ export function CartSheet() {
                         <ShoppingBag className="text-red-500" />
                         Twój Koszyk
                     </h2>
-                    <button onClick={onClose} className="text-zinc-400 hover:text-white transition-colors">
+                    <Button variant="ghost" size="icon" onClick={onClose} className="text-zinc-400 hover:text-white hover:bg-transparent">
                         <X size={24} />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -131,12 +132,14 @@ export function CartSheet() {
                                                     </p>
                                                 )}
                                             </div>
-                                            <button
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleRemove(item.id)}
-                                                className="text-zinc-500 hover:text-red-500 transition-colors ml-2"
+                                                className="text-zinc-500 hover:text-red-500 hover:bg-transparent h-auto p-0 ml-2"
                                             >
                                                 <X size={16} />
-                                            </button>
+                                            </Button>
                                         </div>
                                         <p className="text-zinc-400 text-sm mt-1">
                                             {Number(item.product.price).toFixed(2)} PLN
@@ -145,20 +148,24 @@ export function CartSheet() {
 
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center border border-white/10 rounded-lg bg-background/20">
-                                            <button
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
-                                                className="p-1 hover:text-red-500 transition-colors disabled:opacity-50"
+                                                className="p-1 hover:text-red-500 hover:bg-transparent h-6 w-6"
                                                 disabled={item.quantity <= 1}
                                             >
                                                 <Minus size={14} />
-                                            </button>
+                                            </Button>
                                             <span className="text-white text-sm w-6 text-center">{item.quantity}</span>
-                                            <button
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
-                                                className="p-1 hover:text-red-500 transition-colors"
+                                                className="p-1 hover:text-red-500 hover:bg-transparent h-6 w-6"
                                             >
                                                 <Plus size={14} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -168,12 +175,13 @@ export function CartSheet() {
                         <div className="h-full flex flex-col items-center justify-center text-zinc-500 space-y-4">
                             <ShoppingBag size={48} className="opacity-20" />
                             <p>Twój koszyk jest pusty</p>
-                            <button
+                            <Button
+                                variant="link"
                                 onClick={onClose}
-                                className="text-red-500 hover:text-red-400 text-sm font-medium"
+                                className="text-red-500 hover:text-red-400 text-sm font-medium h-auto p-0"
                             >
                                 Wróć do sklepu
-                            </button>
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -195,13 +203,17 @@ export function CartSheet() {
                                 {total.toFixed(2)} PLN
                             </span>
                         </div>
-                        <Link
-                            href="/checkout"
-                            onClick={onClose}
-                            className="block w-full text-center bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
+                        <Button
+                            asChild
+                            className="w-full text-center bg-white text-black font-bold py-6 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
                         >
-                            Przejdź do kasy
-                        </Link>
+                            <Link
+                                href="/checkout"
+                                onClick={onClose}
+                            >
+                                Przejdź do kasy
+                            </Link>
+                        </Button>
                     </div>
                 )}
             </div>

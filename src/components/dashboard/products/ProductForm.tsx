@@ -13,6 +13,8 @@ import { clsx } from "clsx";
 import { useDropzone } from "@uploadthing/react";
 import { products } from "@/db/schema";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type ProductFormProps = {
     initialData?: typeof products.$inferSelect;
@@ -130,9 +132,9 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 <label className="text-sm font-medium text-zinc-300">
                                     Nazwa produktu
                                 </label>
-                                <input
+                                <Input
                                     {...form.register("name")}
-                                    className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all"
+                                    className="bg-zinc-800/50 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                                     placeholder="np. Karta Renault Laguna II"
                                 />
                                 {form.formState.errors.name && (
@@ -174,16 +176,16 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                                 fill
                                                 className="object-cover"
                                             />
-                                            <button
+                                            <Button
                                                 type="button"
                                                 onClick={() => {
                                                     const newImages = images.filter((_, i) => i !== index);
                                                     form.setValue("images", newImages);
                                                 }}
-                                                className="absolute top-2 right-2 p-1.5 bg-background/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100"
+                                                className="absolute top-2 right-2 p-1.5 bg-background/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 h-auto w-auto"
                                             >
                                                 <X size={14} />
-                                            </button>
+                                            </Button>
                                         </div>
                                     ))}
                                 </div>
@@ -237,13 +239,13 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                 <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                                     <DollarSign size={16} /> Cena (PLN)
                                 </label>
-                                <input
+                                <Input
                                     type="number"
                                     step="0.01"
                                     onWheel={(e) => e.currentTarget.blur()}
                                     // Zod coercion handles number conversion
                                     {...form.register("price")}
-                                    className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    className="bg-zinc-800/50 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                                 {form.formState.errors.price && (
                                     <p className="text-sm text-red-500">
@@ -310,19 +312,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                         {availableSizes.map((size) => {
                                             const isSelected = currentSizes.includes(size);
                                             return (
-                                                <button
+                                                <Button
                                                     key={size}
                                                     type="button"
                                                     onClick={() => handleSizeToggle(size)}
                                                     className={clsx(
-                                                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
+                                                        "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border h-auto",
                                                         isSelected
-                                                            ? "bg-red-600 text-white border-red-600"
-                                                            : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500"
+                                                            ? "bg-red-600 text-white border-red-600 hover:bg-red-700"
+                                                            : "bg-zinc-800 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800"
                                                     )}
                                                 >
                                                     {size}
-                                                </button>
+                                                </Button>
                                             );
                                         })}
                                     </div>
@@ -339,10 +341,10 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         )}
 
                         {/* Submit Button */}
-                        <button
+                        <Button
                             type="submit"
                             disabled={isPending || isUploading}
-                            className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-auto"
                         >
                             {isPending || isUploading ? (
                                 <>
@@ -360,7 +362,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                     {initialData ? "Zapisz zmiany" : "Dodaj produkt"}
                                 </>
                             )}
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </form>

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Loader2, MapPin } from "lucide-react";
 import { getPlaceSuggestions, getPlaceDetails, type PlaceSuggestion, type AddressComponents } from "@/app/actions/google-maps-actions";
+import { Input } from "@/components/ui/input";
 
 interface AddressAutocompleteProps {
     defaultValue?: string;
@@ -76,7 +77,7 @@ export default function AddressAutocomplete({
     return (
         <div className="relative" ref={wrapperRef}>
             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-            <input
+            <Input
                 name="street"
                 value={query}
                 onChange={handleInputChange}
@@ -84,7 +85,7 @@ export default function AddressAutocomplete({
                     if (suggestions.length > 0) setShowSuggestions(true);
                 }}
                 placeholder="Zacznij wpisywać adres..."
-                className="w-full bg-secondary border border-border rounded-lg py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-muted-foreground"
+                className="bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-red-600 focus:ring-red-600"
                 autoComplete="off"
             />
 

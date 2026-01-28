@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { Loader2, Save, User, Mail, Shield } from "lucide-react";
 import { users } from "@/db/schema";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 type UserFormProps = {
     initialData: typeof users.$inferSelect;
@@ -62,9 +64,9 @@ export function UserForm({ initialData }: UserFormProps) {
                         <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                             <User size={16} /> Imię i nazwisko
                         </label>
-                        <input
+                        <Input
                             {...form.register("name")}
-                            className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all"
+                            className="bg-zinc-800/50 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                             placeholder="Imię i nazwisko"
                         />
                         {form.formState.errors.name && (
@@ -79,10 +81,10 @@ export function UserForm({ initialData }: UserFormProps) {
                         <label className="text-sm font-medium text-zinc-300 flex items-center gap-2">
                             <Mail size={16} /> Adres Email
                         </label>
-                        <input
+                        <Input
                             {...form.register("email")}
                             type="email"
-                            className="w-full bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all"
+                            className="bg-zinc-800/50 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                             placeholder="email@example.com"
                         />
                         {form.formState.errors.email && (
@@ -143,10 +145,10 @@ export function UserForm({ initialData }: UserFormProps) {
                 )}
 
                 <div className="flex justify-end">
-                    <button
+                    <Button
                         type="submit"
                         disabled={isPending}
-                        className="bg-red-600 hover:bg-red-700 text-foreground font-medium px-8 py-3 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-red-600 hover:bg-red-700 text-foreground font-medium px-8 py-3 rounded-xl transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed h-auto"
                     >
                         {isPending ? (
                             <Loader2 size={20} className="animate-spin" />
@@ -154,7 +156,7 @@ export function UserForm({ initialData }: UserFormProps) {
                             <Save size={20} />
                         )}
                         Zapisz zmiany
-                    </button>
+                    </Button>
                 </div>
             </form>
         </div>

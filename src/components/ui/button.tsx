@@ -43,11 +43,6 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant, size, asChild = false, children, onClick, ...props }, ref) => {
         const Comp = asChild ? Slot : "button"
-
-        // We only add Ripple if not asChild, because Slot merges props and it's harder to control the children structure.
-        // If asChild is true, the child element needs to handle the ripple or be styled with overflow-hidden separately.
-        // For simplicity, we add Ripple as a child of Comp. Button normally accepts children.
-
         return (
             <Comp
                 className={cn(buttonVariants({ variant, size, className }))}

@@ -6,6 +6,8 @@ import { UploadButton } from "@/lib/uploadthing";
 import Image from "next/image";
 import { Loader2, User, Phone, MapPin, Building, Globe, CheckCircle2, AlertCircle, Crown } from "lucide-react";
 import AddressAutocomplete from "./AddressAutocomplete";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface SettingsFormProps {
     user: any; // Using any for simplicity with Drizzle type inference usually needed
@@ -90,12 +92,12 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                         <label className="text-sm font-medium text-zinc-400">Imię i nazwisko</label>
                         <div className="relative">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                            <input
+                            <Input
                                 name="name"
                                 defaultValue={user.name || ""}
                                 type="text"
                                 placeholder="Jan Kowalski"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                             />
                         </div>
                     </div>
@@ -104,12 +106,12 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                         <label className="text-sm font-medium text-zinc-400">Numer telefonu</label>
                         <div className="relative">
                             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                            <input
+                            <Input
                                 name="phoneNumber"
                                 defaultValue={user.phoneNumber || ""}
                                 type="tel"
                                 placeholder="+48 123 456 789"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                             />
                         </div>
                     </div>
@@ -138,13 +140,13 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                         <label className="text-sm font-medium text-zinc-400">Kod pocztowy</label>
                         <div className="relative">
                             <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                            <input
+                            <Input
                                 name="postalCode"
                                 value={postalCode}
                                 onChange={(e) => setPostalCode(e.target.value)}
                                 type="text"
                                 placeholder="00-000"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                             />
                         </div>
                     </div>
@@ -153,13 +155,13 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                         <label className="text-sm font-medium text-zinc-400">Miasto</label>
                         <div className="relative">
                             <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                            <input
+                            <Input
                                 name="city"
                                 value={city}
                                 onChange={(e) => setCity(e.target.value)}
                                 type="text"
                                 placeholder="Warszawa"
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-zinc-600"
+                                className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-red-600 focus:ring-red-600"
                             />
                         </div>
                     </div>
@@ -168,13 +170,13 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                         <label className="text-sm font-medium text-zinc-400">Kraj</label>
                         <div className="relative">
                             <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
-                            <input
+                            <Input
                                 name="country"
                                 value={country}
                                 onChange={(e) => setCountry(e.target.value)}
                                 type="text"
                                 placeholder="Polska"
-                                className="w-full bg-secondary border border-border rounded-lg py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-all placeholder:text-muted-foreground"
+                                className="bg-secondary border-border text-foreground placeholder:text-muted-foreground focus:border-red-600 focus:ring-red-600"
                             />
                         </div>
                     </div>
@@ -198,13 +200,13 @@ export default function SettingsForm({ user }: SettingsFormProps) {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-                <button
+                <Button
                     type="submit"
                     disabled={isPending}
-                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-red-600/20 hover:shadow-red-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-semibold transition-all shadow-lg shadow-red-600/20 hover:shadow-red-600/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 h-auto"
                 >
                     {isPending ? <Loader2 className="animate-spin" /> : "Zapisz zmiany"}
-                </button>
+                </Button>
             </div>
         </form>
     );

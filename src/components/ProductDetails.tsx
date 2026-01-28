@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 // ... previous imports
 import { AddToCartButton } from "./cart/AddToCartButton";
+import { Button } from "@/components/ui/button";
 
 interface Product {
     id: string;
@@ -39,11 +40,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                 {product.images.length > 1 && (
                     <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible lg:w-24 shrink-0 pb-2 lg:pb-0 scrollbar-hide max-h-[calc(100vh-10rem)] overflow-y-auto">
                         {product.images.slice(0, 5).map((img, idx) => (
-                            <button
+                            <Button
                                 key={idx}
+                                variant="ghost"
                                 onClick={() => setSelectedImage(img)}
                                 className={cn(
-                                    "relative aspect-3/4 w-20 lg:w-full rounded-lg overflow-hidden border transition-all duration-300 shrink-0",
+                                    "relative aspect-3/4 w-20 lg:w-full rounded-lg overflow-hidden border transition-all duration-300 shrink-0 p-0 h-auto hover:bg-transparent",
                                     selectedImage === img
                                         ? "border-red-600 opacity-100 ring-2 ring-red-600/30"
                                         : "border-border opacity-50 hover:opacity-100 hover:border-white/30"
@@ -56,7 +58,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                     className="object-cover"
                                     sizes="100px"
                                 />
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 )}
@@ -109,23 +111,24 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 </div>
                                 <div className="grid grid-cols-4 gap-2">
                                     {product.sizes.map((size) => (
-                                        <button
+                                        <Button
                                             key={size}
+                                            variant="ghost"
                                             onClick={() => {
                                                 setSelectedSize(size);
                                                 setShowError(false);
                                             }}
                                             className={cn(
-                                                "h-12 rounded-md font-bold text-sm flex items-center justify-center transition-all duration-200 border",
+                                                "h-12 rounded-md font-bold text-sm flex items-center justify-center transition-all duration-200 border w-full",
                                                 selectedSize === size
-                                                    ? "bg-white text-black border-white"
+                                                    ? "bg-white text-black border-white hover:bg-white/90 hover:text-black"
                                                     : showError
-                                                        ? "bg-transparent border-red-500 text-red-500 hover:border-red-400"
-                                                        : "bg-transparent border-white/20 text-gray-400 hover:border-white hover:text-white"
+                                                        ? "bg-transparent border-red-500 text-red-500 hover:border-red-400 hover:bg-red-500/10 hover:text-red-500"
+                                                        : "bg-transparent border-white/20 text-gray-400 hover:border-white hover:text-white hover:bg-white/5"
                                             )}
                                         >
                                             {size}
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
                             </div>
