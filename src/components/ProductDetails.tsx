@@ -156,7 +156,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 setShowError(false);
                                 return true;
                             }}
-                            className="block w-full text-center bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
                             showText={true}
                             iconSize={20}
                         />

@@ -32,7 +32,7 @@ export function AddToCartButton({
     iconSize = 20,
     showText = false,
     selectedSize = null,
-    size, // This is now ButtonProps size
+    size,
     onValidate,
     ...props
 }: AddToCartButtonProps) {
@@ -90,6 +90,9 @@ export function AddToCartButton({
             size={size}
             className={cn(
                 "flex items-center justify-center transition-all duration-300 hover:bg-transparent group relative overflow-hidden",
+                // Default primary styling if no specific variant override is provided (though we defaults to ghost above, we might want to change that or just append these classes)
+                // Actually, the user wants to unify it. Let's make this the default look for the component when used in this context.
+                showText && "w-full text-center bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 uppercase tracking-wide",
                 className
             )}
             {...props}
