@@ -153,7 +153,7 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 setShowError(false);
                                 return true;
                             }}
-                            className="flex-1 bg-white hover:bg-zinc-200 text-black font-black uppercase tracking-wide py-4 px-8 rounded-lg flex items-center justify-center gap-3 transition-colors"
+                            className="block w-full text-center bg-white text-black font-bold py-3 rounded-lg hover:bg-zinc-200 transition-colors uppercase tracking-wide"
                             showText={true}
                             iconSize={20}
                         />

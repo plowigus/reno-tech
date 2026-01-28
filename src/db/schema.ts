@@ -6,6 +6,7 @@ import {
     boolean,
     decimal,
     primaryKey,
+    uuid,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -182,6 +183,38 @@ export const wishlists = pgTable("wishlist", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// --- SECTION 5: FORUM ---
+
+export const forumCategories = pgTable("forum_category", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").unique().notNull(),
+    description: text("description"),
+    icon: text("icon"),
+    order: integer("order").default(0),
+});
+
+export const forumPosts = pgTable("forum_post", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    categoryId: uuid("categoryId").references(() => forumCategories.id),
+    authorId: text("authorId").references(() => users.id),
+    title: text("title").notNull(),
+    content: text("content").notNull(),
+    slug: text("slug").unique(),
+    views: integer("views").default(0),
+    pinned: boolean("pinned").default(false),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const forumComments = pgTable("forum_comment", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    postId: uuid("postId").references(() => forumPosts.id),
+    authorId: text("authorId").references(() => users.id),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+});
+
 // --- RELATIONS ---
 import { relations } from "drizzle-orm";
 
@@ -246,4 +279,36 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
         fields: [orderItems.productId],
         references: [products.id],
     }),
+}));
+
+export const forumCategoriesRelations = relations(forumCategories, ({ many }) => ({
+    posts: many(forumPosts),
+}));
+
+export const forumPostsRelations = relations(forumPosts, ({ one, many }) => ({
+    category: one(forumCategories, {
+        fields: [forumPosts.categoryId],
+        references: [forumCategories.id],
+    }),
+    author: one(users, {
+        fields: [forumPosts.authorId],
+        references: [users.id],
+    }),
+    comments: many(forumComments),
+}));
+
+export const forumCommentsRelations = relations(forumComments, ({ one }) => ({
+    post: one(forumPosts, {
+        fields: [forumComments.postId],
+        references: [forumPosts.id],
+    }),
+    author: one(users, {
+        fields: [forumComments.authorId],
+        references: [users.id],
+    }),
+}));
+
+export const usersForumRelations = relations(users, ({ many }) => ({
+    forumPosts: many(forumPosts),
+    forumComments: many(forumComments),
 }));
