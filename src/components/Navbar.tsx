@@ -11,6 +11,7 @@ import { WishlistButton } from "@/components/nav/WishlistButton";
 
 import { getWishlistCount } from "@/app/actions/wishlist-actions";
 import { WishlistCounterSync } from "@/components/nav/WishlistCounterSync";
+import { CartSyncer } from "@/components/cart/CartSyncer";
 
 const links = [
   { label: "O nas", href: "/#about" },
@@ -62,6 +63,7 @@ export default async function Navbar() {
           ))}
           <div className="ml-4 pl-4 border-l border-border flex items-center gap-4">
             <WishlistButton />
+            <CartSyncer />
             <CartTrigger />
             <UserNav user={user} />
           </div>

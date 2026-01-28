@@ -11,15 +11,15 @@ export const CartTrigger = forwardRef<HTMLButtonElement, ButtonProps>((props, re
 
     useEffect(() => { setMounted(true); }, []);
 
-    const count = mounted ? items.length : 0;
+    const count = mounted ? items?.length || 0 : 0;
 
     return (
         <Button
             ref={ref}
             variant="ghost"
             size="icon"
-            {...props} // <--- THIS MAKES THE CLICK WORK (Passes onClick from SheetTrigger)
             className={cn("relative rounded-full hover:bg-zinc-800 transition-colors", props.className)}
+            {...props}
         >
             <ShoppingBag className="w-6 h-6 text-white" />
             {count > 0 && (
