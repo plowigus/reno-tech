@@ -1,28 +1,33 @@
-"use client";
+import React, { forwardRef } from 'react';
+import { Button, ButtonProps } from '@/components/ui/button';
+import { ShoppingBag } from 'lucide-react';
+import { useCartStore } from '@/store/use-cart-store';
+import { useMounted } from '@/hooks/use-mounted';
+import { cn } from '@/lib/utils';
 
-import { useCartStore } from "@/store/use-cart-store";
-import { ShoppingBag } from "lucide-react";
-import { cn } from "@/lib/utils";
+export const CartTrigger = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+    const items = useCartStore((state) => state.items);
+    const isMounted = useMounted();
 
-interface CartTriggerProps {
-    className?: string;
-    count?: number;
-}
-
-export function CartTrigger({ className, count = 0 }: CartTriggerProps) {
-    const onOpen = useCartStore((state) => state.onOpen);
+    const itemCount = isMounted ? items.length : 0;
 
     return (
-        <button
-            onClick={onOpen}
-            className={cn("relative group p-2 hover:bg-white/10 rounded-full transition-colors", className)}
+        <Button
+            ref={ref}
+            variant="ghost"
+            size="icon"
+            className={cn("relative rounded-full hover:bg-zinc-800 transition-colors", props.className)}
+            {...props}
         >
-            <ShoppingBag className="text-white transition-colors group-hover:text-red-500" size={20} />
-            {count > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-black">
-                    {count > 99 ? "99+" : count}
+            <ShoppingBag className="w-6 h-6 text-white" />
+            {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-black">
+                    {itemCount}
                 </span>
             )}
-        </button>
+            <span className="sr-only">Otwórz koszyk</span>
+        </Button>
     );
-}
+});
+
+CartTrigger.displayName = "CartTrigger";
