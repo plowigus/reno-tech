@@ -17,7 +17,7 @@ export function middleware(req: NextRequest) {
     form-action 'self';
     frame-ancestors 'none';
     frame-src 'self' https://challenges.cloudflare.com https://vercel.live;
-    connect-src 'self' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
+    connect-src 'self' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com https://uploadthing.com https://utfs.io;
     upgrade-insecure-requests;
   `.replace(/\s{2,}/g, " ").trim()
     );
