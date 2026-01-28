@@ -33,7 +33,7 @@ export default function UserNav({ user }: UserNavProps) {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 focus:outline-none"
+                className="flex items-center gap-2 focus:outline-none cursor-pointer"
             >
                 <div className="relative">
                     <div className="w-9 h-9 rounded-full overflow-hidden border border-border bg-card">
@@ -90,7 +90,7 @@ export default function UserNav({ user }: UserNavProps) {
                                     setIsOpen(false);
                                     handleSignOut();
                                 }}
-                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left"
+                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 transition-colors text-left cursor-pointer"
                             >
                                 <LogOut size={16} />
                                 Wyloguj się

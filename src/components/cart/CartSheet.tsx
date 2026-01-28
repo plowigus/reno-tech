@@ -129,7 +129,7 @@ export function CartSheet() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleRemove(item.id)}
-                                                className="text-zinc-500 hover:text-red-500 hover:bg-transparent h-auto p-0 ml-2"
+                                                className="text-zinc-500 hover:text-red-500 hover:bg-transparent h-auto p-0 ml-2 cursor-pointer"
                                             >
                                                 <X size={16} />
                                                 <span className="sr-only">Usuń</span>

@@ -10,7 +10,7 @@ export function WishlistButton() {
     return (
         <Link
             href="/dashboard/wishlist"
-            className="group relative p-2 hover:bg-white/10 rounded-full transition-colors"
+            className="group relative p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
         >
             <Heart className="text-white transition-colors group-hover:text-red-500" size={20} />
             {count > 0 && (

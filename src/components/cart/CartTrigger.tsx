@@ -24,7 +24,7 @@ export const CartTrigger = forwardRef<HTMLButtonElement, React.ButtonHTMLAttribu
     return (
         <button
             ref={ref}
-            className={cn("group relative p-2 hover:bg-white/10 rounded-full transition-colors", props.className)}
+            className={cn("group relative p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer", props.className)}
             {...props}
             onClick={handleClick}
         >
