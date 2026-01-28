@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageSquare, Quote, Flag } from "lucide-react";
 import { ReplyForm } from "@/components/forum/reply-form";
+import { forumPosts, forumComments } from "@/db/schema";
+import { sql, eq } from "drizzle-orm";
 
 // --- HELPER COMPONENT: THE CLASSIC FORUM POST ---
 const ForumPostBlock = ({
@@ -16,13 +18,15 @@ const ForumPostBlock = ({
     content,
     createdAt,
     isMainPost = false,
-    index
+    index,
+    userPostCount = 0
 }: {
     author: any,
     content: string,
     createdAt: Date,
     isMainPost?: boolean,
-    index: number
+    index: number,
+    userPostCount?: number
 }) => {
     return (
         <div className={`mb-4 border border-zinc-800 rounded-md overflow-hidden ${isMainPost ? "bg-zinc-900/60 shadow-md" : "bg-zinc-900/20"}`}>
@@ -62,8 +66,7 @@ const ForumPostBlock = ({
                         <p className="text-zinc-400">
                             {author?.createdAt ? format(new Date(author.createdAt), "yyyy-MM-dd") : "Nieznana"}
                         </p>
-                        {/* Placeholder for stats */}
-                        <p>Postów: <span className="text-zinc-300">--</span></p>
+                        <p>Postów: <span className="text-zinc-300">{userPostCount}</span></p>
                     </div>
                 </div>
 
@@ -112,7 +115,36 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
 
     if (!post) return notFound();
 
-    // Fetch Category Name for Breadcrumbs (Optional optimization: pass via params or fetch)
+    // 1. ATOMIC VIEW INCREMENT (Server-side)
+    // We execute this immediately. No need to await if we don't need the result immediately,
+    // but better to await to ensure it runs successfully.
+    await db.update(forumPosts)
+        .set({ views: sql`${forumPosts.views} + 1` })
+        .where(eq(forumPosts.id, post.id));
+
+    // 2. FETCH USER STATS (Optimized for N+1)
+    // Collect unique author IDs
+    const authorIds = new Set<string>();
+    if (post.authorId) authorIds.add(post.authorId);
+    post.comments.forEach(c => {
+        if (c.authorId) authorIds.add(c.authorId);
+    });
+
+    // Fetch stats in parallel for unique authors
+    const uniqueAuthorIds = Array.from(authorIds);
+    const statsPromises = uniqueAuthorIds.map(async (userId) => {
+        const [postsCount, commentsCount] = await Promise.all([
+            db.$count(forumPosts, eq(forumPosts.authorId, userId)),
+            db.$count(forumComments, eq(forumComments.authorId, userId))
+        ]);
+        return { userId, total: postsCount + commentsCount };
+    });
+
+    const statsResults = await Promise.all(statsPromises);
+    // Create a map for easy lookup
+    const statsMap = new Map(statsResults.map(s => [s.userId, s.total]));
+
+    // Fetch Category Name for Breadcrumbs
     const category = await db.query.forumCategories.findFirst({
         where: (cats, { eq }) => eq(cats.slug, slug),
     });
@@ -142,6 +174,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
                         createdAt={post.createdAt!}
                         isMainPost={true}
                         index={1}
+                        userPostCount={statsMap.get(post.authorId || "") || 0}
                     />
 
                     {/* 2. COMMENTS LIST */}
@@ -152,6 +185,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
                             content={comment.content}
                             createdAt={comment.createdAt!}
                             index={i + 2}
+                            userPostCount={statsMap.get(comment.authorId || "") || 0}
                         />
                     ))}
                 </div>

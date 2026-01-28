@@ -70,7 +70,7 @@ export default async function ForumPage() {
                                 <TableHead className="text-zinc-400 h-12 w-full pl-6">Dział</TableHead>
                                 <TableHead className="text-center text-zinc-400 w-[100px] whitespace-nowrap">Tematy</TableHead>
                                 <TableHead className="text-center text-zinc-400 w-[100px] whitespace-nowrap">Posty</TableHead>
-                                <TableHead className="text-right text-zinc-400 w-[220px] whitespace-nowrap pr-6">Ostatnia aktywność</TableHead>
+                                <TableHead className="text-right text-zinc-400 w-[300px] whitespace-nowrap pr-6">Ostatnia aktywność</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
