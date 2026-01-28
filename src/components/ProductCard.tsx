@@ -21,7 +21,7 @@ export function ProductCard({ product, isWishlisted = false }: ProductCardProps)
     return (
         <Link
             href={`/shop/${product.category}/${product.slug}`}
-            className="group relative block bg-foreground/5 border border-border rounded-2xl overflow-hidden hover:border-red-500/50 transition-colors duration-300"
+            className="group relative block bg-foreground/5 border border-border rounded-2xl overflow-hidden shadow-elevation-1 hover:shadow-elevation-2 hover:-translate-y-1 transition-all duration-300 ease-out hover:border-red-500/50"
         >
             <div className="aspect-4/5 w-full bg-background/50 relative flex items-center justify-center overflow-hidden">
                 {/* Image */}

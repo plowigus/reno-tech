@@ -252,11 +252,11 @@ function ServiceItem({
   isActive,
 }: ServiceItemProps) {
   return (
-    <div className="service-item-wrapper border-b border-red-600/15 last:border-0 backdrop-blur-md bg-background/40 rounded-3xl border border-red-600/10">
+    <div className="service-item-wrapper border-b border-red-600/15 last:border-0 backdrop-blur-md bg-background/40 rounded-3xl border">
       <div className="flex gap-6 md:gap-10 items-center">
         {/* Number & Icon */}
         <div className="shrink-0 relative">
-          <div className="absolute -top-8 -left-6 text-7xl md:text-9xl font-black text-red-600/[0.04] leading-none pointer-events-none select-none">
+          <div className="absolute -top-8 -left-6 text-7xl md:text-9xl font-black text-red-600/4 leading-none pointer-events-none select-none">
             {service.number}
           </div>
           <div

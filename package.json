@@ -12,6 +12,7 @@
     "@auth/drizzle-adapter": "^1.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
+    "@radix-ui/react-slot": "^1.2.4",
     "@uploadthing/react": "^7.3.3",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",

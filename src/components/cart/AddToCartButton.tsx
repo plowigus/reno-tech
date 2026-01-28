@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/use-cart-store";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface AddToCartButtonProps {
     productId: string;
@@ -72,11 +73,12 @@ export function AddToCartButton({
     };
 
     return (
-        <button
+        <Button
             onClick={handleAddToCart}
             disabled={isLoading}
+            variant="ghost"
             className={cn(
-                "flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed",
+                "flex items-center justify-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-transparent group relative overflow-hidden",
                 className
             )}
         >
@@ -88,6 +90,6 @@ export function AddToCartButton({
                     {showText && <span className="ml-2">Dodaj do koszyka</span>}
                 </>
             )}
-        </button>
+        </Button>
     );
 }
