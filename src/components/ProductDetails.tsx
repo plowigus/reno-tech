@@ -178,8 +178,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                                 <ArrowLeft size={20} className="text-gray-400" />
                             </div>
                             <div>
-                                className="inline-flex items-center gap-2 text-gray-500 hover:text-foreground transition-colors mt-8 group text-sm"
-                                <p className="text-xs text-gray-400">Bezproblemowy zwrot towaru</p>
+                                <p className="text-sm font-bold text-foreground">Bezproblemowy zwrot towaru</p>
+                                <p className="text-xs text-gray-400">Darmowa zwrot towaru</p>
                             </div>
                         </div>
                     </div>
@@ -193,6 +193,6 @@ export function ProductDetails({ product }: ProductDetailsProps) {
                     </Link>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
