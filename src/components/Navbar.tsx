@@ -62,7 +62,7 @@ export default async function Navbar() {
           ))}
           <div className="ml-4 pl-4 border-l border-border flex items-center gap-4">
             <WishlistButton />
-            <CartSyncer />
+            <CartSyncer userId={user?.id} />
             <CartSheet />
             <UserNav user={user} />
           </div>

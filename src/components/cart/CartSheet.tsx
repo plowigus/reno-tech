@@ -24,23 +24,22 @@ interface CartItem {
     };
 }
 
-interface CartData {
-    id: string;
-    items: CartItem[];
-}
+
 
 export function CartSheet() {
-    const { isOpen, onOpen, onClose } = useCartStore();
-    const items = useCartStore((state) => state.items) || [];
-    const [cart, setCart] = useState<CartData | null>(null);
+    const { isOpen, onOpen, onClose, items, setItems } = useCartStore(); // Use global items
     const [isPending, startTransition] = useTransition();
 
-    // Fetch cart when opened
+    // Fetch cart when opened to ensure freshness
     useEffect(() => {
         if (isOpen) {
-            getCart().then((data: any) => setCart(data));
+            getCart().then((data: any) => {
+                if (data && data.items) {
+                    setItems(data.items);
+                }
+            });
         }
-    }, [isOpen]);
+    }, [isOpen, setItems]);
 
     const calculateSubtotal = (items: CartItem[]) => {
         return items.reduce((total, item) => {
@@ -49,41 +48,37 @@ export function CartSheet() {
     };
 
     const shippingCost = 9.99;
-    const subtotal = cart?.items ? calculateSubtotal(cart.items) : 0;
+    const subtotal = calculateSubtotal(items as CartItem[]);
     const total = subtotal + shippingCost;
 
     const handleUpdateQuantity = async (itemId: string, newQty: number) => {
-        if (!cart) return;
-
         // Optimistic update
-        const updatedItems = cart.items.map(item =>
+        const updatedItems = items.map((item: any) =>
             item.id === itemId ? { ...item, quantity: newQty } : item
-        ).filter(item => item.quantity > 0);
+        ).filter((item: any) => item.quantity > 0);
 
-        setCart({ ...cart, items: updatedItems });
+        setItems(updatedItems);
 
         const result = await updateItemQuantity(itemId, newQty);
 
         if (!result.success) {
             toast.error("Błąd aktualizacji koszyka");
-            getCart().then((data: any) => setCart(data));
+            // Revert/Refetch on error
+            getCart().then((data: any) => { if (data) setItems(data.items) });
         } else {
-            // In a real app we might re-fetch here to be safe, but optimistic is fine for now
-            // Badge updates via revalidatePath("/") in action
+            // Success - maybe unnecessary to refetch if optimistic worked, but safe to do so
         }
     };
 
     const handleRemove = async (itemId: string) => {
-        if (!cart) return;
-
-        const updatedItems = cart.items.filter(item => item.id !== itemId);
-        setCart({ ...cart, items: updatedItems });
+        const updatedItems = items.filter((item: any) => item.id !== itemId);
+        setItems(updatedItems);
 
         const result = await removeFromCart(itemId);
 
         if (!result.success) {
             toast.error("Błąd usuwania produktu");
-            getCart().then((data: any) => setCart(data));
+            getCart().then((data: any) => { if (data) setItems(data.items) });
         }
     };
 
@@ -112,8 +107,8 @@ export function CartSheet() {
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                            {cart?.items && cart.items.length > 0 ? (
-                                cart.items.map((item) => (
+                            {items && items.length > 0 ? (
+                                items.map((item: any) => (
                                     <div key={item.id} className="flex gap-4">
                                         <div className="relative w-20 h-24 bg-foreground/5 rounded-md overflow-hidden shrink-0 border border-border">
                                             <Image
@@ -191,7 +186,7 @@ export function CartSheet() {
                         </div>
 
                         {/* Footer */}
-                        {cart?.items && cart.items.length > 0 && (
+                        {items && items.length > 0 && (
                             <div className="p-6 border-t border-border bg-card space-y-4">
                                 <div className="flex justify-between items-center text-sm text-zinc-400">
                                     <span>Suma częściowa</span>
