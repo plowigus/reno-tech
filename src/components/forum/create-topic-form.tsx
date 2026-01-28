@@ -1,3 +1,4 @@
+
 "use client";
 
 import { createPostAction } from "@/app/actions/forum-actions";
@@ -6,70 +7,72 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-import { useActionState } from "react";
-
-
 import { useFormStatus } from "react-dom";
+import Link from "next/link";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
 
     return (
-        <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white" disabled={pending}>
+        <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white font-bold px-8" disabled={pending}>
             {pending ? (
                 <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Publikowanie...
                 </>
             ) : (
-                "Opublikuj temat"
+                "Opublikuj"
             )}
         </Button>
     );
 }
 
-export function CreateTopicForm({ categoryId }: { categoryId: string }) {
+export function CreateTopicForm({ categoryId, slug }: { categoryId: string, slug: string }) {
 
-    const createPostWithId = createPostAction.bind(null, categoryId);
     async function clientAction(formData: FormData) {
         const result = await createPostAction(categoryId, formData);
         if (result?.error) {
-            alert(result.error); // Simple error handling for now as requested "clean form".
+            alert(result.error);
         }
     }
 
     return (
-        <form action={clientAction} className="space-y-6 bg-zinc-900/50 p-6 rounded-xl border border-white/5">
+        <form action={clientAction} className="space-y-6 max-w-3xl">
             <div className="space-y-2">
-                <Label htmlFor="title" className="text-zinc-300">
-                    Tytuł tematu
-                </Label>
+                <Label htmlFor="title" className="text-zinc-300">Tytuł tematu</Label>
                 <Input
                     id="title"
                     name="title"
-                    placeholder="np. Problem z silnikiem 1.6 dCi"
+                    placeholder="Krótko opisz swój problem..."
+                    className="bg-zinc-950 border-zinc-800 focus-visible:ring-red-600 text-white placeholder:text-zinc-600"
                     required
                     minLength={5}
                     maxLength={100}
-                    className="bg-zinc-950 border-white/10 focus:border-red-600/50"
                 />
+                <p className="text-[10px] text-zinc-500">Min. 5 znaków. Bądź konkretny.</p>
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="content" className="text-zinc-300">
-                    Treść
-                </Label>
+                <Label htmlFor="content" className="text-zinc-300">Treść wiadomości</Label>
                 <Textarea
                     id="content"
                     name="content"
-                    placeholder="Opisz dokładnie swój problem..."
+                    placeholder="Opisz dokładnie o co chodzi..."
+                    className="min-h-[300px] bg-zinc-950 border-zinc-800 focus-visible:ring-red-600 text-white placeholder:text-zinc-600 font-mono text-sm"
                     required
-                    minLength={20}
-                    className="min-h-[200px] bg-zinc-950 border-white/10 focus:border-red-600/50 resize-y"
+                    minLength={10}
                 />
+                <p className="text-[10px] text-zinc-500">Możesz używać Markdown.</p>
             </div>
 
-            <SubmitButton />
+            <div className="flex justify-end gap-4 pt-4">
+                <Link href={`/forum/${slug}`}>
+                    <Button variant="ghost" type="button" className="text-zinc-400 hover:text-white hover:bg-zinc-800">
+                        Anuluj
+                    </Button>
+                </Link>
+                <SubmitButton />
+            </div>
         </form>
     );
 }

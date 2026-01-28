@@ -2,8 +2,8 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { forumCategories, forumPosts } from "@/db/schema";
-import { createPostSchema } from "@/lib/validators/forum-schema";
+import { forumCategories, forumPosts, forumComments } from "@/db/schema";
+import { createPostSchema, createCommentSchema } from "@/lib/validators/forum-schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -74,4 +74,47 @@ export async function createPostAction(categoryId: string, formData: FormData) {
     const path = `/forum/${category.slug}`;
     revalidatePath(path);
     redirect(`${path}/topic/${slug}`);
+}
+
+export async function createCommentAction(postId: string, formData: FormData) {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+        return { error: "Musisz być zalogowany, aby dodać komentarz." };
+    }
+
+    const rawData = {
+        content: formData.get("content"),
+        postId: postId,
+    };
+
+    const validation = createCommentSchema.safeParse(rawData);
+
+    if (!validation.success) {
+        return { error: "Błąd walidacji danych." };
+    }
+
+    const { content } = validation.data;
+
+    try {
+        await db.insert(forumComments).values({
+            content,
+            postId,
+            authorId: session.user.id,
+        });
+    } catch (error) {
+        console.error("Error creating comment:", error);
+        return { error: "Wystąpił błąd podczas dodawania komentarza." };
+    }
+
+    const post = await db.query.forumPosts.findFirst({
+        where: eq(forumPosts.id, postId),
+        with: {
+            category: true,
+        },
+    });
+
+    if (post && post.category) {
+        revalidatePath(`/forum/${post.category.slug}/topic/${post.slug}`);
+    }
 }

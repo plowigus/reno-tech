@@ -1,65 +1,152 @@
-
 import { db } from "@/db";
-import { forumCategories } from "@/db/schema";
-import { asc } from "drizzle-orm";
+import { forumCategories, forumPosts } from "@/db/schema";
+import { asc, desc } from "drizzle-orm";
 import Link from "next/link";
-import { MessageSquare } from "lucide-react";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+    Wrench,
+    Zap,
+    Speaker,
+    Car,
+    ShoppingCart,
+    Coffee,
+    MessageSquare,
+    type LucideIcon
+} from "lucide-react";
+
+const iconMap: Record<string, LucideIcon> = {
+    Wrench,
+    Zap,
+    Speaker,
+    Car,
+    ShoppingCart,
+    Coffee,
+};
+
+function formatDate(date: Date) {
+    return new Intl.DateTimeFormat("pl-PL", {
+        day: "numeric",
+        month: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(date);
+}
 
 export default async function ForumPage() {
     const categories = await db.query.forumCategories.findMany({
         orderBy: [asc(forumCategories.order)],
+        with: {
+            posts: {
+                orderBy: [desc(forumPosts.createdAt)],
+                with: {
+                    author: true,
+                    comments: true,
+                },
+            },
+        },
     });
 
     return (
-        <div className="container py-10 max-w-5xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight text-white">
-                    Forum Dyskusyjne
-                </h1>
-                <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-                    Witaj na forum społeczności RenoTech. Wybierz kategorię poniżej, aby
-                    dołączyć do dyskusji, zadawać pytania i dzielić się wiedzą.
-                </p>
-            </div>
+        <div className="min-h-screen bg-background pt-32 pb-12 px-4">
+            <div className="max-w-7xl mx-auto space-y-6">
+                <div>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">Centrum Wiedzy</h1>
+                    <p className="text-zinc-400 mt-1 text-sm">Przeglądaj działy i dołącz do dyskusji.</p>
+                </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {categories.map((category) => (
-                    <Link
-                        key={category.id}
-                        href={`/forum/${category.slug}`}
-                        className="group relative overflow-hidden bg-zinc-900/50 border border-white/5 rounded-xl p-6 transition-all duration-300 hover:bg-zinc-900/80 hover:border-red-600/30 hover:shadow-lg hover:shadow-red-900/10 flex flex-col h-full"
-                    >
-                        <div className="absolute top-0 left-0 w-1 h-full bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <Card className="bg-zinc-900/40 border-zinc-800 overflow-hidden shadow-sm backdrop-blur-sm">
+                    <Table>
+                        <TableHeader className="bg-zinc-900/80">
+                            <TableRow className="border-zinc-800 hover:bg-transparent">
+                                <TableHead className="text-zinc-400 h-12 w-full pl-6">Dział</TableHead>
+                                <TableHead className="text-center text-zinc-400 w-[100px] whitespace-nowrap">Tematy</TableHead>
+                                <TableHead className="text-center text-zinc-400 w-[100px] whitespace-nowrap">Posty</TableHead>
+                                <TableHead className="text-right text-zinc-400 w-[220px] whitespace-nowrap pr-6">Ostatnia aktywność</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {categories.map((category) => {
+                                const IconComponent = category.icon && iconMap[category.icon]
+                                    ? iconMap[category.icon]
+                                    : MessageSquare;
 
-                        <div className="mb-4 p-3 bg-zinc-950/50 rounded-lg w-fit text-red-500 group-hover:text-red-400 group-hover:scale-110 transition-all duration-300">
-                            <MessageSquare className="w-8 h-8" />
-                        </div>
+                                const topicCount = category.posts.length;
+                                // Calculate total replies (posts/comments)
+                                const postsCount = category.posts.reduce((acc, post) => acc + post.comments.length, 0);
 
-                        <h2 className="text-xl font-semibold text-zinc-100 mb-2 group-hover:text-white transition-colors">
-                            {category.name}
-                        </h2>
+                                const lastPost = category.posts[0];
 
-                        <p className="text-zinc-400 text-sm leading-relaxed flex-grow">
-                            {category.description || "Brak opisu dla tej kategorii."}
-                        </p>
+                                return (
+                                    <TableRow
+                                        key={category.id}
+                                        className="border-zinc-800 hover:bg-zinc-900/60 transition-colors cursor-pointer group"
+                                    >
+                                        <TableCell className="py-5 pl-6">
+                                            <Link href={`/forum/${category.slug}`} className="flex items-center gap-4 block w-full h-full">
+                                                <div className="p-2.5 bg-zinc-900/80 rounded-lg border border-zinc-800 text-red-600 group-hover:border-red-600/30 group-hover:text-red-500 transition-colors">
+                                                    <IconComponent className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-zinc-200 text-base group-hover:text-white transition-colors">
+                                                        {category.name}
+                                                    </div>
+                                                    <div className="text-sm text-zinc-500 line-clamp-1 mt-0.5">
+                                                        {category.description || "Brak opisu."}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </TableCell>
+                                        <TableCell className="text-center align-middle">
+                                            <div className="text-sm font-medium text-zinc-300">{topicCount}</div>
+                                        </TableCell>
+                                        <TableCell className="text-center align-middle">
+                                            <div className="text-sm font-medium text-zinc-300">{postsCount}</div>
+                                        </TableCell>
+                                        <TableCell className="text-right align-middle pr-6">
+                                            {lastPost ? (
+                                                <div className="flex flex-col items-end gap-1.5">
+                                                    <span className="text-xs text-zinc-400">
+                                                        {lastPost.createdAt ? formatDate(lastPost.createdAt) : ""}
+                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs font-medium text-zinc-300">
+                                                            {lastPost.author?.name || "Użytkownik usunięty"}
+                                                        </span>
+                                                        <Avatar className="h-5 w-5 border border-white/10">
+                                                            <AvatarImage src={lastPost.author?.image || undefined} />
+                                                            <AvatarFallback className="text-[9px] bg-zinc-800 text-zinc-400">
+                                                                {(lastPost.author?.name || "U")[0].toUpperCase()}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-zinc-500">Brak aktywności</span>
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
 
-                        <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors hidden">
-                            {/* Placeholder for stats like "120 tematów" if available later */}
-                            <span>Zobacz tematy &rarr;</span>
-                        </div>
-                    </Link>
-                ))}
-
-                {categories.length === 0 && (
-                    <div className="col-span-full text-center py-20 bg-zinc-900/30 rounded-xl border border-white/5 border-dashed">
-                        <h3 className="text-xl font-medium text-zinc-300 mb-2">
-                            Brak kategorii forum
-                        </h3>
-                        <p className="text-zinc-500">
-                            Obecnie nie ma żadnych dostępnych kategorii.
-                        </p>
-                    </div>
-                )}
+                            {categories.length === 0 && (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="h-32 text-center text-zinc-500">
+                                        Brak kategorii do wyświetlenia.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </Card>
             </div>
         </div>
     );

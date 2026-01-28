@@ -7,7 +7,7 @@ export const createPostSchema = z.object({
         .max(100, { message: "Tytuł nie może przekraczać 100 znaków." }),
     content: z
         .string()
-        .min(20, { message: "Treść posta musi mieć co najmniej 20 znaków." }),
+        .min(10, { message: "Treść posta musi mieć co najmniej 10 znaków." }),
     categoryId: z.string().uuid({ message: "Nieprawidłowy identyfikator kategorii." }),
 });
 
