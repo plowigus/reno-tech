@@ -4,29 +4,18 @@ import { useCartStore } from "@/store/use-cart-store";
 import { ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { Button } from "@/components/ui/button";
-import { forwardRef } from "react";
-
-interface CartTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface CartTriggerProps {
+    className?: string;
     count?: number;
 }
 
-export const CartTrigger = forwardRef<HTMLButtonElement, CartTriggerProps>(({ className, count = 0, onClick, ...props }, ref) => {
+export function CartTrigger({ className, count = 0 }: CartTriggerProps) {
     const onOpen = useCartStore((state) => state.onOpen);
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        onOpen();
-        onClick?.(e);
-    };
-
     return (
-        <Button
-            ref={ref}
-            onClick={handleClick}
-            variant="ghost"
-            size="icon"
-            className={cn("relative rounded-full hover:bg-white/10", className)}
-            {...props}
+        <button
+            onClick={onOpen}
+            className={cn("relative group p-2 hover:bg-white/10 rounded-full transition-colors", className)}
         >
             <ShoppingBag className="text-white transition-colors group-hover:text-red-500" size={20} />
             {count > 0 && (
@@ -34,8 +23,6 @@ export const CartTrigger = forwardRef<HTMLButtonElement, CartTriggerProps>(({ cl
                     {count > 99 ? "99+" : count}
                 </span>
             )}
-        </Button>
+        </button>
     );
-});
-
-CartTrigger.displayName = "CartTrigger";
+}
