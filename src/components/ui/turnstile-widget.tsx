@@ -44,7 +44,6 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
   }));
 
   useEffect(() => {
-    // Load script only if not present
     if (!document.getElementById("turnstile-script")) {
       const script = document.createElement("script");
       script.id = "turnstile-script";
@@ -64,7 +63,7 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
         callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "interaction-only",
+        appearance: "always", // <-- CHANGED: Forces visibility
         theme: "dark",
       });
       widgetId.current = id;
@@ -74,7 +73,7 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
   return (
     <div
       ref={containerRef}
-      className={cn("flex justify-center items-center w-full", className)}
+      className={cn("w-full flex justify-center items-center", className)}
     />
   );
 });
