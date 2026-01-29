@@ -2,8 +2,7 @@
 import { db } from "@/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { formatDatePL } from "@/lib/utils"; // Importujemy helper z utils
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +39,7 @@ const ForumPostBlock = ({
                     </Avatar>
                     <span className={`font-bold ${isMainPost ? "text-red-500" : "text-zinc-200"}`}>{author?.name || "Użytkownik"}</span>
                 </div>
-                <span className="text-xs text-zinc-500">{format(createdAt, "dd MMM yyyy", { locale: pl })}</span>
+                <span className="text-xs text-zinc-500">{formatDatePL(createdAt, "dd MMM yyyy")}</span>
             </div>
 
             <div className="flex flex-col md:flex-row">
@@ -65,7 +64,7 @@ const ForumPostBlock = ({
                     <div className="text-xs text-zinc-500 space-y-1">
                         <p>Dołączył:</p>
                         <p className="text-zinc-400">
-                            {author?.createdAt ? format(new Date(author.createdAt), "yyyy-MM-dd") : "Nieznana"}
+                            {author?.createdAt ? formatDatePL(author.createdAt, "yyyy-MM-dd") : "Nieznana"}
                         </p>
                         <p>Postów: <span className="text-zinc-300">{userPostCount}</span></p>
                     </div>
@@ -75,7 +74,7 @@ const ForumPostBlock = ({
                 <div className="flex-1 flex flex-col min-h-[200px]">
                     {/* Desktop Post Header */}
                     <div className="hidden md:flex justify-between items-center p-3 border-b border-zinc-800/50 text-xs text-zinc-500 bg-zinc-900/30">
-                        <span>Wysłany: {format(createdAt, "d MMMM yyyy, HH:mm", { locale: pl })}</span>
+                        <span>Wysłany: {formatDatePL(createdAt, "d MMMM yyyy, HH:mm")}</span>
                         <span className="opacity-50">#{index}</span>
                     </div>
 

@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBag, ChevronRight, Package, Clock, CheckCircle, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDatePL } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -84,13 +84,7 @@ export default async function OrdersPage() {
                                         {getStatusBadge(order.status)}
                                     </div>
                                     <p className="text-xs text-zinc-500">
-                                        Data: {new Date(order.createdAt).toLocaleDateString("pl-PL", {
-                                            day: "numeric",
-                                            month: "long",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit"
-                                        })}
+                                        Data: {formatDatePL(order.createdAt)}
                                     </p>
                                 </div>
                                 <div className="text-right">
