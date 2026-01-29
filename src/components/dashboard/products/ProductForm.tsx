@@ -8,7 +8,7 @@ import { createProduct, updateProduct } from "@/app/actions/product-actions";
 
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Loader2, X, Plus, DollarSign, Layers, AlignLeft, Check, Save } from "lucide-react";
+import { Loader2, X, Plus, Trash, DollarSign, Layers, AlignLeft, Check, Save } from "lucide-react";
 import { clsx } from "clsx";
 import { products } from "@/db/schema";
 import { toast } from "sonner";
@@ -141,8 +141,9 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         </div>
 
                         {/* Images */}
+                        {/* Images */}
                         {images.length > 0 && (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
                                 {images.map((url, index) => (
                                     <div key={url} className="relative group aspect-square rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
                                         <Image
@@ -159,7 +160,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                             }}
                                             className="absolute top-2 right-2 p-1.5 bg-background/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 h-auto w-auto"
                                         >
-                                            <X size={14} />
+                                            <Trash size={14} />
                                         </Button>
                                     </div>
                                 ))}
@@ -175,10 +176,19 @@ export function ProductForm({ initialData }: ProductFormProps) {
                                         form.setValue("images", [...images, url]);
                                     }
                                 }}
-                                aspectRatio={1}
+                                aspectRatio={16 / 9}
                                 endpoint="productImages"
-                                className="w-full max-w-[200px]"
-                            />
+                                className="w-full"
+                            >
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full h-12 border-dashed border-zinc-700 bg-zinc-950/50 hover:bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-500 transition-all"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Dodaj kolejne zdjęcie
+                                </Button>
+                            </ImageUpload>
                         )}
                     </div>
 

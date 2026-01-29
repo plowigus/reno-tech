@@ -56,16 +56,45 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <ImageUpload
-                            value={imagePreview}
-                            onChange={(url) => setImagePreview(url)}
-                            aspectRatio={1}
-                            endpoint="profileImage"
-                            className="w-full max-w-[200px]"
-                        />
-                        <p className="text-xs text-zinc-500">
-                            JPG, PNG lub GIF. Max 4MB.
-                        </p>
+                        <label className="text-sm font-medium text-zinc-300">Zdjęcie Profilowe</label>
+                        <div className="flex items-center gap-6">
+                            {/* 1. Current Avatar (Display Only) */}
+                            <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-800 bg-zinc-900 shrink-0">
+                                {imagePreview ? (
+                                    <Image
+                                        src={imagePreview}
+                                        alt="Avatar"
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-zinc-500 text-xs">
+                                        Brak
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* 2. Upload Button (Trigger) */}
+                            <div className="flex-1">
+                                <ImageUpload
+                                    value={imagePreview}
+                                    onChange={(url) => setImagePreview(url)}
+                                    aspectRatio={1}
+                                    endpoint="profileImage"
+                                >
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        className="w-full sm:w-auto min-w-[150px]"
+                                    >
+                                        Zmień zdjęcie
+                                    </Button>
+                                </ImageUpload>
+                                <p className="text-[10px] text-zinc-500 mt-2">
+                                    Zalecany format: kwadrat, min. 500x500px.
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 {/* Hidden input to send image URL */}
