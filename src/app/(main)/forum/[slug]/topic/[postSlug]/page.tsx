@@ -2,6 +2,7 @@
 import { db } from "@/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { auth } from "@/auth";
 import { formatDatePL } from "@/lib/utils"; // Importujemy helper z utils
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { ReplyForm } from "@/components/forum/reply-form";
 import { forumPosts, forumComments } from "@/db/schema";
 import { sql, eq } from "drizzle-orm";
 import { RichTextRenderer } from "@/components/ui/rich-text-renderer"; // Import Renderer
+import { PostActions } from "@/components/forum/PostActions";
 
 // --- HELPER COMPONENT: THE CLASSIC FORUM POST ---
 const ForumPostBlock = ({
@@ -19,14 +21,18 @@ const ForumPostBlock = ({
     createdAt,
     isMainPost = false,
     index,
-    userPostCount = 0
+    userPostCount = 0,
+    currentUser,
+    postId
 }: {
     author: any,
     content: string,
     createdAt: Date,
     isMainPost?: boolean,
     index: number,
-    userPostCount?: number
+    userPostCount?: number,
+    currentUser: any,
+    postId: string
 }) => {
     return (
         <div className={`mb-4 border border-zinc-800 rounded-md overflow-hidden ${isMainPost ? "bg-zinc-900/60 shadow-md" : "bg-zinc-900/20"}`}>
@@ -85,12 +91,15 @@ const ForumPostBlock = ({
 
                     {/* Footer / Actions */}
                     <div className="p-3 border-t border-zinc-800/50 flex justify-end gap-2 bg-zinc-900/30">
-                        <Button variant="ghost" size="sm" className="h-8 text-zinc-500 hover:text-white hover:bg-zinc-800">
-                            <Flag className="w-3 h-3 mr-2" /> Zgłoś
-                        </Button>
-                        <Button variant="ghost" size="sm" className="h-8 text-zinc-500 hover:text-white hover:bg-zinc-800">
-                            <Quote className="w-3 h-3 mr-2" /> Cytuj
-                        </Button>
+                        {/* We render PostActions here. Note: This component is rendered for both Main Post and Comments. */}
+                        <PostActions
+                            postId={postId}
+                            authorName={author?.name || "Użytkownik"}
+                            contentHtml={content}
+                            isOwner={currentUser?.id === author?.id}
+                            isAdmin={currentUser?.role === "admin" || currentUser?.role === "moderator"}
+                            type={isMainPost ? "TOPIC" : "COMMENT"}
+                        />
                     </div>
                 </div>
             </div>
@@ -101,6 +110,10 @@ const ForumPostBlock = ({
 // --- MAIN PAGE COMPONENT ---
 export default async function TopicPage({ params }: { params: Promise<{ slug: string; postSlug: string }> }) {
     const { slug, postSlug } = await params;
+
+    // Get session for permissions
+    const session = await auth();
+    const currentUser = session?.user;
 
     const post = await db.query.forumPosts.findFirst({
         where: (posts, { eq }) => eq(posts.slug, postSlug),
@@ -175,6 +188,8 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
                         isMainPost={true}
                         index={1}
                         userPostCount={statsMap.get(post.authorId || "") || 0}
+                        currentUser={currentUser}
+                        postId={post.id}
                     />
 
                     {/* 2. COMMENTS LIST */}
@@ -186,6 +201,8 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
                             createdAt={comment.createdAt!}
                             index={i + 2}
                             userPostCount={statsMap.get(comment.authorId || "") || 0}
+                            currentUser={currentUser}
+                            postId={comment.id}
                         />
                     ))}
                 </div>

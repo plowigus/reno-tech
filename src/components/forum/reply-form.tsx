@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import { Loader2 } from "lucide-react";
 import { useFormStatus } from "react-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function SubmitButton() {
     const { pending } = useFormStatus();
@@ -48,6 +48,21 @@ export function ReplyForm({ postId }: { postId: string }) {
             setContent(""); // Reset editor content on success
         }
     }
+
+    // Handle Quote Event
+    useEffect(() => {
+        const handleQuote = (e: any) => {
+            const quoteHtml = e.detail;
+            if (content) {
+                setContent((prev) => prev + quoteHtml);
+            } else {
+                setContent(quoteHtml);
+            }
+        };
+
+        window.addEventListener("forum:quote", handleQuote);
+        return () => window.removeEventListener("forum:quote", handleQuote);
+    }, [content]);
 
     return (
         <form id="reply-form" action={clientAction} className="space-y-4">
