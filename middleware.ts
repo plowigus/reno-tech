@@ -17,16 +17,16 @@ export function middleware(req: NextRequest) {
     form-action 'self';
     frame-ancestors 'none';
     frame-src 'self' https://challenges.cloudflare.com https://vercel.live https://www.youtube.com https://www.youtube-nocookie.com;
-    connect-src 'self' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com https://uploadthing.com https://*.uploadthing.com https://utfs.io https://*.ingest.uploadthing.com;
+    connect-src 'self' https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com https://uploadthing.com https://*.uploadthing.com https://utfs.io https://*.ingest.uploadthing.com wss://*.pusher.com https://*.pusher.com;
     upgrade-insecure-requests;
-  `
-      .replace(/\s{2,}/g, " ")
-      .trim(),
+  `.replace(/\s{2,}/g, " ").trim()
   );
 
   return res;
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
