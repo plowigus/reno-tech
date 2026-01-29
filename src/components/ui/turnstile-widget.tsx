@@ -26,7 +26,6 @@ declare global {
         }
       ) => string;
       reset: (widgetId: string) => void;
-      execute: (widgetId: string, options?: any) => void;
     };
   }
 }
@@ -40,15 +39,12 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
     reset: () => {
       if (widgetId.current && window.turnstile) {
         window.turnstile.reset(widgetId.current);
-        // In execute mode, we might need to re-trigger execution after reset
-        setTimeout(() => {
-          if (widgetId.current) window.turnstile?.execute(widgetId.current);
-        }, 100);
       }
     },
   }));
 
   useEffect(() => {
+    // Load script only if not present
     if (!document.getElementById("turnstile-script")) {
       const script = document.createElement("script");
       script.id = "turnstile-script";
@@ -68,20 +64,17 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
         callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "execute", // <-- KEY CHANGE: Invisible until needed
+        appearance: "interaction-only",
         theme: "dark",
       });
       widgetId.current = id;
-
-      // Trigger execution immediately
-      window.turnstile.execute(id);
     }
   }, [scriptLoaded, onVerify]);
 
   return (
     <div
       ref={containerRef}
-      className={cn("transition-all duration-300", className)} // Clean container
+      className={cn("flex justify-center items-center w-full", className)}
     />
   );
 });
