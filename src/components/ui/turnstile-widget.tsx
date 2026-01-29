@@ -20,7 +20,7 @@ declare global {
           sitekey: string;
           callback: (token: string) => void;
           "refresh-expired"?: "auto" | "manual" | "never";
-          appearance?: "always" | "execute" | "interaction-only";
+          appearance?: "always" | "execute" | "interaction-only" | "invisible";
           theme?: "light" | "dark" | "auto";
         }
       ) => string;
@@ -64,7 +64,7 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
         callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "interaction-only", // KLUCZOWE: To naprawia problem z autocomplete!
+        appearance: "invisible", // <-- CHANGED TO INVISIBLE
         theme: "dark",
       });
       widgetId.current = id;
