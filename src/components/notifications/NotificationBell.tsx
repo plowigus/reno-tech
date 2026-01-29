@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getUnreadNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/app/actions/forum-actions";
+import { getUnreadNotifications, markAllNotificationsAsRead, markAsReadAndGetUrl } from "@/app/actions/forum-actions";
 import { useRouter } from "next/navigation";
 import { formatDatePL } from "@/lib/utils";
 import Image from "next/image";
@@ -55,17 +55,16 @@ export function NotificationBell() {
     const handleRead = async (notification: Notification) => {
         // Optimistic UI update
         setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-
-        // Server Action
-        await markNotificationAsRead(notification.id);
-
-        // Redirect logic
-        if (notification.type === "REPLY" && notification.resourceId) {
-            router.push(`/forum`);
-        }
-
         setIsOpen(false);
-        router.refresh();
+
+        // Server Action: Marks as read AND returns the destination URL
+        const url = await markAsReadAndGetUrl(notification.id);
+
+        if (url) {
+            router.push(url);
+        } else {
+            router.refresh();
+        }
     };
 
     const handleMarkAll = async () => {
@@ -116,7 +115,7 @@ export function NotificationBell() {
                                 className="p-4 focus:bg-zinc-900 cursor-pointer border-b border-zinc-900 last:border-0 items-start gap-3"
                             >
                                 {/* Sender Avatar */}
-                                <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-zinc-800 border border-zinc-700">
+                                <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 bg-zinc-800 border border-zinc-700">
                                     {n.sender?.image ? (
                                         <Image src={n.sender.image} alt="User" fill className="object-cover" />
                                     ) : (
@@ -139,7 +138,7 @@ export function NotificationBell() {
                                     </p>
                                 </div>
 
-                                <div className="h-2 w-2 rounded-full bg-red-600 flex-shrink-0 mt-1.5" />
+                                <div className="h-2 w-2 rounded-full bg-red-600 shrink-0 mt-1.5" />
                             </DropdownMenuItem>
                         ))
                     )}

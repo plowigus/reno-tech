@@ -316,3 +316,40 @@ export async function markAllNotificationsAsRead() {
 
     revalidatePath("/");
 }
+
+export async function markAsReadAndGetUrl(notificationId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return null;
+
+    // 1. Mark as read
+    await db.update(notifications)
+        .set({ isRead: true })
+        .where(and(
+            eq(notifications.id, notificationId),
+            eq(notifications.recipientId, session.user.id)
+        ));
+
+    // 2. Fetch notification details to get resourceId
+    const notification = await db.query.notifications.findFirst({
+        where: eq(notifications.id, notificationId),
+    });
+
+    if (!notification || !notification.resourceId) return null;
+
+    // 3. Resolve URL based on type
+    if (notification.type === "REPLY") {
+        const topic = await db.query.forumPosts.findFirst({
+            where: eq(forumPosts.id, notification.resourceId),
+            with: { category: true }
+        });
+
+        if (topic && topic.category) {
+            revalidatePath("/"); // Update badge
+            return `/forum/${topic.category.slug}/topic/${topic.slug}`;
+        }
+    }
+
+    // Default fallback
+    revalidatePath("/");
+    return "/forum";
+}
