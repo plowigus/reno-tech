@@ -12,6 +12,11 @@ export interface AuthState {
 
 // 2. Logika logowania hasłem
 export async function loginUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    const honeypot = formData.get("_gotcha");
+    if (honeypot && honeypot.toString().length > 0) {
+        return { error: "Bot detected via honeypot." };
+    }
+
     const turnstileToken = formData.get("turnstileToken") as string;
     const isHuman = await verifyTurnstile(turnstileToken);
 

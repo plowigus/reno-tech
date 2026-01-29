@@ -115,6 +115,14 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
         }}
         className="space-y-4"
       >
+        <input
+          type="text"
+          name="_gotcha"
+          style={{ display: "none" }}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+
         {!isLogin && (
           <div className="space-y-1.5">
             <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wider">
@@ -144,7 +152,7 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
               name="email"
               type="email"
               placeholder="twoj@email.com"
-              autoComplete="email"
+              autoComplete="username"
               required
               className="bg-zinc-950/50 border-zinc-800 text-white pl-9 pr-3 focus:border-red-600 focus:ring-red-600"
             />

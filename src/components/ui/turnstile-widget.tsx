@@ -50,6 +50,8 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileWidgetProps>(
         callback: handleVerify,
         "error-callback": handleError,
         "expired-callback": handleExpire,
+        "refresh-expired": "auto",
+        appearance: "interaction-only",
       });
 
       widgetIdRef.current = widgetId;
