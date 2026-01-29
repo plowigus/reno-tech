@@ -8,7 +8,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { getUnreadNotifications, markNotificationAsRead, markAllNotificationsAsRead } from "@/app/actions/forum-actions";
 import { useRouter } from "next/navigation";
 import { formatDatePL } from "@/lib/utils";
@@ -71,31 +70,7 @@ export function NotificationBell() {
 
     const handleMarkAll = async () => {
         setNotifications([]);
-        // We need to implement this action or assume it exists/is simple
-        // For now, loop or call a new action. 
-        // The user prompt used `markAllNotificationsAsRead`, so let's import it.
-        // If it doesn't exist in backend, I'll need to add it.
-        // I'll assume I need to ADD it to backend actions if not there.
-        // Wait, my previous turn didn't add `markAllNotificationsAsRead`. 
-        // I should verify/add it or just map over them.
-        // For efficiency, I'll map over them here or just assume I should have added it.
-        // I'll stick to what I have: `markNotificationAsRead`.
-        // I'll add `markAllNotificationsAsRead` to forum-actions.ts quickly or just loop.
-        // Looping is safer for now without extra context switches.
-
-        // Actually, let's just loop for now to be safe.
-        // Wait, looping 100 notifications is bad behavior.
-        // I'll treat it as a TODO or implement `markAll` if I can.
-        // Let's check `forum-actions.ts` content again... I only added `getUnread` and `markAsRead`.
-        // I will implement `markAllNotificationsAsRead` in `NotificationBell` by iterating or just add it to actions?
-        // User prompt SAYS: `markAllNotificationsAsRead` in imports.
-        // So I MUST add it to `forum-actions.ts` first? 
-        // Or I can just leave it out for now?
-        // I'll assume the user wants me to add it if they asked for it in frontend code.
-        // I'll add it to `forum-actions.ts` in a separate tool call.
-
         await markAllNotificationsAsRead();
-
         setIsOpen(false);
         router.refresh();
     }
@@ -103,12 +78,14 @@ export function NotificationBell() {
     return (
         <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative text-zinc-400 hover:text-white">
-                    <Bell className="h-5 w-5" />
+                <div className="group relative p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer outline-none">
+                    <Bell className="text-white transition-colors group-hover:text-red-500" size={20} />
                     {notifications.length > 0 && (
-                        <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-600 animate-pulse" />
+                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-foreground shadow-sm ring-2 ring-black">
+                            {notifications.length > 99 ? "99+" : notifications.length}
+                        </span>
                     )}
-                </Button>
+                </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border-zinc-800 text-white p-0">
                 <div className="flex items-center justify-between p-4 border-b border-zinc-800">
