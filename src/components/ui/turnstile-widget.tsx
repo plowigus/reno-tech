@@ -66,7 +66,6 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         "refresh-expired": "auto",
         appearance: "always",
         theme: "dark",
-        // 'flexible' might help, but our CSS override is the ultimate enforcer
         size: "flexible",
       });
       widgetId.current = id;
@@ -76,11 +75,13 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
   return (
     <div
       ref={containerRef}
-      // CRITICAL: [&_iframe] targets the iframe inside. 
-      // !w-full and !h-full override Cloudflare's inline styles.
+      // FINAL CSS FIX:
+      // [&>div]:!w-full -> Targets the Cloudflare wrapper div and forces full width
+      // [&_iframe]:!rounded-md -> Matches the border radius of the parent container
       className={cn(
         "flex justify-center items-center w-full h-full",
-        "[&_iframe]:!w-full [&_iframe]:!h-full",
+        "[&>div]:!w-full",
+        "[&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!rounded-md",
         className
       )}
     />
