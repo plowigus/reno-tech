@@ -10,7 +10,6 @@ export interface TurnstileRef {
   reset: () => void;
 }
 
-// Globalna definicja typów dla window (żeby TypeScript nie krzyczał)
 declare global {
   interface Window {
     turnstile?: {
@@ -20,7 +19,7 @@ declare global {
           sitekey: string;
           callback: (token: string) => void;
           "refresh-expired"?: "auto" | "manual" | "never";
-          appearance?: "always" | "execute" | "interaction-only" | "invisible";
+          appearance?: "always" | "execute" | "interaction-only";
           theme?: "light" | "dark" | "auto";
         }
       ) => string;
@@ -34,7 +33,6 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
   const widgetId = useRef<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
 
-  // Udostępniamy metodę reset() rodzicowi (AuthForm)
   useImperativeHandle(ref, () => ({
     reset: () => {
       if (widgetId.current && window.turnstile) {
@@ -44,7 +42,6 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
   }));
 
   useEffect(() => {
-    // Ładowanie skryptu Cloudflare, jeśli go nie ma
     if (!document.getElementById("turnstile-script")) {
       const script = document.createElement("script");
       script.id = "turnstile-script";
@@ -64,14 +61,19 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
         callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "invisible", // <-- CHANGED TO INVISIBLE
+        appearance: "interaction-only", // REVERTED: Must be visible to be clickable
         theme: "dark",
       });
       widgetId.current = id;
     }
   }, [scriptLoaded, onVerify]);
 
-  return <div ref={containerRef} className="my-4 min-h-[65px] flex justify-center" />;
+  return (
+    <div
+      ref={containerRef}
+      className="my-4 min-h-[65px] flex justify-center items-center"
+    />
+  );
 });
 
 TurnstileWidget.displayName = "TurnstileWidget";
