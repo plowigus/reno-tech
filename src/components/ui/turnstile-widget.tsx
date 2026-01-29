@@ -80,8 +80,8 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
       // [&_iframe]:!rounded-md -> Matches the border radius of the parent container
       className={cn(
         "flex justify-center items-center w-full h-full",
-        "[&>div]:!w-full",
-        "[&_iframe]:!w-full [&_iframe]:!h-full [&_iframe]:!rounded-md",
+        "[&>div]:w-full!",
+        "[&_iframe]:w-full! [&_iframe]:h-full! [&_iframe]:rounded-md!",
         className
       )}
     />

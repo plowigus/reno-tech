@@ -76,7 +76,7 @@ export default async function ForumPage() {
                                 return (
                                     <TableRow key={category.id} className="border-zinc-800 hover:bg-zinc-900/60 transition-colors group">
                                         <TableCell className="py-4">
-                                            <Link href={`/forum/${category.slug}`} className="flex items-center gap-4 block w-full">
+                                            <Link href={`/forum/${category.slug}`} className="flex items-center gap-4 w-full">
                                                 <div className="p-3 bg-zinc-900 rounded-md border border-zinc-800 text-red-600 group-hover:text-red-500 group-hover:border-red-600/30 transition-all">
                                                     <Icon className="w-6 h-6" />
                                                 </div>
