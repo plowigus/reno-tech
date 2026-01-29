@@ -9,6 +9,7 @@ import {
     Bold, Italic, Strikethrough, Code, List, ListOrdered,
     Quote, Heading2, Link as LinkIcon, Youtube as YoutubeIcon, Unlink
 } from "lucide-react";
+import { useEffect } from "react";
 
 const Toolbar = ({ editor }: { editor: any }) => {
     if (!editor) return null;
@@ -107,6 +108,13 @@ export default function RichTextEditor({ value, onChange }: { value: string; onC
         },
         immediatelyRender: false
     });
+
+    // Listen for external reset (empty string)
+    useEffect(() => {
+        if (editor && value === "") {
+            editor.commands.clearContent();
+        }
+    }, [editor, value]);
 
     return (
         <div className="border border-zinc-800 rounded-md overflow-hidden bg-zinc-950 focus-within:ring-1 focus-within:ring-red-600 transition-all">

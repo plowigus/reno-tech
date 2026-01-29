@@ -35,6 +35,8 @@ export function CreateTopicForm({ categoryId, slug }: { categoryId: string, slug
         const result = await createPostAction(categoryId, formData);
         if (result?.error) {
             alert(result.error);
+        } else {
+            setContent("");
         }
     }
 
