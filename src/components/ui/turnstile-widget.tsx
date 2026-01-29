@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef, forwardRef, useImperativeHandle, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface TurnstileProps {
   onVerify: (token: string) => void;
+  className?: string;
 }
 
 export interface TurnstileRef {
@@ -24,11 +26,12 @@ declare global {
         }
       ) => string;
       reset: (widgetId: string) => void;
+      execute: (widgetId: string, options?: any) => void;
     };
   }
 }
 
-export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVerify }, ref) => {
+export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVerify, className }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetId = useRef<string | null>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
@@ -37,6 +40,10 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
     reset: () => {
       if (widgetId.current && window.turnstile) {
         window.turnstile.reset(widgetId.current);
+        // In execute mode, we might need to re-trigger execution after reset
+        setTimeout(() => {
+          if (widgetId.current) window.turnstile?.execute(widgetId.current);
+        }, 100);
       }
     },
   }));
@@ -61,17 +68,20 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
         callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "interaction-only", // REVERTED: Must be visible to be clickable
+        appearance: "execute", // <-- KEY CHANGE: Invisible until needed
         theme: "dark",
       });
       widgetId.current = id;
+
+      // Trigger execution immediately
+      window.turnstile.execute(id);
     }
   }, [scriptLoaded, onVerify]);
 
   return (
     <div
       ref={containerRef}
-      className="my-4 min-h-[65px] flex justify-center items-center"
+      className={cn("transition-all duration-300", className)} // Clean container
     />
   );
 });

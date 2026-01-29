@@ -171,7 +171,10 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
         <input type="hidden" name="turnstileToken" value={turnstileToken} />
 
         {/* Przekazujemy ref do widgetu */}
-        <TurnstileWidget ref={turnstileRef} onVerify={setTurnstileToken} />
+        <TurnstileWidget
+          ref={turnstileRef}
+          onVerify={setTurnstileToken}
+        />
 
         {isLogin && (
           <div className="flex items-center justify-between text-xs">
