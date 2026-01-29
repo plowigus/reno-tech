@@ -6,6 +6,7 @@ interface CartStore {
     onOpen: () => void;
     onClose: () => void;
     setItems: (items: any[]) => void;
+    clearCart: () => void;
 }
 
 export const useCartStore = create<CartStore>((set) => ({
@@ -14,4 +15,5 @@ export const useCartStore = create<CartStore>((set) => ({
     onOpen: () => set({ isOpen: true }),
     onClose: () => set({ isOpen: false }),
     setItems: (items) => set({ items }),
+    clearCart: () => set({ items: [] }),
 }));
