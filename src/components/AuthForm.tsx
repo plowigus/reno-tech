@@ -171,7 +171,8 @@ export default function AuthForm({ initialTab = "login" }: AuthFormProps) {
         <input type="hidden" name="turnstileToken" value={turnstileToken} />
 
         {/* Container now has fixed height of 65px to match Turnstile's native height */}
-        <div className="w-full h-[65px] bg-zinc-950/50 border border-zinc-800 rounded-md flex items-center justify-center p-0 overflow-hidden transition-colors hover:border-red-600/50 focus-within:border-red-600 focus-within:ring-1 focus-within:ring-red-600">
+        {/* Container now has fixed height of 65px to match Turnstile's native height */}
+        <div className="w-full h-[65px] bg-zinc-950/50 border border-zinc-800 rounded-md flex items-center justify-center p-0 overflow-hidden">
           <TurnstileWidget
             ref={turnstileRef}
             onVerify={setTurnstileToken}
