@@ -23,6 +23,7 @@ declare global {
           "refresh-expired"?: "auto" | "manual" | "never";
           appearance?: "always" | "execute" | "interaction-only";
           theme?: "light" | "dark" | "auto";
+          size?: "normal" | "compact" | "flexible";
         }
       ) => string;
       reset: (widgetId: string) => void;
@@ -63,8 +64,10 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
         sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
         callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "always", // <-- CHANGED: Forces visibility
+        appearance: "always",
         theme: "dark",
+        // 'flexible' might help, but our CSS override is the ultimate enforcer
+        size: "flexible",
       });
       widgetId.current = id;
     }
@@ -73,7 +76,13 @@ export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVer
   return (
     <div
       ref={containerRef}
-      className={cn("w-full flex justify-center items-center", className)}
+      // CRITICAL: [&_iframe] targets the iframe inside. 
+      // !w-full and !h-full override Cloudflare's inline styles.
+      className={cn(
+        "flex justify-center items-center w-full h-full",
+        "[&_iframe]:!w-full [&_iframe]:!h-full",
+        className
+      )}
     />
   );
 });
