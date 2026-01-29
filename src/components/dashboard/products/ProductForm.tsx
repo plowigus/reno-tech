@@ -315,7 +315,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         </Button>
                     </div>
                 </div>
-            </form >
-        </div >
+            </form>
+        </div>
     );
 }
