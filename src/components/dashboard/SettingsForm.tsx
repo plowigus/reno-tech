@@ -56,10 +56,11 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium text-zinc-300">Zdjęcie Profilowe</label>
+                        {/* <label className="text-sm font-medium text-zinc-300">Zdjęcie Profilowe</label> */}
                         <div className="flex items-center gap-6">
                             {/* 1. Current Avatar (Display Only) */}
-                            <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-800 bg-zinc-900 shrink-0">
+                            {/* 1. Current Avatar (Display Only) */}
+                            {/* <div className="relative w-20 h-20 rounded-full overflow-hidden border border-zinc-800 bg-zinc-900 shrink-0">
                                 {imagePreview ? (
                                     <Image
                                         src={imagePreview}
@@ -72,7 +73,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                                         Brak
                                     </div>
                                 )}
-                            </div>
+                            </div> */}
 
                             {/* 2. Upload Button (Trigger) */}
                             <div className="flex-1">
