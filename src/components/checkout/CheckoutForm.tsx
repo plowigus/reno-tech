@@ -213,10 +213,12 @@ export function CheckoutForm({ user, initialCart }: CheckoutFormProps) {
                         type="submit"
                         form="checkout-form"
                         disabled={isSubmitting}
-                        className="w-full mt-6 bg-white hover:bg-zinc-200 text-black font-black uppercase py-4 rounded-lg transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed h-auto"
+                        className="w-full mt-6 bg-white hover:bg-zinc-200 text-black font-black uppercase py-4 rounded-lg transition-all group disabled:opacity-50 disabled:cursor-not-allowed h-auto"
                     >
-                        {isSubmitting ? <Loader2 className="animate-spin" /> : <Lock size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />}
-                        {isSubmitting ? "Przetwarzanie..." : "Zamawiam i płacę"}
+                        <span className="flex items-center justify-center gap-2 w-full">
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : <Lock size={18} className="opacity-50 group-hover:opacity-100 transition-opacity" />}
+                            <span>{isSubmitting ? "Przetwarzanie..." : "Zamawiam i płacę"}</span>
+                        </span>
                     </Button>
 
                     <div className="mt-4 flex items-center justify-center gap-2 text-xs text-zinc-600">
