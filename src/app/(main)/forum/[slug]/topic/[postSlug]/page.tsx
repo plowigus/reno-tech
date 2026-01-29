@@ -11,102 +11,9 @@ import { MessageSquare, Quote, Flag } from "lucide-react";
 import { ReplyForm } from "@/components/forum/reply-form";
 import { forumPosts, forumComments } from "@/db/schema";
 import { sql, eq } from "drizzle-orm";
-import { RichTextRenderer } from "@/components/ui/rich-text-renderer"; // Import Renderer
-import { PostActions } from "@/components/forum/PostActions";
 import { ForumPost } from "@/components/forum/ForumPost";
 
-// --- HELPER COMPONENT: THE CLASSIC FORUM POST ---
-const ForumPostBlock = ({
-    author,
-    content,
-    createdAt,
-    isMainPost = false,
-    index,
-    userPostCount = 0,
-    currentUser,
-    postId
-}: {
-    author: any,
-    content: string,
-    createdAt: Date,
-    isMainPost?: boolean,
-    index: number,
-    userPostCount?: number,
-    currentUser: any,
-    postId: string
-}) => {
-    return (
-        <div className={`mb-4 border border-zinc-800 rounded-md overflow-hidden ${isMainPost ? "bg-zinc-900/60 shadow-md" : "bg-zinc-900/20"}`}>
-            {/* POST HEADER BAR (Mobile Only / Top bar info) */}
-            <div className="md:hidden bg-zinc-900 p-3 border-b border-zinc-800 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <Avatar className="w-8 h-8 md:w-10 md:h-10">
-                        <AvatarImage src={author?.image || undefined} />
-                        <AvatarFallback>{(author?.name || "U")?.[0]}</AvatarFallback>
-                    </Avatar>
-                    <span className={`font-bold ${isMainPost ? "text-red-500" : "text-zinc-200"}`}>{author?.name || "Użytkownik"}</span>
-                </div>
-                <span className="text-xs text-zinc-500">{formatDatePL(createdAt, "dd MMM yyyy")}</span>
-            </div>
-
-            <div className="flex flex-col md:flex-row">
-                {/* LEFT COLUMN: USER INFO (Desktop Sidebar) */}
-                <div className="hidden md:flex w-48 flex-col items-center p-6 bg-zinc-900/50 border-r border-zinc-800 text-center gap-3">
-                    <Avatar className="w-20 h-20 border-2 border-zinc-800 shadow-xl">
-                        <AvatarImage src={author?.image || undefined} />
-                        <AvatarFallback className="text-2xl bg-zinc-800 text-zinc-400">{(author?.name || "U")?.[0].toUpperCase()}</AvatarFallback>
-                    </Avatar>
-
-                    <div className="space-y-1">
-                        <div className={`font-bold text-lg ${isMainPost ? "text-red-500" : "text-white"}`}>
-                            {author?.name || "Użytkownik"}
-                        </div>
-                        <Badge variant="outline" className="border-zinc-700 text-zinc-400 text-[10px] uppercase">
-                            {author?.role || "Użytkownik"}
-                        </Badge>
-                    </div>
-
-                    <div className="w-full h-px bg-zinc-800 my-2" />
-
-                    <div className="text-xs text-zinc-500 space-y-1">
-                        <p>Dołączył:</p>
-                        <p className="text-zinc-400">
-                            {author?.createdAt ? formatDatePL(author.createdAt, "yyyy-MM-dd") : "Nieznana"}
-                        </p>
-                        <p>Postów: <span className="text-zinc-300">{userPostCount}</span></p>
-                    </div>
-                </div>
-
-                {/* RIGHT COLUMN: CONTENT */}
-                <div className="flex-1 flex flex-col min-h-[200px]">
-                    {/* Desktop Post Header */}
-                    <div className="hidden md:flex justify-between items-center p-3 border-b border-zinc-800/50 text-xs text-zinc-500 bg-zinc-900/30">
-                        <span>Wysłany: {formatDatePL(createdAt, "d MMMM yyyy, HH:mm")}</span>
-                        <span className="opacity-50">#{index}</span>
-                    </div>
-
-                    {/* Main Content */}
-                    <div className="p-6 text-zinc-300 leading-relaxed min-h-[100px] flex-1">
-                        <RichTextRenderer content={content} />
-                    </div>
-
-                    {/* Footer / Actions */}
-                    <div className="p-3 border-t border-zinc-800/50 flex justify-end gap-2 bg-zinc-900/30">
-                        {/* We render PostActions here. Note: This component is rendered for both Main Post and Comments. */}
-                        <PostActions
-                            postId={postId}
-                            authorName={author?.name || "Użytkownik"}
-                            contentHtml={content}
-                            isOwner={currentUser?.id === author?.id}
-                            isAdmin={currentUser?.role === "admin" || currentUser?.role === "moderator"}
-                            type={isMainPost ? "TOPIC" : "COMMENT"}
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+// --- MAIN PAGE COMPONENT ---
 
 // --- MAIN PAGE COMPONENT ---
 export default async function TopicPage({ params }: { params: Promise<{ slug: string; postSlug: string }> }) {
@@ -182,15 +89,22 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
                 {/* THREAD CONTAINER */}
                 <div className="space-y-0">
                     {/* 1. MAIN POST */}
-                    <ForumPostBlock
-                        author={post.author}
-                        content={post.content}
-                        createdAt={post.createdAt!}
-                        isMainPost={true}
+                    <ForumPost
+                        comment={{
+                            ...post,
+                            author: post.author || null,
+                            authorId: post.authorId || "",
+                            createdAt: post.createdAt || new Date(),
+                            updatedAt: post.updatedAt,
+                            content: post.content
+                        }}
+                        currentUser={currentUser && currentUser.id ? {
+                            id: currentUser.id,
+                            role: currentUser.role || "user"
+                        } : undefined}
                         index={1}
+                        isMainPost={true}
                         userPostCount={statsMap.get(post.authorId || "") || 0}
-                        currentUser={currentUser}
-                        postId={post.id}
                     />
 
                     {/* 2. COMMENTS LIST */}
