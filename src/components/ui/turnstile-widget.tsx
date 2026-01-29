@@ -1,81 +1,77 @@
 "use client";
 
-import Turnstile from "react-turnstile";
-import { forwardRef, useImperativeHandle, useRef, useEffect } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle, useState } from "react";
 
-interface TurnstileWidgetProps {
+interface TurnstileProps {
   onVerify: (token: string) => void;
-  onError?: () => void;
 }
 
 export interface TurnstileRef {
   reset: () => void;
 }
 
-export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileWidgetProps>(
-  ({ onVerify, onError }, ref) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const widgetIdRef = useRef<string | null>(null);
-    const siteKey =
-      process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
-
-    useImperativeHandle(ref, () => ({
-      reset: () => {
-        if (widgetIdRef.current && window.turnstile) {
-          window.turnstile.reset(widgetIdRef.current);
+// Globalna definicja typów dla window (żeby TypeScript nie krzyczał)
+declare global {
+  interface Window {
+    turnstile?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          callback: (token: string) => void;
+          "refresh-expired"?: "auto" | "manual" | "never";
+          appearance?: "always" | "execute" | "interaction-only";
+          theme?: "light" | "dark" | "auto";
         }
-      },
-    }));
+      ) => string;
+      reset: (widgetId: string) => void;
+    };
+  }
+}
 
-    useEffect(() => {
-      if (!containerRef.current) return;
+export const TurnstileWidget = forwardRef<TurnstileRef, TurnstileProps>(({ onVerify }, ref) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<string | null>(null);
+  const [scriptLoaded, setScriptLoaded] = useState(false);
 
-      // Store the widget ID when rendered
-      const handleVerify = (token: string) => {
-        onVerify(token);
-      };
+  // Udostępniamy metodę reset() rodzicowi (AuthForm)
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      if (widgetId.current && window.turnstile) {
+        window.turnstile.reset(widgetId.current);
+      }
+    },
+  }));
 
-      const handleError = () => {
-        if (onError) onError();
-      };
+  useEffect(() => {
+    // Ładowanie skryptu Cloudflare, jeśli go nie ma
+    if (!document.getElementById("turnstile-script")) {
+      const script = document.createElement("script");
+      script.id = "turnstile-script";
+      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+      script.async = true;
+      script.defer = true;
+      script.onload = () => setScriptLoaded(true);
+      document.head.appendChild(script);
+    } else {
+      setScriptLoaded(true);
+    }
+  }, []);
 
-      const handleExpire = () => {
-        if (onError) onError();
-      };
-
-      // Render Turnstile and capture the widget ID
-      const widgetId = (window as any).turnstile?.render(containerRef.current, {
-        sitekey: siteKey,
-        theme: "dark",
-        callback: handleVerify,
-        "error-callback": handleError,
-        "expired-callback": handleExpire,
+  useEffect(() => {
+    if (scriptLoaded && containerRef.current && !widgetId.current && window.turnstile) {
+      const id = window.turnstile.render(containerRef.current, {
+        sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!,
+        callback: (token: string) => onVerify(token),
         "refresh-expired": "auto",
-        appearance: "interaction-only",
+        appearance: "interaction-only", // KLUCZOWE: To naprawia problem z autocomplete!
+        theme: "dark",
       });
+      widgetId.current = id;
+    }
+  }, [scriptLoaded, onVerify]);
 
-      widgetIdRef.current = widgetId;
-
-      return () => {
-        // Cleanup if needed
-        if (widgetIdRef.current && (window as any).turnstile?.remove) {
-          (window as any).turnstile.remove(widgetIdRef.current);
-          widgetIdRef.current = null;
-        }
-      };
-    }, [onVerify, onError, siteKey]);
-
-    return (
-      // 1. Kontener na cały ekran, ale przepuszcza kliknięcia (pointer-events-none)
-      // Dzięki temu, gdy widget jest ukryty, nie blokuje formularza.
-      <div className="fixed inset-0 z-100 flex items-center justify-center pointer-events-none">
-        {/* 2. Sam widget przechwytuje kliknięcia (pointer-events-auto), jeśli się pojawi */}
-        <div className="pointer-events-auto">
-          <div ref={containerRef} className="my-4" />
-        </div>
-      </div>
-    );
-  },
-);
+  return <div ref={containerRef} className="my-4 min-h-[65px] flex justify-center" />;
+});
 
 TurnstileWidget.displayName = "TurnstileWidget";

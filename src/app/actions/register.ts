@@ -6,15 +6,14 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { verifyTurnstile } from "@/lib/turnstile";
-import { signIn } from "@/auth";
+import { signIn } from "@/auth"; // IMPORT SIGNIN
 import { AuthError } from "next-auth";
 
 import { AuthState } from "@/app/actions/auth-actions";
 
 const RegisterSchema = z.object({
   email: z.string().email({ message: "Nieprawidłowy adres email" }),
-  password: z
-    .string()
+  password: z.string()
     .min(8, "Hasło musi mieć min. 8 znaków")
     .regex(/[A-Z]/, "Hasło musi zawierać jedną dużą literę")
     .regex(/[0-9]/, "Hasło musi zawierać jedną cyfrę")
@@ -22,30 +21,27 @@ const RegisterSchema = z.object({
   name: z.string().min(2, "Imię jest wymagane"),
 });
 
-export async function registerUser(
-  prevState: AuthState,
-  formData: FormData,
-): Promise<AuthState> {
+export async function registerUser(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  // 1. Sprawdzenie Honeypot
   const honeypot = formData.get("_gotcha");
   if (honeypot && honeypot.toString().length > 0) {
-    return { error: "Bot detected via honeypot." };
+    return { error: "Bot detected via honeypot." }; // Cichy błąd lub standardowy
   }
 
+  // 2. Turnstile
   const turnstileToken = formData.get("turnstileToken") as string;
   const isHuman = await verifyTurnstile(turnstileToken);
 
   if (!isHuman) {
-    return { error: "Weryfikacja anty-botowa nie powiodła się." };
+    return { error: "Weryfikacja anty-botowa nie powiodła się. Spróbuj ponownie." };
   }
 
-  // 1. Walidacja danych
+  // 3. Walidacja danych
   const rawData = Object.fromEntries(formData.entries());
   const validated = RegisterSchema.safeParse(rawData);
 
   if (!validated.success) {
-    // ZMIANA: Zamiast .errors używamy .issues
-    const errorMessage =
-      validated.error.issues[0]?.message ?? "Nieprawidłowe dane formularza";
+    const errorMessage = validated.error.issues[0]?.message ?? "Nieprawidłowe dane formularza";
     return { error: errorMessage };
   }
 
@@ -66,28 +62,24 @@ export async function registerUser(
       email,
       name,
       password: hashedPassword,
-      // Dodajemy domyślne wartości dla nowych pól, żeby baza nie krzyczała (opcjonalne, jeśli są nullable)
       role: "user",
     });
 
-    // Auto-login after successful registration
+    // AUTO-LOGIN PO REJESTRACJI
     try {
       await signIn("credentials", {
-        email: validated.data.email,
-        password: validated.data.password,
+        email,
+        password,
         redirect: false,
       });
-
-      return { success: "Konto utworzone! Logowanie..." };
-    } catch (error) {
-      if (error instanceof AuthError) {
-        return {
-          error:
-            "Konto utworzone, ale błąd logowania. Spróbuj zalogować się ręcznie.",
-        };
+      return { success: "Konto utworzone! Następuje logowanie..." };
+    } catch (authErr) {
+      if (authErr instanceof AuthError) {
+        return { error: "Konto utworzone, ale błąd automatycznego logowania." };
       }
-      throw error;
+      throw authErr;
     }
+
   } catch (err) {
     console.error("Błąd rejestracji:", err);
     return { error: "Wystąpił błąd serwera podczas tworzenia konta." };
