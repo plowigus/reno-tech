@@ -5,16 +5,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productSchema, ProductFormValues } from "@/lib/validators/product-schema";
 import { createProduct, updateProduct } from "@/app/actions/product-actions";
-import { useUploadThing } from "@/lib/uploadthing";
+
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Loader2, X, Plus, DollarSign, Layers, AlignLeft, UploadCloud, Check, Save } from "lucide-react";
+import { Loader2, X, Plus, DollarSign, Layers, AlignLeft, Check, Save } from "lucide-react";
 import { clsx } from "clsx";
-import { useDropzone } from "@uploadthing/react";
 import { products } from "@/db/schema";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 type ProductFormProps = {
     initialData?: typeof products.$inferSelect;
@@ -25,31 +25,9 @@ export function ProductForm({ initialData }: ProductFormProps) {
     const router = useRouter();
     const [error, setError] = useState<string | undefined>("");
 
-    // Custom upload hook
-    const { startUpload, isUploading } = useUploadThing("productImages", {
-        onClientUploadComplete: (res) => {
-            if (res && res.length > 0) {
-                const newImages = res.map((r) => r.url);
-                form.setValue("images", [...images, ...newImages]);
-            }
-        },
-        onUploadError: (e) => {
-            setError(`Upload failed: ${e.message}`);
-        },
-    });
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        if (acceptedFiles.length > 0) {
-            startUpload(acceptedFiles);
-        }
-    }, [startUpload]);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: { 'image/*': [] },
-        multiple: true,
-        disabled: isUploading
-    });
+    // We removed the custom useUploadThing hook as it is now handled by ImageUpload component internally
 
     const form = useForm<ProductFormValues>({
         resolver: zodResolver(productSchema) as any,
@@ -163,73 +141,47 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         </div>
 
                         {/* Images */}
-                        <div className="bg-secondary/50 border border-border rounded-2xl p-6 space-y-6">
-                            <label className="text-sm font-medium text-zinc-300">Zdjęcia</label>
+                        {images.length > 0 && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                {images.map((url, index) => (
+                                    <div key={url} className="relative group aspect-square rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
+                                        <Image
+                                            src={url}
+                                            alt={`Product image ${index + 1}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={() => {
+                                                const newImages = images.filter((_, i) => i !== index);
+                                                form.setValue("images", newImages);
+                                            }}
+                                            className="absolute top-2 right-2 p-1.5 bg-background/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 h-auto w-auto"
+                                        >
+                                            <X size={14} />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
-                            {images.length > 0 && (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                                    {images.map((url, index) => (
-                                        <div key={url} className="relative group aspect-square rounded-xl overflow-hidden border border-zinc-700 bg-zinc-800">
-                                            <Image
-                                                src={url}
-                                                alt={`Product image ${index + 1}`}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                            <Button
-                                                type="button"
-                                                onClick={() => {
-                                                    const newImages = images.filter((_, i) => i !== index);
-                                                    form.setValue("images", newImages);
-                                                }}
-                                                className="absolute top-2 right-2 p-1.5 bg-background/50 hover:bg-red-600 rounded-full text-white backdrop-blur-sm transition-colors opacity-0 group-hover:opacity-100 h-auto w-auto"
-                                            >
-                                                <X size={14} />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Custom Upload Area */}
-                            {images.length < 4 && (
-                                <div
-                                    {...getRootProps()}
-                                    className={clsx(
-                                        "border-2 border-dashed rounded-xl p-8 transition-all cursor-pointer flex flex-col items-center justify-center gap-2",
-                                        isDragActive ? "border-red-600 bg-red-600/5" : "border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800/50",
-                                        isUploading && "opacity-50 cursor-not-allowed"
-                                    )}
-                                >
-                                    <input {...getInputProps()} />
-                                    {isUploading ? (
-                                        <div className="flex flex-col items-center gap-2 text-zinc-400">
-                                            <Loader2 className="animate-spin text-red-600" size={32} />
-                                            <span className="text-sm">Przesyłanie zdjęć...</span>
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-2 text-zinc-400">
-                                            <div className="p-3 bg-zinc-800 rounded-full mb-1">
-                                                <UploadCloud size={24} className="text-zinc-300" />
-                                            </div>
-                                            <p className="text-sm font-medium text-zinc-300">
-                                                Kliknij lub upuść zdjęcia tutaj
-                                            </p>
-                                            <p className="text-xs text-zinc-500">
-                                                Maksymalnie 4 zdjęcia (4MB każde)
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {form.formState.errors.images && (
-                                <p className="text-sm text-red-500">
-                                    {form.formState.errors.images.message}
-                                </p>
-                            )}
-                        </div>
+                        {/* Custom Upload Area */}
+                        {images.length < 4 && (
+                            <ImageUpload
+                                value=""
+                                onChange={(url) => {
+                                    if (url) {
+                                        form.setValue("images", [...images, url]);
+                                    }
+                                }}
+                                aspectRatio={1}
+                                endpoint="productImages"
+                                className="w-full max-w-[200px]"
+                            />
+                        )}
                     </div>
+
 
                     {/* Right Column - Details */}
                     <div className="space-y-6">
@@ -343,17 +295,15 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            disabled={isPending || isUploading}
+                            disabled={isPending}
                             className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed h-auto"
                         >
-                            {isPending || isUploading ? (
+                            {isPending ? (
                                 <>
                                     <Loader2 className="animate-spin" size={20} />
-                                    {isUploading
-                                        ? "Wysyłanie..."
-                                        : initialData
-                                            ? "Zapisywanie..."
-                                            : "Dodawanie..."
+                                    {initialData
+                                        ? "Zapisywanie..."
+                                        : "Dodawanie..."
                                     }
                                 </>
                             ) : (
@@ -365,7 +315,7 @@ export function ProductForm({ initialData }: ProductFormProps) {
                         </Button>
                     </div>
                 </div>
-            </form>
-        </div>
+            </form >
+        </div >
     );
 }

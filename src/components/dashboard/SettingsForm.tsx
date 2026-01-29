@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { updateUserProfile, ProfileState } from "@/app/actions/user-actions";
-import { UploadButton } from "@/lib/uploadthing";
+import { ImageUpload } from "@/components/ui/image-upload";
 import Image from "next/image";
 import { Loader2, User, Phone, MapPin, Building, Globe, CheckCircle2, AlertCircle, Crown } from "lucide-react";
 import AddressAutocomplete from "./AddressAutocomplete";
@@ -56,23 +56,12 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <UploadButton
+                        <ImageUpload
+                            value={imagePreview}
+                            onChange={(url) => setImagePreview(url)}
+                            aspectRatio={1}
                             endpoint="profileImage"
-                            appearance={{
-                                button: "bg-zinc-800 text-white hover:bg-zinc-700 text-sm py-2 px-4 rounded-lg transition-colors border border-zinc-700",
-                                allowedContent: "hidden"
-                            }}
-                            content={{
-                                button: "Zmień zdjęcie"
-                            }}
-                            onClientUploadComplete={(res) => {
-                                if (res && res[0]) {
-                                    setImagePreview(res[0].url);
-                                }
-                            }}
-                            onUploadError={(error: Error) => {
-                                alert(`ERROR! ${error.message}`);
-                            }}
+                            className="w-full max-w-[200px]"
                         />
                         <p className="text-xs text-zinc-500">
                             JPG, PNG lub GIF. Max 4MB.
