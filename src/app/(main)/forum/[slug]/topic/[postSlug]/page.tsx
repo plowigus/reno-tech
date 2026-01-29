@@ -13,6 +13,7 @@ import { forumPosts, forumComments } from "@/db/schema";
 import { sql, eq } from "drizzle-orm";
 import { RichTextRenderer } from "@/components/ui/rich-text-renderer"; // Import Renderer
 import { PostActions } from "@/components/forum/PostActions";
+import { ForumPost } from "@/components/forum/ForumPost";
 
 // --- HELPER COMPONENT: THE CLASSIC FORUM POST ---
 const ForumPostBlock = ({
@@ -193,18 +194,22 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
                     />
 
                     {/* 2. COMMENTS LIST */}
-                    {post.comments.map((comment, i) => (
-                        <ForumPostBlock
-                            key={comment.id}
-                            author={comment.author}
-                            content={comment.content}
-                            createdAt={comment.createdAt!}
-                            index={i + 2}
-                            userPostCount={statsMap.get(comment.authorId || "") || 0}
-                            currentUser={currentUser}
-                            postId={comment.id}
-                        />
-                    ))}
+                    <div className="space-y-0">
+                        {post.comments.map((comment) => (
+                            <ForumPost
+                                key={comment.id}
+                                comment={{
+                                    ...comment,
+                                    createdAt: comment.createdAt || new Date(),
+                                    authorId: comment.authorId || "",
+                                }}
+                                currentUser={currentUser && currentUser.id ? {
+                                    id: currentUser.id,
+                                    role: currentUser.role || "user"
+                                } : undefined}
+                            />
+                        ))}
+                    </div>
                 </div>
 
                 {/* 3. REPLY FORM */}

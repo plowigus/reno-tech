@@ -228,6 +228,42 @@ export async function deleteComment(commentId: string) {
     return { success: "Komentarz usunięty." };
 }
 
+export async function updateComment(commentId: string, newContent: string) {
+    const session = await auth();
+    if (!session?.user) return { error: "Brak autoryzacji." };
+
+    const comment = await db.query.forumComments.findFirst({
+        where: eq(forumComments.id, commentId),
+    });
+
+    if (!comment) return { error: "Komentarz nie istnieje." };
+
+    const isOwner = comment.authorId === session.user.id;
+    const isAdmin = session.user.role === "admin" || session.user.role === "moderator";
+
+    if (!isOwner && !isAdmin) {
+        return { error: "Tylko autor może edytować komentarz." };
+    }
+
+    await db.update(forumComments)
+        .set({ content: newContent }) // Note: forumComments might not have updatedAt? Checked schema in step 672 view: it has createdAt. Does it update parent post updatedAt? Maybe. But let's just update content for now.
+        .where(eq(forumComments.id, commentId));
+
+    // Optional: Bump logic for post? Maybe not for editing a comment.
+
+    // Revalidate
+    const topic = await db.query.forumPosts.findFirst({
+        where: eq(forumPosts.id, comment.postId || ""),
+        with: { category: true }
+    });
+
+    if (topic && topic.category) {
+        revalidatePath(`/forum/${topic.category.slug}/topic/${topic.slug}`);
+    }
+
+    return { success: "Komentarz zaktualizowany." };
+}
+
 // --- NOTIFICATION ACTIONS ---
 
 import { notifications } from "@/db/schema";
