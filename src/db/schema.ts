@@ -7,6 +7,7 @@ import {
     decimal,
     primaryKey,
     uuid,
+    pgEnum,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -215,6 +216,21 @@ export const forumComments = pgTable("forum_comment", {
     createdAt: timestamp("created_at").defaultNow(),
 });
 
+// --- SECTION 6: NOTIFICATIONS ---
+
+export const notificationTypeEnum = pgEnum("notification_type", ["REPLY", "MENTION", "SYSTEM"]);
+
+export const notifications = pgTable("notification", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    recipientId: text("recipient_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    senderId: text("sender_id").references(() => users.id, { onDelete: "set null" }), // Nullable for SYSTEM
+    type: notificationTypeEnum("type").notNull(),
+    resourceId: text("resource_id"), // ID of the topic or post to redirect to
+    content: text("content"), // Optional short text preview
+    isRead: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // --- RELATIONS ---
 import { relations } from "drizzle-orm";
 
@@ -225,6 +241,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     }),
     wishlist: many(wishlists),
     orders: many(orders),
+    notificationsReceived: many(notifications, { relationName: "recipientNotifications" }),
+    notificationsSent: many(notifications, { relationName: "senderNotifications" }),
 }));
 
 export const cartsRelations = relations(carts, ({ one, many }) => ({
@@ -311,4 +329,17 @@ export const forumCommentsRelations = relations(forumComments, ({ one }) => ({
 export const usersForumRelations = relations(users, ({ many }) => ({
     forumPosts: many(forumPosts),
     forumComments: many(forumComments),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+    recipient: one(users, {
+        fields: [notifications.recipientId],
+        references: [users.id],
+        relationName: "recipientNotifications",
+    }),
+    sender: one(users, {
+        fields: [notifications.senderId],
+        references: [users.id],
+        relationName: "senderNotifications",
+    }),
 }));
