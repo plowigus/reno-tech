@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { conversations, messages, conversationParticipants, users } from "@/db/schema";
+import { conversations, messages, conversationParticipants, users, friends } from "@/db/schema";
 import { pusherServer } from "@/lib/pusher";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -135,30 +135,52 @@ export async function startConversation(targetUserId: string) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Unauthorized" };
 
-    // A. Check if conversation already exists between these 2 users (1-on-1)
-    // Complex query: Find a conversation where BOTH users are participants AND it is NOT a group
-    // For MVP/Simplicity: We will create a new one or you can implement the check logic.
+    // 1. SECURITY CHECK (Friendship)
+    const isFriend = await db.query.friends.findFirst({
+        where: and(
+            eq(friends.userId, session.user.id),
+            eq(friends.friendId, targetUserId)
+        )
+    });
 
-    // Let's create a NEW one for now to ensure it works. 
-    // Optimization: Check for existing convo later.
+    if (!isFriend) {
+        return { error: "Musisz dodać użytkownika do znajomych, aby rozpocząć rozmowę." };
+    }
 
+    // 2. CHECK FOR EXISTING CONVERSATION
+    // We are looking for a conversation that is NOT a group
+    // AND has both users as participants.
+    const existingConversation = await db
+        .select({ id: conversations.id })
+        .from(conversations)
+        .where(and(
+            eq(conversations.isGroup, false),
+            sql`EXISTS (
+            SELECT 1 FROM ${conversationParticipants} cp 
+            WHERE cp.conversation_id = ${conversations.id} AND cp.user_id = ${session.user.id}
+          )`,
+            sql`EXISTS (
+            SELECT 1 FROM ${conversationParticipants} cp 
+            WHERE cp.conversation_id = ${conversations.id} AND cp.user_id = ${targetUserId}
+          )`
+        ))
+        .limit(1);
+
+    if (existingConversation.length > 0) {
+        return { success: true, conversationId: existingConversation[0].id };
+    }
+
+    // 3. CREATE NEW (If not found)
     const newConvo = await db.insert(conversations).values({
         isGroup: false,
     }).returning();
 
     const convoId = newConvo[0].id;
 
-    // Add Me
-    await db.insert(conversationParticipants).values({
-        conversationId: convoId,
-        userId: session.user.id
-    });
-
-    // Add Them
-    await db.insert(conversationParticipants).values({
-        conversationId: convoId,
-        userId: targetUserId
-    });
+    await db.insert(conversationParticipants).values([
+        { conversationId: convoId, userId: session.user.id },
+        { conversationId: convoId, userId: targetUserId }
+    ]);
 
     revalidatePath("/dashboard/chat");
     return { success: true, conversationId: convoId };
