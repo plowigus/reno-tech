@@ -243,6 +243,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     orders: many(orders),
     notificationsReceived: many(notifications, { relationName: "recipientNotifications" }),
     notificationsSent: many(notifications, { relationName: "senderNotifications" }),
+    conversations: many(conversationParticipants),
+    messages: many(messages),
 }));
 
 export const cartsRelations = relations(carts, ({ one, many }) => ({
@@ -341,5 +343,69 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
         fields: [notifications.senderId],
         references: [users.id],
         relationName: "senderNotifications",
+    }),
+}));
+
+// --- SECTION 7: CHAT SYSTEM ---
+
+export const conversations = pgTable("conversation", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    name: text("name"), // Opcjonalne: Dla rozmów grupowych
+    isGroup: boolean("is_group").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    lastMessageAt: timestamp("last_message_at").defaultNow(), // Do sortowania listy rozmów
+});
+
+export const conversationParticipants = pgTable("conversation_participant", {
+    conversationId: uuid("conversation_id")
+        .notNull()
+        .references(() => conversations.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    lastReadAt: timestamp("last_read_at"), // Do liczenia nieprzeczytanych wiadomości
+    joinedAt: timestamp("joined_at").defaultNow().notNull(),
+}, (t) => [
+    primaryKey({ columns: [t.conversationId, t.userId] }),
+]);
+
+export const messages = pgTable("message", {
+    id: uuid("id").defaultRandom().primaryKey(),
+    conversationId: uuid("conversation_id")
+        .notNull()
+        .references(() => conversations.id, { onDelete: "cascade" }),
+    senderId: text("sender_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    content: text("content").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- UPDATE RELATIONS ---
+
+export const conversationsRelations = relations(conversations, ({ many }) => ({
+    participants: many(conversationParticipants),
+    messages: many(messages),
+}));
+
+export const conversationParticipantsRelations = relations(conversationParticipants, ({ one }) => ({
+    conversation: one(conversations, {
+        fields: [conversationParticipants.conversationId],
+        references: [conversations.id],
+    }),
+    user: one(users, {
+        fields: [conversationParticipants.userId],
+        references: [users.id],
+    }),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+    conversation: one(conversations, {
+        fields: [messages.conversationId],
+        references: [conversations.id],
+    }),
+    sender: one(users, {
+        fields: [messages.senderId],
+        references: [users.id],
     }),
 }));
