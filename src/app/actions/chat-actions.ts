@@ -2,32 +2,43 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { conversations, messages, conversationParticipants, users, friends } from "@/db/schema";
+import { conversations, messages, conversationParticipants, friends } from "@/db/schema";
 import { pusherServer } from "@/lib/pusher";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-// 1. Send a Message
+// --- EMERGENCY RESET ---
+export async function resetChatSystem() {
+    const session = await auth();
+    // Optional: Add admin check here if needed
+    if (!session?.user) return { error: "Unauthorized" };
+
+    try {
+        // Deleting conversations cascades to messages and participants
+        await db.delete(conversations);
+        revalidatePath("/");
+        return { success: "Czat wyczyszczony." };
+    } catch (e) {
+        return { error: "Błąd resetowania." };
+    }
+}
+
+// --- SEND MESSAGE ---
 export async function sendMessage(conversationId: string, content: string) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Unauthorized" };
 
     try {
-        // A. Save to Database
         const [newMessage] = await db.insert(messages).values({
             conversationId,
             senderId: session.user.id,
             content,
         }).returning();
 
-        // B. Update Conversation Timestamp
         await db.update(conversations)
             .set({ lastMessageAt: new Date() })
             .where(eq(conversations.id, conversationId));
 
-        // C. Trigger Pusher Event (Real-Time!)
-        // Channel: conversation-[id]
-        // Event: new-message
         await pusherServer.trigger(
             `conversation-${conversationId}`,
             "new-message",
@@ -42,48 +53,38 @@ export async function sendMessage(conversationId: string, content: string) {
         );
 
         return { success: true, message: newMessage };
-    } catch (error: any) {
+    } catch (error) {
         console.error("Chat Error:", error);
-        return { error: error.message || "Failed to send message" };
+        return { error: "Failed to send message" };
     }
 }
 
-// 2. Get My Conversations (for Sidebar)
+// --- GET CONVERSATIONS ---
 export async function getConversations() {
     const session = await auth();
     if (!session?.user?.id) return [];
 
-    // This query fetches conversations where the current user is a participant
-    // It also needs to fetch the 'other' participant's details for the UI (Avatar/Name)
-
-    // Simplified logic for MVP:
-    // 1. Get conversation IDs for user
     const userConvos = await db.query.conversationParticipants.findMany({
         where: eq(conversationParticipants.userId, session.user.id),
-        columns: { conversationId: true },
         with: {
             conversation: {
                 with: {
                     participants: {
                         with: {
-                            user: {
-                                columns: { id: true, name: true, image: true, role: true } // Fetch 'status' logic later via Pusher
-                            }
+                            user: { columns: { id: true, name: true, image: true } }
                         }
                     },
                     messages: {
                         orderBy: [desc(messages.createdAt)],
-                        limit: 1, // Last message preview
+                        limit: 1,
                     }
                 }
             }
         }
     });
 
-    // Transform data for easier UI consumption
-    const formatted = userConvos.map(item => {
+    return userConvos.map(item => {
         const convo = item.conversation;
-        // Find the participant that is NOT me (for 1-on-1 chats)
         const otherUser = convo.participants.find(p => p.user.id !== session.user.id)?.user;
 
         return {
@@ -91,24 +92,18 @@ export async function getConversations() {
             isGroup: convo.isGroup,
             name: convo.name || otherUser?.name || "Użytkownik",
             image: otherUser?.image,
-            otherUserId: otherUser?.id, // Key for checking Online status later
+            otherUserId: otherUser?.id,
             lastMessage: convo.messages[0],
             lastMessageAt: convo.lastMessageAt,
         };
-    }).sort((a, b) => {
-        // Sort by latest activity
-        return new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime();
-    });
-
-    return formatted;
+    }).sort((a, b) => new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime());
 }
 
-// 3. Get Messages for a specific Conversation
+// --- GET MESSAGES ---
 export async function getMessages(conversationId: string) {
     const session = await auth();
     if (!session?.user?.id) return [];
 
-    // Verify participation (Security)
     const isParticipant = await db.query.conversationParticipants.findFirst({
         where: and(
             eq(conversationParticipants.conversationId, conversationId),
@@ -120,68 +115,51 @@ export async function getMessages(conversationId: string) {
 
     return await db.query.messages.findMany({
         where: eq(messages.conversationId, conversationId),
-        orderBy: [desc(messages.createdAt)], // Oldest first is usually better for chat history render (reversed flex), but let's stick to desc for fetching
+        orderBy: [desc(messages.createdAt)],
         limit: 50,
         with: {
-            sender: {
-                columns: { id: true, name: true, image: true }
-            }
+            sender: { columns: { id: true, name: true, image: true } }
         }
     });
 }
 
-// 4. Create or Get Conversation (Start Chat)
+// --- START CONVERSATION (FIXED DUPLICATES) ---
 export async function startConversation(targetUserId: string) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Unauthorized" };
 
-    // 1. SECURITY CHECK (Friendship)
+    // 1. Friend Check
     const isFriend = await db.query.friends.findFirst({
         where: and(
             eq(friends.userId, session.user.id),
             eq(friends.friendId, targetUserId)
         )
     });
+    if (!isFriend) return { error: "Najpierw dodaj do znajomych." };
 
-    if (!isFriend) {
-        return { error: "Musisz dodać użytkownika do znajomych, aby rozpocząć rozmowę." };
-    }
-
-    // 2. CHECK FOR EXISTING CONVERSATION
-    // We are looking for a conversation that is NOT a group
-    // AND has both users as participants.
-    const existingConversation = await db
+    // 2. Duplicate Check (SQL EXISTS)
+    const existing = await db
         .select({ id: conversations.id })
         .from(conversations)
         .where(and(
             eq(conversations.isGroup, false),
-            sql`EXISTS (
-            SELECT 1 FROM ${conversationParticipants} cp 
-            WHERE cp.conversation_id = ${conversations.id} AND cp.user_id = ${session.user.id}
-          )`,
-            sql`EXISTS (
-            SELECT 1 FROM ${conversationParticipants} cp 
-            WHERE cp.conversation_id = ${conversations.id} AND cp.user_id = ${targetUserId}
-          )`
+            sql`EXISTS (SELECT 1 FROM ${conversationParticipants} cp WHERE cp.conversation_id = ${conversations.id} AND cp.user_id = ${session.user.id})`,
+            sql`EXISTS (SELECT 1 FROM ${conversationParticipants} cp WHERE cp.conversation_id = ${conversations.id} AND cp.user_id = ${targetUserId})`
         ))
         .limit(1);
 
-    if (existingConversation.length > 0) {
-        return { success: true, conversationId: existingConversation[0].id };
+    if (existing.length > 0) {
+        return { success: true, conversationId: existing[0].id };
     }
 
-    // 3. CREATE NEW (If not found)
-    const newConvo = await db.insert(conversations).values({
-        isGroup: false,
-    }).returning();
-
-    const convoId = newConvo[0].id;
+    // 3. Create New
+    const [newConvo] = await db.insert(conversations).values({ isGroup: false }).returning();
 
     await db.insert(conversationParticipants).values([
-        { conversationId: convoId, userId: session.user.id },
-        { conversationId: convoId, userId: targetUserId }
+        { conversationId: newConvo.id, userId: session.user.id },
+        { conversationId: newConvo.id, userId: targetUserId }
     ]);
 
     revalidatePath("/dashboard/chat");
-    return { success: true, conversationId: convoId };
+    return { success: true, conversationId: newConvo.id };
 }
