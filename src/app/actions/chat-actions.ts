@@ -25,20 +25,28 @@ export async function resetChatSystem() {
 
 // --- SEND MESSAGE ---
 export async function sendMessage(conversationId: string, content: string) {
+    console.log("[sendMessage] Action started", { conversationId, content });
     const session = await auth();
-    if (!session?.user?.id) return { error: "Unauthorized" };
+    if (!session?.user?.id) {
+        console.log("[sendMessage] Unauthorized: No session");
+        return { error: "Unauthorized" };
+    }
 
     try {
+        console.log("[sendMessage] Inserting message to DB...");
         const [newMessage] = await db.insert(messages).values({
             conversationId,
             senderId: session.user.id,
             content,
         }).returning();
+        console.log("[sendMessage] Message inserted:", newMessage.id);
 
+        console.log("[sendMessage] Updating conversation lastMessageAt...");
         await db.update(conversations)
             .set({ lastMessageAt: new Date() })
             .where(eq(conversations.id, conversationId));
 
+        console.log("[sendMessage] Triggering Pusher event...");
         await pusherServer.trigger(
             `conversation-${conversationId}`,
             "new-message",
@@ -51,11 +59,12 @@ export async function sendMessage(conversationId: string, content: string) {
                 senderImage: session.user.image,
             }
         );
+        console.log("[sendMessage] Pusher triggered successfully");
 
         return { success: true, message: newMessage };
-    } catch (error) {
-        console.error("Chat Error:", error);
-        return { error: "Failed to send message" };
+    } catch (error: any) {
+        console.error("[sendMessage] Critical Error:", error);
+        return { error: `Failed to send message: ${error.message}` };
     }
 }
 

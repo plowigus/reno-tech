@@ -60,19 +60,19 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
 
     const handleSend = async (e?: React.FormEvent) => {
         e?.preventDefault();
+        console.log("[ChatWindow] Sending message...", { inputValue });
         if (!inputValue.trim() || isSending) return;
 
         const content = inputValue;
         setInputValue(""); // Clear immediately (Optimistic)
         setIsSending(true);
 
-        // Optimistic Update (Optional, but makes it snappy)
-        // We can wait for Pusher to deliver the message back to us to verify it was sent
-
         const res = await sendMessage(conversationId, content);
+        console.log("[ChatWindow] Send result:", res);
         setIsSending(false);
 
         if (res?.error) {
+            console.error("[ChatWindow] Error toast triggered:", res.error);
             toast.error(res.error);
             setInputValue(content); // Restore text
         }
