@@ -42,9 +42,9 @@ export async function sendMessage(conversationId: string, content: string) {
         );
 
         return { success: true, message: newMessage };
-    } catch (error) {
+    } catch (error: any) {
         console.error("Chat Error:", error);
-        return { error: "Failed to send message" };
+        return { error: error.message || "Failed to send message" };
     }
 }
 

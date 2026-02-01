@@ -73,7 +73,7 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
         setIsSending(false);
 
         if (res?.error) {
-            toast.error("Nie udało się wysłać wiadomości.");
+            toast.error(res.error);
             setInputValue(content); // Restore text
         }
     };
