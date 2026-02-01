@@ -104,10 +104,24 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <Button size="icon" variant="ghost" asChild title="Napisz">
-                                                <Link href={`/dashboard/chat`}>
-                                                    <MessageSquare className="w-4 h-4 text-blue-400" />
-                                                </Link>
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                title="Napisz"
+                                                onClick={async () => {
+                                                    try {
+                                                        const res = await import("@/app/actions/chat-actions").then(mod => mod.startConversation(friend.id));
+                                                        if (res.error) {
+                                                            toast.error(res.error);
+                                                        } else if (res.conversationId) {
+                                                            router.push(`/dashboard/chat/${res.conversationId}`);
+                                                        }
+                                                    } catch (error) {
+                                                        toast.error("Wystąpił błąd podczas tworzenia rozmowy.");
+                                                    }
+                                                }}
+                                            >
+                                                <MessageSquare className="w-4 h-4 text-blue-400" />
                                             </Button>
                                             <Button size="icon" variant="ghost" onClick={() => handleRemoveFriend(friend.id)} title="Usuń">
                                                 <Trash2 className="w-4 h-4 text-red-500" />
