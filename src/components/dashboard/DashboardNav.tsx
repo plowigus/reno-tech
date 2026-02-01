@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Package, Settings, LogOut, Users, Heart, Bell } from "lucide-react";
+import { User, Package, Settings, LogOut, Users, Heart, Bell, MessageSquare } from "lucide-react";
 import { handleSignOut } from "@/app/actions/auth-actions";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,16 @@ const navItems = [
         name: "Zamówienia",
         href: "/dashboard/orders",
         icon: Package,
+    },
+    {
+        name: "Wiadomości",
+        href: "/dashboard/chat",
+        icon: MessageSquare,
+    },
+    {
+        name: "Znajomi",
+        href: "/dashboard/friends",
+        icon: Users,
     },
     {
         name: "Ustawienia",

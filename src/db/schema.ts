@@ -218,7 +218,13 @@ export const forumComments = pgTable("forum_comment", {
 
 // --- SECTION 6: NOTIFICATIONS ---
 
-export const notificationTypeEnum = pgEnum("notification_type", ["REPLY", "MENTION", "SYSTEM"]);
+export const notificationTypeEnum = pgEnum("notification_type", [
+    "REPLY",
+    "MENTION",
+    "SYSTEM",
+    "FRIEND_REQUEST",
+    "FRIEND_ACCEPT"
+]);
 
 export const notifications = pgTable("notification", {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -245,6 +251,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     notificationsSent: many(notifications, { relationName: "senderNotifications" }),
     conversations: many(conversationParticipants),
     messages: many(messages),
+    sentFriendRequests: many(friendRequests, { relationName: "sentRequests" }),
+    receivedFriendRequests: many(friendRequests, { relationName: "receivedRequests" }),
+    friends: many(friends, { relationName: "userFriends" }),
 }));
 
 export const cartsRelations = relations(carts, ({ one, many }) => ({
@@ -407,5 +416,61 @@ export const messagesRelations = relations(messages, ({ one }) => ({
     sender: one(users, {
         fields: [messages.senderId],
         references: [users.id],
+        relationName: "senderMessages", // Added relationName for clarity/consistency though not strictly required if not used in query
+    }),
+}));
+
+// --- SECTION 8: FRIENDS SYSTEM ---
+
+export const friendRequests = pgTable("friend_request", {
+    senderId: text("sender_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    receiverId: text("receiver_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+    // Ensure unique request between two users
+    primaryKey({ columns: [t.senderId, t.receiverId] }),
+]);
+
+export const friends = pgTable("friend", {
+    userId: text("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    friendId: text("friend_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+    primaryKey({ columns: [t.userId, t.friendId] }),
+]);
+
+// --- UPDATE RELATIONS ---
+
+export const friendRequestsRelations = relations(friendRequests, ({ one }) => ({
+    sender: one(users, {
+        fields: [friendRequests.senderId],
+        references: [users.id],
+        relationName: "sentRequests",
+    }),
+    receiver: one(users, {
+        fields: [friendRequests.receiverId],
+        references: [users.id],
+        relationName: "receivedRequests",
+    }),
+}));
+
+export const friendsRelations = relations(friends, ({ one }) => ({
+    user: one(users, {
+        fields: [friends.userId],
+        references: [users.id],
+        relationName: "userFriends", // My link to the friend record
+    }),
+    friend: one(users, {
+        fields: [friends.friendId],
+        references: [users.id],
+        relationName: "friendUsers", // The friend's user details
     }),
 }));

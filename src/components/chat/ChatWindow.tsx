@@ -91,7 +91,7 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
                         return (
                             <div key={msg.id} className={cn("flex gap-3 max-w-[80%]", isMe ? "ml-auto flex-row-reverse" : "")}>
                                 {/* Avatar */}
-                                <div className="relative w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 flex-shrink-0 mt-1">
+                                <div className="relative w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 shrink-0 mt-1">
                                     {msg.senderImage ? (
                                         <Image src={msg.senderImage} alt="User" fill className="object-cover" />
                                     ) : (

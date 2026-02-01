@@ -45,7 +45,7 @@ export function ChatSidebar({ conversations }: { conversations: ConversationItem
                                     isActive ? "bg-zinc-800" : "hover:bg-zinc-900"
                                 )}
                             >
-                                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800 flex-shrink-0">
+                                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800 shrink-0">
                                     {chat.image ? (
                                         <Image src={chat.image} alt="User" fill className="object-cover" />
                                     ) : (
