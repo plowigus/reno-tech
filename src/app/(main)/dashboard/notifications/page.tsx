@@ -60,8 +60,8 @@ export default async function NotificationsPage() {
                                         <span className="text-xs text-zinc-500">{formatDatePL(n.createdAt)}</span>
                                     </div>
                                     <p className="text-sm text-zinc-400 italic">"{n.content}"</p>
-                                    {n.resourceId && (
-                                        <Link href={`/forum/${n.resourceId}`} className="inline-flex items-center text-xs text-red-500 hover:text-red-400 mt-1">
+                                    {n.targetUrl && (
+                                        <Link href={n.targetUrl} className="inline-flex items-center text-xs text-red-500 hover:text-red-400 mt-1">
                                             <MessageSquare className="w-3 h-3 mr-1" />
                                             Przejdź do dyskusji
                                         </Link>

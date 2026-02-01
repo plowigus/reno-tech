@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/db";
 import { forumCategories, forumPosts, forumComments } from "@/db/schema";
 import { createPostSchema, createCommentSchema } from "@/lib/validators/forum-schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -350,7 +350,7 @@ export async function getAllNotifications(limit = 50) {
     const session = await auth();
     if (!session?.user?.id) return [];
 
-    return await db.query.notifications.findMany({
+    const notificationsList = await db.query.notifications.findMany({
         where: eq(notifications.recipientId, session.user.id),
         orderBy: [desc(notifications.createdAt)],
         limit: limit,
@@ -359,6 +359,49 @@ export async function getAllNotifications(limit = 50) {
                 columns: { name: true, image: true }
             }
         }
+    });
+
+    // Extract resource IDs for REPLY types
+    const resourceIds = notificationsList
+        .filter(n => n.type === "REPLY" && n.resourceId)
+        .map(n => n.resourceId as string);
+
+    // Bulk fetch related topics if any
+    let topicsMap = new Map<string, { slug: string; category: { slug: string } }>();
+
+    if (resourceIds.length > 0) {
+        const topics = await db.query.forumPosts.findMany({
+            where: inArray(forumPosts.id, resourceIds),
+            with: {
+                category: {
+                    columns: { slug: true }
+                }
+            },
+            columns: { id: true, slug: true }
+        });
+
+        topics.forEach(t => {
+            if (t.category) {
+                topicsMap.set(t.id, { slug: t.slug!, category: t.category });
+            }
+        });
+    }
+
+    // Attach targetUrl to notifications
+    return notificationsList.map(n => {
+        let targetUrl = null;
+
+        if (n.type === "REPLY" && n.resourceId && topicsMap.has(n.resourceId)) {
+            const topic = topicsMap.get(n.resourceId);
+            if (topic) {
+                targetUrl = `/forum/${topic.category.slug}/topic/${topic.slug}`;
+            }
+        }
+
+        return {
+            ...n,
+            targetUrl
+        };
     });
 }
 
