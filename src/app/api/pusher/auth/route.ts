@@ -3,27 +3,40 @@ import { pusherServer } from "@/lib/pusher";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+    // 1. Sprawdź sesję
     const session = await auth();
 
     if (!session?.user?.id) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const body = await req.formData();
-    const socketId = body.get("socket_id") as string;
-    const channel = body.get("channel_name") as string;
+    // 2. Bezpieczne parsowanie body (x-www-form-urlencoded)
+    // Pusher wysyła dane jako formularz, nie JSON
+    const text = await req.text();
+    const params = new URLSearchParams(text);
 
-    // User data exposed to other clients
-    const data = {
+    const socketId = params.get("socket_id");
+    const channel = params.get("channel_name");
+
+    if (!socketId || !channel) {
+        return new NextResponse("Missing socket_id or channel_name", { status: 400 });
+    }
+
+    // 3. Dane użytkownika widoczne dla innych (np. na liście online)
+    const userData = {
         user_id: session.user.id,
         user_info: {
             name: session.user.name,
-            image: session.user.image
-        }
+            image: session.user.image,
+        },
     };
 
-    const authResponse = pusherServer.authorizeChannel(socketId, channel, data);
-    // pusherServer.authorizeChannel actually returns a response object (JSON), but Next's NextResponse.json wraps it.
-    // However, authorizeChannel returns a plain object { auth: string, channel_data?: string }.
-    return NextResponse.json(authResponse);
+    try {
+        // 4. Autoryzacja w Pusherze
+        const authResponse = pusherServer.authorizeChannel(socketId, channel, userData);
+        return NextResponse.json(authResponse);
+    } catch (error) {
+        console.error("Pusher Auth Error:", error);
+        return new NextResponse("Internal Server Error", { status: 500 });
+    }
 }
