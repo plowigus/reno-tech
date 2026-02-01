@@ -306,16 +306,7 @@ export async function markNotificationAsRead(notificationId: string) {
     revalidatePath("/");
 }
 
-export async function markAllNotificationsAsRead() {
-    const session = await auth();
-    if (!session?.user?.id) return;
 
-    await db.update(notifications)
-        .set({ isRead: true })
-        .where(eq(notifications.recipientId, session.user.id));
-
-    revalidatePath("/");
-}
 
 export async function markAsReadAndGetUrl(notificationId: string) {
     const session = await auth();
@@ -352,4 +343,34 @@ export async function markAsReadAndGetUrl(notificationId: string) {
     // Default fallback
     revalidatePath("/");
     return "/forum";
+}
+
+// Fetch full history with pagination limit
+export async function getAllNotifications(limit = 50) {
+    const session = await auth();
+    if (!session?.user?.id) return [];
+
+    return await db.query.notifications.findMany({
+        where: eq(notifications.recipientId, session.user.id),
+        orderBy: [desc(notifications.createdAt)],
+        limit: limit,
+        with: {
+            sender: {
+                columns: { name: true, image: true }
+            }
+        }
+    });
+}
+
+// Mark everything as read (Bulk action)
+export async function markAllNotificationsAsRead() {
+    const session = await auth();
+    if (!session?.user?.id) return;
+
+    await db.update(notifications)
+        .set({ isRead: true })
+        .where(eq(notifications.recipientId, session.user.id));
+
+    revalidatePath("/dashboard/notifications");
+    revalidatePath("/"); // Update bell count too
 }

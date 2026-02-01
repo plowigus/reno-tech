@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Package, Settings, LogOut, Users, Heart } from "lucide-react";
+import { User, Package, Settings, LogOut, Users, Heart, Bell } from "lucide-react";
 import { handleSignOut } from "@/app/actions/auth-actions";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,11 @@ const navItems = [
         name: "Mój Profil",
         href: "/dashboard",
         icon: User,
+    },
+    {
+        name: "Powiadomienia",
+        href: "/dashboard/notifications",
+        icon: Bell,
     },
     {
         name: "Lista Życzeń",
