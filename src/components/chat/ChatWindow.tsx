@@ -103,21 +103,25 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
             </div>
 
             {/* MESSAGES AREA */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-                <div className="flex flex-col justify-end min-h-full gap-2">
-                    {/* If initialMessages are sorted DESC (newest first), reverse them here for display */}
-                    {[...messages].reverse().map((msg, index) => {
-                        const isLast = index === messages.length - 1;
-                        const isMe = msg.senderId === currentUserId;
-                        return (
-                            <MessageBubble
-                                key={msg.id}
-                                message={msg}
-                                isMe={isMe}
-                                isLastInSequence={true} // Simplified for now, can be advanced later
-                            />
-                        )
-                    })}
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+                <div className="flex flex-col justify-end min-h-full">
+                    {(() => {
+                        const displayMessages = [...messages].reverse();
+                        return displayMessages.map((msg, index) => {
+                            const isMe = msg.senderId === currentUserId;
+                            const nextMsg = displayMessages[index + 1];
+                            const isLastInSequence = !nextMsg || nextMsg.senderId !== msg.senderId;
+
+                            return (
+                                <MessageBubble
+                                    key={msg.id}
+                                    message={msg}
+                                    isMe={isMe}
+                                    isLastInSequence={isLastInSequence}
+                                />
+                            );
+                        });
+                    })()}
                     <div ref={bottomRef} />
                 </div>
             </div>
