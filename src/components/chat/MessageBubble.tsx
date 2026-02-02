@@ -40,7 +40,7 @@ export function MessageBubble({ message, isMe, isLastInSequence, isFirstInSequen
 
             {/* Bubble */}
             <div className={cn(
-                "px-4 py-2.5 text-[15px] leading-snug break-words min-w-[20px] transition-all",
+                "px-4 py-2.5 text-[15px] leading-snug wrap-break-word min-w-[20px] transition-all",
                 roundedClass,
                 // Colors
                 isMe

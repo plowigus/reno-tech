@@ -69,7 +69,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder="Napisz wiadomość..."
                             // Force override padding-left with !pl-3 to fix "huge padding" issue
-                            className="bg-transparent border-none text-white focus-visible:ring-0 placeholder:text-zinc-500 py-3 !pl-3 pr-3 text-[15px] h-auto max-h-32 min-h-[44px]"
+                            className="bg-transparent border-none text-white focus-visible:ring-0 placeholder:text-zinc-500 py-3 pl-3! pr-3 text-[15px] h-auto max-h-32 min-h-[44px]"
                         // autoFocus 
                         />
                         <Button
