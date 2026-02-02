@@ -28,6 +28,7 @@ export const users = pgTable("user", {
     postalCode: text("postal_code"),
     country: text("country").default("Poland"),
     phoneNumber: text("phone_number"),
+    lastSeen: timestamp("last_seen").defaultNow(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

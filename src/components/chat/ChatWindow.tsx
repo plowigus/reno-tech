@@ -5,10 +5,11 @@ import { pusherClient } from "@/lib/pusher"; // Ensure this exists
 import { sendMessage } from "@/app/actions/chat-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, Smile } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 
 interface Message {
     id: string;
@@ -29,6 +30,7 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [inputValue, setInputValue] = useState("");
     const [isSending, setIsSending] = useState(false);
+    const [showEmoji, setShowEmoji] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
 
     // 1. Subscribe to Pusher
@@ -124,8 +126,26 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
             </div>
 
             {/* INPUT AREA */}
-            <div className="p-4 border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
-                <form onSubmit={handleSend} className="flex gap-2">
+            <div className="p-4 border-t border-zinc-800 bg-zinc-950/80 backdrop-blur-sm relative">
+                {showEmoji && (
+                    <div className="absolute bottom-20 left-4 z-50 shadow-xl rounded-xl border border-zinc-800">
+                        <EmojiPicker
+                            theme={Theme.DARK}
+                            onEmojiClick={(data) => setInputValue((prev) => prev + data.emoji)}
+                            lazyLoadEmojis={true}
+                        />
+                    </div>
+                )}
+                <form onSubmit={handleSend} className="flex gap-2 items-end">
+                    <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="text-zinc-400 hover:text-yellow-400 mb-0.5"
+                        onClick={() => setShowEmoji(!showEmoji)}
+                    >
+                        <Smile className="w-6 h-6" />
+                    </Button>
                     <Input
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}

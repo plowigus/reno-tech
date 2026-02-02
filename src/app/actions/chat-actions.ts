@@ -122,7 +122,7 @@ export async function getConversations() {
                 with: {
                     participants: {
                         with: {
-                            user: { columns: { id: true, name: true, image: true } }
+                            user: { columns: { id: true, name: true, image: true, lastSeen: true } }
                         }
                     },
                     messages: {
@@ -146,6 +146,7 @@ export async function getConversations() {
             otherUserId: otherUser?.id,
             lastMessage: convo.messages[0],
             lastMessageAt: convo.lastMessageAt,
+            otherUserLastSeen: otherUser?.lastSeen,
         };
     }).sort((a, b) => new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime());
 }

@@ -11,7 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useActiveChannel } from "@/hooks/use-active-channel";
 import { useActiveList } from "@/hooks/use-active-store";
 import { startConversation } from "@/app/actions/chat-actions";
+import { updateLastSeen } from "@/app/actions/user-actions";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 interface ConversationItem {
     id: string;
@@ -20,6 +22,7 @@ interface ConversationItem {
     lastMessage: { content: string; createdAt: Date } | undefined;
     lastMessageAt: Date | null;
     otherUserId?: string;
+    otherUserLastSeen?: Date | null;
 }
 
 interface FriendItem {
@@ -41,6 +44,10 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
     const { members } = useActiveList();
     useActiveChannel(); // Subscribe to presence channel
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+    useEffect(() => {
+        updateLastSeen();
+    }, []);
 
     const sortedFriends = [...friends].sort((a, b) => {
         const aOnline = members.includes(a.id);
@@ -145,9 +152,11 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                             {chat.name?.charAt(0) || "?"}
                                         </div>
                                     )}
-                                    {isOnline && (
-                                        <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-zinc-950 rounded-full" />
-                                    )}
+                                    {/* STATUS INDICATOR */}
+                                    <span className={cn(
+                                        "absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-zinc-950 z-10",
+                                        isOnline ? "bg-green-500" : "bg-zinc-700"
+                                    )} />
                                 </div>
 
                                 <div className="flex-1 min-w-0">
@@ -160,7 +169,7 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                         </span>
                                     </div>
                                     <p className="text-xs text-zinc-400 truncate">
-                                        {chat.lastMessage?.content || "Rozpocznij rozmowę..."}
+                                        {isOnline ? "Dostępny" : chat.otherUserLastSeen ? `Ostatnio: ${formatDatePL(chat.otherUserLastSeen)}` : "Offline"}
                                     </p>
                                 </div>
                             </Link>
