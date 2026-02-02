@@ -44,7 +44,7 @@ export function MessageBubble({ message, isMe, isLastInSequence, isFirstInSequen
                 roundedClass,
                 // Colors
                 isMe
-                    ? "bg-red-600 text-white"
+                    ? "bg-blue-600 text-white"
                     : "bg-zinc-800 text-zinc-100"
             )}>
                 {message.content}
