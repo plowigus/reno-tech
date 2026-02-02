@@ -8,6 +8,7 @@ import {
     primaryKey,
     uuid,
     pgEnum,
+    index,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -30,7 +31,9 @@ export const users = pgTable("user", {
     phoneNumber: text("phone_number"),
     lastSeen: timestamp("last_seen").defaultNow(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+    index("last_seen_idx").on(table.lastSeen),
+]);
 
 export const accounts = pgTable(
     "account",
@@ -236,7 +239,9 @@ export const notifications = pgTable("notification", {
     content: text("content"), // Optional short text preview
     isRead: boolean("is_read").default(false).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => [
+    index("recipient_idx").on(table.recipientId),
+]);
 
 // --- RELATIONS ---
 import { relations } from "drizzle-orm";
@@ -471,6 +476,7 @@ export const friends = pgTable("friend", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (t) => [
     primaryKey({ columns: [t.userId, t.friendId] }),
+    index("friends_user_idx").on(t.userId),
 ]);
 
 // --- UPDATE RELATIONS ---

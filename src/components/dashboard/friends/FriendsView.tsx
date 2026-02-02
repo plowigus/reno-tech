@@ -10,25 +10,79 @@ import { Search, UserPlus, Check, X, MessageSquare, Trash2, Loader2 } from "luci
 import { sendFriendRequest, acceptFriendRequest, removeFriendRequest, removeFriend, searchUsers } from "@/app/actions/friend-actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useDebouncedCallback } from "use-debounce";
+
+interface User {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+}
+
+interface FriendRequestReceived {
+    senderId: string;
+    sender: {
+        name: string | null;
+        image: string | null;
+    };
+}
+
+interface FriendRequestSent {
+    receiverId: string;
+    receiver: {
+        name: string | null;
+        image: string | null;
+    };
+}
 
 interface FriendsViewProps {
-    friends: any[];
-    requests: { sent: any[]; received: any[] };
+    friends: User[];
+    requests: {
+        sent: FriendRequestSent[];
+        received: FriendRequestReceived[];
+    };
 }
 
 export function FriendsView({ friends, requests }: FriendsViewProps) {
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<User[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const router = useRouter();
 
-    const handleSearch = async () => {
+    const debouncedSearch = useDebouncedCallback(async (query: string) => {
+        if (query.length < 3) return;
+
+        setIsSearching(true);
+        try {
+            const users = await searchUsers(query);
+            // Ensure result matches User interface or map it (searchUsers likely returns similar shape)
+            setSearchResults(users as User[]);
+        } catch (error) {
+            toast.error("Błąd wyszukiwania.");
+        } finally {
+            setIsSearching(false);
+        }
+    }, 300);
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+        if (value.length >= 3) {
+            setIsSearching(true);
+            debouncedSearch(value);
+        } else {
+            setSearchResults([]);
+        }
+    };
+
+    const handleManualSearch = async () => {
         if (searchQuery.length < 3) return;
+        debouncedSearch.cancel();
+
         setIsSearching(true);
         try {
             const users = await searchUsers(searchQuery);
-            setSearchResults(users);
+            setSearchResults(users as User[]);
         } catch (error) {
             toast.error("Błąd wyszukiwania.");
         } finally {
@@ -41,7 +95,7 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
         if (res.error) toast.error(res.error);
         else {
             toast.success("Zaproszenie wysłane!");
-            setSearchResults(prev => prev.filter(u => u.id !== id)); // Remove from list
+            setSearchResults(prev => prev.filter(u => u.id !== id));
             router.refresh();
         }
     }
@@ -95,7 +149,7 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
                                     <div key={friend.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-800 bg-zinc-900/50">
                                         <div className="flex items-center gap-3">
                                             <Avatar>
-                                                <AvatarImage src={friend.image} />
+                                                <AvatarImage src={friend.image || undefined} />
                                                 <AvatarFallback>{friend.name?.[0]}</AvatarFallback>
                                             </Avatar>
                                             <div>
@@ -146,7 +200,7 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
                                 <div key={req.senderId} className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
                                         <Avatar className="w-8 h-8">
-                                            <AvatarImage src={req.sender.image} />
+                                            <AvatarImage src={req.sender.image || undefined} />
                                             <AvatarFallback>?</AvatarFallback>
                                         </Avatar>
                                         <span className="text-sm font-medium">{req.sender.name}</span>
@@ -169,7 +223,7 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
                                 <div key={req.receiverId} className="flex items-center justify-between opacity-70">
                                     <div className="flex items-center gap-2">
                                         <Avatar className="w-8 h-8">
-                                            <AvatarImage src={req.receiver.image} />
+                                            <AvatarImage src={req.receiver.image || undefined} />
                                             <AvatarFallback>?</AvatarFallback>
                                         </Avatar>
                                         <span className="text-sm font-medium">{req.receiver.name}</span>
@@ -195,11 +249,11 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
                             <Input
                                 placeholder="Szukaj..."
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                onChange={handleSearchChange}
+                                onKeyDown={(e) => e.key === 'Enter' && handleManualSearch()}
                                 className="bg-zinc-900 border-zinc-800"
                             />
-                            <Button onClick={handleSearch} disabled={isSearching || searchQuery.length < 3}>
+                            <Button onClick={handleManualSearch} disabled={isSearching || searchQuery.length < 3}>
                                 {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                             </Button>
                         </div>
@@ -209,7 +263,7 @@ export function FriendsView({ friends, requests }: FriendsViewProps) {
                                 <div key={user.id} className="flex items-center justify-between p-3 border border-zinc-800 rounded-lg">
                                     <div className="flex items-center gap-3">
                                         <Avatar>
-                                            <AvatarImage src={user.image} />
+                                            <AvatarImage src={user.image || undefined} />
                                             <AvatarFallback>{user.name?.[0]}</AvatarFallback>
                                         </Avatar>
                                         <div>

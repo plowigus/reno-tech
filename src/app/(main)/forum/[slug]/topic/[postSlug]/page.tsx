@@ -23,27 +23,55 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     const session = await auth();
     const currentUser = session?.user;
 
-    const post = await db.query.forumPosts.findFirst({
-        where: (posts, { eq }) => eq(posts.slug, postSlug),
-        with: {
-            author: true,
-            comments: {
-                with: { author: true },
-                orderBy: (comments, { asc }) => [asc(comments.createdAt)],
+    // 1. Parallel Data Fetching & Partial Selects
+    const [post, category] = await Promise.all([
+        db.query.forumPosts.findFirst({
+            where: (posts, { eq }) => eq(posts.slug, postSlug),
+            // Partial select for Main Post & Author
+            with: {
+                author: {
+                    columns: {
+                        id: true,
+                        name: true,
+                        image: true,
+                        role: true,
+                    }
+                },
+                comments: {
+                    // Partial select for Comments & Comment Authors
+                    with: {
+                        author: {
+                            columns: {
+                                id: true,
+                                name: true,
+                                image: true,
+                                role: true,
+                            }
+                        }
+                    },
+                    orderBy: (comments, { asc }) => [asc(comments.createdAt)],
+                }
             }
-        }
-    });
+        }),
+
+        db.query.forumCategories.findFirst({
+            where: (cats, { eq }) => eq(cats.slug, slug),
+            columns: {
+                id: true,
+                name: true,
+                slug: true,
+            }
+        })
+    ]);
 
     if (!post) return notFound();
 
-    // 1. ATOMIC VIEW INCREMENT (Server-side)
-    // We execute this immediately. No need to await if we don't need the result immediately,
-    // but better to await to ensure it runs successfully.
+    // 2. ATOMIC VIEW INCREMENT (Server-side) - Fire and forget (or await if critical)
     await db.update(forumPosts)
         .set({ views: sql`${forumPosts.views} + 1` })
         .where(eq(forumPosts.id, post.id));
 
-    // 2. FETCH USER STATS (Optimized for N+1)
+    // 3. FETCH USER STATS (Optimized for N+1)
     // Collect unique author IDs
     const authorIds = new Set<string>();
     if (post.authorId) authorIds.add(post.authorId);
@@ -64,11 +92,6 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
     const statsResults = await Promise.all(statsPromises);
     // Create a map for easy lookup
     const statsMap = new Map(statsResults.map(s => [s.userId, s.total]));
-
-    // Fetch Category Name for Breadcrumbs
-    const category = await db.query.forumCategories.findFirst({
-        where: (cats, { eq }) => eq(cats.slug, slug),
-    });
 
     return (
         <div className="min-h-screen bg-background pt-32 pb-12 px-4">
