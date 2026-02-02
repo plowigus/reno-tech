@@ -94,9 +94,7 @@ export async function sendMessage(conversationId: string, content: string) {
                 lastMessageAt: new Date(),
                 // updatedAt: new Date() // If exists
             })
-            .where(eq(conversations.id, conversationId));
-
-        console.log("[sendMessage] Triggering Pusher event...");
+        // revalidatePath("/dashboard/chat"); // Removed to prevent layout jump on send
         try {
             await pusherServer.trigger(
                 `conversation-${conversationId}`,
