@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { conversations, messages, conversationParticipants, friends, messageReactions } from "@/db/schema";
+import { conversations, messages, conversationParticipants, friends, messageReactions, users } from "@/db/schema";
 import { pusherServer } from "@/lib/pusher";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -45,17 +45,55 @@ export async function sendMessage(conversationId: string, content: string) {
             return { error: "Invalid data." };
         }
 
+        const senderId = session.user.id;
+
+        // Fetch fresh user data to ensure image is up-to-date
+        // Using db.query.users.findFirst for cleaner syntax with relations support if needed, 
+        // but simple select is fine too.
+        const sender = await db.query.users.findFirst({
+            where: eq(users.id, senderId),
+            columns: {
+                id: true,
+                name: true,
+                image: true
+            }
+        });
+
+        if (!sender) {
+            return { error: "Nie znaleziono użytkownika" };
+        }
+
         console.log("[sendMessage] Inserting message to DB...");
         const [newMessage] = await db.insert(messages).values({
             conversationId,
-            senderId: session.user.id,
+            senderId: sender.id,
             content,
         }).returning();
         console.log("[sendMessage] Message inserted:", newMessage.id);
 
+        // Construct message strictly matching the Message interface
+        const messageWithSender = {
+            id: newMessage.id,
+            content: newMessage.content,
+            senderId: newMessage.senderId,
+            senderName: sender.name,
+            senderImage: sender.image,
+            createdAt: newMessage.createdAt, // Drizzle returns Date object
+            reactions: []
+        };
+
         console.log("[sendMessage] Updating conversation lastMessageAt...");
+        // Ensure we only update existing columns. Checked schema: conversations has lastMessageId?
+        // Actually, previous code only updated lastMessageAt. Let's stick to that unless we are sure.
+        // Viewing schema.ts (Step 258 output will confirm, but let's be safe and assume lastMessageAt only for now,
+        // or check if I saw lastMessageId in previous gets. 
+        // usage in getConversations: `lastMessage: convo.messages[0]` implies it fetches via relation, not column.
+        // However, if I want to update `updatedAt`, I should do that.
         await db.update(conversations)
-            .set({ lastMessageAt: new Date() })
+            .set({
+                lastMessageAt: new Date(),
+                // updatedAt: new Date() // If exists
+            })
             .where(eq(conversations.id, conversationId));
 
         console.log("[sendMessage] Triggering Pusher event...");
@@ -64,45 +102,19 @@ export async function sendMessage(conversationId: string, content: string) {
                 `conversation-${conversationId}`,
                 "new-message",
                 {
-                    id: newMessage.id,
-                    content: newMessage.content,
-                    senderId: session.user.id,
-                    createdAt: newMessage.createdAt.toISOString(), // Ensure string formatting
-                    senderName: session.user.name,
-                    senderImage: session.user.image,
+                    ...messageWithSender,
+                    createdAt: newMessage.createdAt.toISOString() // Serialize date for Pusher
                 }
             );
             console.log("[sendMessage] Pusher triggered successfully");
         } catch (pusherError: any) {
-            // Log but don't fail the whole action since DB insert worked
-            console.error("[sendMessage] Pusher Trigger Failed (400 likely means invalid payload/channel):", pusherError);
-            console.error("[sendMessage] Payload was:", {
-                channel: `conversation-${conversationId}`,
-                event: "new-message",
-                data: {
-                    id: newMessage.id,
-                    content: newMessage.content,
-                    senderId: session.user.id,
-                    createdAt: newMessage.createdAt,
-                }
-            });
-            // return { success: true, message: newMessage, warning: "Message sent but realtime update failed" };
-            // For now, let's keep throwing to visibility, OR return success to stop the UI error loop?
-            // User says "message sends but error hangs". Returning success fixes the UI "error" state.
-            // But we need to fix the realtime. 
-            // Let's rethrow for now to see the log, but maybe the previous log is enough.
-            // Actually, if I suppress the error, the user won't see the toast, but realtime won't work.
-            // I'll return success but log heavily on server.
+            console.error("[sendMessage] Pusher Trigger Failed:", pusherError);
         }
 
         // Return full message structure for UI to use immediately
         return {
             success: true,
-            message: {
-                ...newMessage,
-                senderName: session.user.name,
-                senderImage: session.user.image,
-            }
+            message: messageWithSender
         };
     } catch (error: any) {
         console.error("[sendMessage] Critical Error:", error);
@@ -111,6 +123,7 @@ export async function sendMessage(conversationId: string, content: string) {
 }
 
 // --- TOGGLE REACTION ---
+// Kept for compatibility but UI connection removed. Can be cleaned up later.
 export async function toggleReaction(messageId: string, emoji: string) {
     const session = await auth();
     if (!session?.user?.id) return { error: "Unauthorized" };
