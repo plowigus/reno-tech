@@ -16,7 +16,7 @@ interface Message {
     senderId: string;
     senderName?: string | null;
     senderImage?: string | null;
-    createdAt: Date;
+    createdAt: Date | string; // Handle both Server (Date) and Pusher (string)
 }
 
 interface ChatWindowProps {
@@ -39,10 +39,11 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
 
         // Bind to event: new-message
         channel.bind("new-message", (newMessage: Message) => {
+            // Ensure createdAt is valid if needed, though we don't display date in bubble yet.
             setMessages((prev) => {
                 // Avoid duplicates just in case
                 if (prev.find(m => m.id === newMessage.id)) return prev;
-                return [newMessage, ...prev]; // Add to top (if using flex-col-reverse) OR bottom
+                return [newMessage, ...prev];
             });
         });
 
@@ -70,6 +71,13 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
         const res = await sendMessage(conversationId, content);
         console.log("[ChatWindow] Send result:", res);
         setIsSending(false);
+
+        if (res?.success && res.message) {
+            // Manual update for sender (fixing "refresh required" issue)
+            const newMessage = res.message;
+            // res.message comes from Drizzle (Date object), so it matches interface
+            setMessages((prev) => [newMessage, ...prev]);
+        }
 
         if (res?.error) {
             console.error("[ChatWindow] Error toast triggered:", res.error);
