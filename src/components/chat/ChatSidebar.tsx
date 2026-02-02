@@ -178,7 +178,7 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                             {chat.name}
                                         </span>
                                         <span className="text-[10px] text-zinc-600 font-medium ml-2 shrink-0">
-                                            {chat.lastMessageAt ? formatDatePL(chat.lastMessageAt).split(" ")[1] : ""} {/* Just time for compactness, or full date? Let's use existing format for now but maybe cleaner */}
+                                            {chat.lastMessageAt ? formatDatePL(chat.lastMessageAt).split(" ")[1] : ""}
                                         </span>
                                     </div>
                                     <div className="flex justify-between items-center">
@@ -187,10 +187,11 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                         </p>
                                     </div>
                                 </div>
-                                );
+                            </div>
+                        );
                     })
                 )}
-                            </div>
-        </div >
-            );
+            </div>
+        </div>
+    );
 }
