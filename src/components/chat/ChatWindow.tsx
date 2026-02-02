@@ -50,7 +50,9 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
 
     // 2. Auto-scroll to bottom on new message
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messages.length > 0) {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+        }
     }, [messages]);
 
     const handleSend = async (content: string) => {

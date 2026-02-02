@@ -150,6 +150,7 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                             <Link
                                 key={chat.id}
                                 href={`/dashboard/chat/${chat.id}`}
+                                scroll={false}
                                 className={cn(
                                     "flex items-center gap-3 p-3 rounded-2xl transition-all duration-200",
                                     isActive ? "bg-zinc-900/80 shadow-sm" : "hover:bg-zinc-900/50"
