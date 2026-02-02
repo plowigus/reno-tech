@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/db";
-import { conversations, messages, conversationParticipants, friends } from "@/db/schema";
+import { conversations, messages, conversationParticipants, friends, messageReactions } from "@/db/schema";
 import { pusherServer } from "@/lib/pusher";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -110,6 +110,71 @@ export async function sendMessage(conversationId: string, content: string) {
     }
 }
 
+// --- TOGGLE REACTION ---
+export async function toggleReaction(messageId: string, emoji: string) {
+    const session = await auth();
+    if (!session?.user?.id) return { error: "Unauthorized" };
+
+    const userId = session.user.id;
+
+    // 1. Check if reaction exists
+    const existing = await db.query.messageReactions.findFirst({
+        where: and(
+            eq(messageReactions.messageId, messageId),
+            eq(messageReactions.userId, userId),
+            eq(messageReactions.emoji, emoji)
+        )
+    });
+
+    // 2. Toggle logic
+    try {
+        if (existing) {
+            await db.delete(messageReactions).where(
+                and(
+                    eq(messageReactions.messageId, messageId),
+                    eq(messageReactions.userId, userId),
+                    eq(messageReactions.emoji, emoji)
+                )
+            );
+        } else {
+            await db.insert(messageReactions).values({
+                messageId,
+                userId,
+                emoji
+            });
+        }
+
+        // 3. Fetch updated reactions for this message to broadcast
+        const updatedReactions = await db.query.messageReactions.findMany({
+            where: eq(messageReactions.messageId, messageId),
+            with: { user: { columns: { id: true, name: true } } }
+        });
+
+        // Get conversation ID for Pusher channel
+        const msg = await db.query.messages.findFirst({
+            where: eq(messages.id, messageId),
+            columns: { conversationId: true }
+        });
+
+        if (msg) {
+            // 4. Trigger Pusher Event
+            await pusherServer.trigger(
+                `conversation-${msg.conversationId}`,
+                "message-reaction-update",
+                {
+                    messageId,
+                    reactions: updatedReactions
+                }
+            );
+        }
+
+        return { success: true };
+    } catch (e) {
+        console.error("Toggle Reaction Error:", e);
+        return { error: "Failed to toggle reaction" };
+    }
+}
+
 // --- GET CONVERSATIONS ---
 export async function getConversations() {
     const session = await auth();
@@ -170,7 +235,12 @@ export async function getMessages(conversationId: string) {
         orderBy: [desc(messages.createdAt)],
         limit: 50,
         with: {
-            sender: { columns: { id: true, name: true, image: true } }
+            sender: { columns: { id: true, name: true, image: true } },
+            reactions: {
+                with: {
+                    user: { columns: { id: true, name: true } } // Fetch who reacted
+                }
+            }
         }
     });
 
@@ -178,6 +248,7 @@ export async function getMessages(conversationId: string) {
         ...msg,
         senderName: msg.sender.name,
         senderImage: msg.sender.image,
+        reactions: msg.reactions || [],
     }));
 }
 

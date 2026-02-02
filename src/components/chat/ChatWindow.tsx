@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useRef } from "react";
 import { pusherClient } from "@/lib/pusher"; // Ensure this exists
-import { sendMessage } from "@/app/actions/chat-actions";
+import { sendMessage, toggleReaction } from "@/app/actions/chat-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Loader2, Smile } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import EmojiPicker, { Theme } from "emoji-picker-react";
+import EmojiPicker, { Theme, EmojiStyle } from "emoji-picker-react";
 
 interface Message {
     id: string;
@@ -18,6 +18,12 @@ interface Message {
     senderName?: string | null;
     senderImage?: string | null;
     createdAt: Date | string; // Handle both Server (Date) and Pusher (string)
+    reactions?: {
+        messageId: string;
+        userId: string;
+        emoji: string;
+        user?: { id: string; name: string | null };
+    }[];
 }
 
 interface ChatWindowProps {
@@ -47,6 +53,16 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
                 if (prev.find(m => m.id === newMessage.id)) return prev;
                 return [newMessage, ...prev];
             });
+        });
+
+        // Bind to event: message-reaction-update
+        channel.bind("message-reaction-update", (data: { messageId: string; reactions: Message['reactions'] }) => {
+            setMessages((prev) => prev.map(msg => {
+                if (msg.id === data.messageId) {
+                    return { ...msg, reactions: data.reactions };
+                }
+                return msg;
+            }));
         });
 
         return () => {
@@ -88,6 +104,14 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
         }
     };
 
+    const handleReaction = async (messageId: string, emoji: string) => {
+        // Optimistic update could go here, but let's rely on fast Pusher for now or simple local toggle if needed
+        // For now, let's just fire and forget -> Pusher will update everyone including us
+        await toggleReaction(messageId, emoji);
+    };
+
+    const QUICK_REACTIONS = ["👍", "❤️", "😂", "😮", "😥", "😡"];
+
     return (
         <div className="flex flex-col h-[calc(100vh-80px)] bg-zinc-950">
             {/* MESSAGES AREA */}
@@ -99,7 +123,22 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
                     {[...messages].reverse().map((msg) => {
                         const isMe = msg.senderId === currentUserId;
                         return (
-                            <div key={msg.id} className={cn("flex gap-3 max-w-[80%]", isMe ? "ml-auto flex-row-reverse" : "")}>
+                            <div key={msg.id} className={cn("flex gap-3 max-w-[80%] group relative mb-6", isMe ? "ml-auto flex-row-reverse" : "")}>
+                                {/* Reaction Trigger (Hover) */}
+                                <div className={cn(
+                                    "absolute top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 bg-zinc-900 border border-zinc-700 rounded-full p-1 shadow-lg z-10",
+                                    isMe ? "right-full mr-2" : "left-full ml-2"
+                                )}>
+                                    {QUICK_REACTIONS.map(emoji => (
+                                        <button
+                                            key={emoji}
+                                            onClick={() => handleReaction(msg.id, emoji)}
+                                            className="hover:scale-125 transition-transform text-lg leading-none p-1"
+                                        >
+                                            {emoji}
+                                        </button>
+                                    ))}
+                                </div>
                                 {/* Avatar */}
                                 <div className="relative w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border border-zinc-700 shrink-0 mt-1">
                                     {msg.senderImage ? (
@@ -118,6 +157,23 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
                                 )}>
                                     {msg.content}
                                 </div>
+
+                                {/* Reactions Display */}
+                                {msg.reactions && msg.reactions.length > 0 && (
+                                    <div className={cn(
+                                        "absolute -bottom-5 flex gap-1",
+                                        isMe ? "right-0" : "left-0"
+                                    )}>
+                                        <div className="bg-zinc-900 border border-zinc-800 rounded-full px-2 py-0.5 text-[10px] flex items-center gap-1 shadow-sm">
+                                            {Array.from(new Set(msg.reactions.map(r => r.emoji))).slice(0, 3).map(emoji => (
+                                                <span key={emoji}>{emoji}</span>
+                                            ))}
+                                            <span className="text-zinc-500 font-medium ml-1">
+                                                {msg.reactions.length}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
@@ -131,6 +187,8 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId }: C
                     <div className="absolute bottom-20 left-4 z-50 shadow-xl rounded-xl border border-zinc-800">
                         <EmojiPicker
                             theme={Theme.DARK}
+                            emojiStyle={EmojiStyle.APPLE}
+                            previewConfig={{ showPreview: false }}
                             onEmojiClick={(data) => setInputValue((prev) => prev + data.emoji)}
                             lazyLoadEmojis={true}
                         />

@@ -391,6 +391,19 @@ export const messages = pgTable("message", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const messageReactions = pgTable("message_reaction", {
+    messageId: uuid("message_id")
+        .notNull()
+        .references(() => messages.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+        .notNull()
+        .references(() => users.id, { onDelete: "cascade" }),
+    emoji: text("emoji").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => [
+    primaryKey({ columns: [t.messageId, t.userId, t.emoji] }),
+]);
+
 // --- UPDATE RELATIONS ---
 
 export const conversationsRelations = relations(conversations, ({ many }) => ({
@@ -409,7 +422,7 @@ export const conversationParticipantsRelations = relations(conversationParticipa
     }),
 }));
 
-export const messagesRelations = relations(messages, ({ one }) => ({
+export const messagesRelations = relations(messages, ({ one, many }) => ({
     conversation: one(conversations, {
         fields: [messages.conversationId],
         references: [conversations.id],
@@ -417,8 +430,20 @@ export const messagesRelations = relations(messages, ({ one }) => ({
     sender: one(users, {
         fields: [messages.senderId],
         references: [users.id],
-        relationName: "senderMessages", // Added relationName for clarity/consistency though not strictly required if not used in query
+        relationName: "senderMessages",
     }),
+    reactions: many(messageReactions),
+}));
+
+export const messageReactionsRelations = relations(messageReactions, ({ one }) => ({
+    message: one(messages, {
+        fields: [messageReactions.messageId],
+        references: [messages.id],
+    }),
+    user: one(users, {
+        fields: [messageReactions.userId],
+        references: [users.id],
+    })
 }));
 
 // --- SECTION 8: FRIENDS SYSTEM ---
