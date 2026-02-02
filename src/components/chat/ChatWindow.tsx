@@ -25,7 +25,7 @@ interface ChatWindowProps {
 
 export function ChatWindow({ conversationId, initialMessages, currentUserId, partner }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>(initialMessages);
-    const bottomRef = useRef<HTMLDivElement>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     // 1. Subscribe to Pusher
     useEffect(() => {
@@ -48,10 +48,10 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
         };
     }, [conversationId]);
 
-    // 2. Auto-scroll to bottom on new message
+    // 2. Auto-scroll to bottom on new message (safe scrollTop)
     useEffect(() => {
-        if (messages.length > 0) {
-            bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [messages]);
 
@@ -104,7 +104,10 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
             </div>
 
             {/* MESSAGES AREA */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
+            <div
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto px-4 py-4 space-y-1 scroll-smooth"
+            >
                 <div className="flex flex-col justify-end min-h-full">
                     {(() => {
                         const displayMessages = [...messages].reverse();
@@ -127,7 +130,6 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
                             );
                         });
                     })()}
-                    <div ref={bottomRef} />
                 </div>
             </div>
 

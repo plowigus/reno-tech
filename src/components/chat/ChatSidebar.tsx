@@ -64,7 +64,7 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
             if (res.error) {
                 toast.error(res.error);
             } else if (res.conversationId) {
-                router.push(`/dashboard/chat/${res.conversationId}`);
+                router.push(`/dashboard/chat/${res.conversationId}`, { scroll: false });
             }
         } catch (error) {
             toast.error("Wystąpił błąd.");
@@ -147,12 +147,11 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                         const isOnline = chat.otherUserId ? members.includes(chat.otherUserId) : false;
 
                         return (
-                            <Link
+                            <div
                                 key={chat.id}
-                                href={`/dashboard/chat/${chat.id}`}
-                                scroll={false}
+                                onClick={() => router.push(`/dashboard/chat/${chat.id}`, { scroll: false })}
                                 className={cn(
-                                    "flex items-center gap-3 p-3 rounded-2xl transition-all duration-200",
+                                    "flex items-center gap-3 p-3 rounded-2xl transition-all duration-200 cursor-pointer",
                                     isActive ? "bg-zinc-900/80 shadow-sm" : "hover:bg-zinc-900/50"
                                 )}
                             >
@@ -186,14 +185,12 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                         <p className={cn("text-xs truncate max-w-[140px]", isActive ? "text-zinc-400" : "text-zinc-500")}>
                                             {chat.lastMessage?.content || "Rozpocznij konwersację"}
                                         </p>
-                                        {/* Optional: Unread count badge could go here */}
                                     </div>
                                 </div>
-                            </Link>
-                        );
+                                );
                     })
                 )}
-            </div>
+                            </div>
         </div >
-    );
+            );
 }
