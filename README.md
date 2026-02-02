@@ -36,11 +36,31 @@ Zmodernizowany interfejs użytkownika zapewniający intuicyjną obsługę:
 - **Pozycjonowanie Absolute**: Navbar nakłada się na sekcję Hero, ale nie podąża za użytkownikiem podczas przewijania (absolute positioning), co pozwala skupić się na treści.
 - **Hero Section**: Idealnie wycentrowane treści powitalne z animacjami Matrix i interaktywnym logo.
 
+## 💬 System Czatu (V2)
+
+W pełni funkcjonalny, nowoczesny system wiadomości czasu rzeczywistego, zaprojektowany z myślą o estetyce i wydajności (Instagram-like).
+
+### Kluczowe Funkcje
+-   **Real-time Messaging**: Natychmiastowe przesyłanie wiadomości dzięki integracji z [Pusher](https://pusher.com/).
+-   **Instagram Aesthetic**:
+    -   Zaokrąglone dymki wiadomości (`rounded-2xl`) z łączeniem rogów dla sekwencji wiadomości od tego samego nadawcy.
+    -   Ciemny motyw: Nadawca (`bg-red-700`), Odbiorca (`bg-zinc-800`).
+    -   Avatary wyświetlane tylko przy ostatniej wiadomości w sekwencji (odbiorca).
+-   **Stabilność UX**:
+    -   **Zero Layout Shift**: Wyeliminowano "skakanie" okna przy wysyłaniu (usunięcie server-side revalidation).
+    -   **Smooth Navigation**: Przełączanie rozmów bez przewijania strony głównej (`scroll: false`).
+    -   **Safe Auto-Scroll**: Inteligentne przewijanie do najnowszej wiadomości bez naruszania pozycji całej strony (`scrollTop` on container).
+-   **Funkcjonalności**:
+    -   Lista znajomych i konwersacji w bocznym panelu.
+    -   Statusy dostępności (online/offline).
+    -   Obsługa emoji (Apple style picker).
+    -   De-duplikacja wiadomości (ochrona przed podwójnym renderowaniem przy szybkim internecie).
+
 ## 🛠️ Stack Technologiczny
 
 Projekt zbudowany jest w oparciu o nowoczesne technologie webowe:
 
-- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js](https://nextjs.org/) (App Router)
 - **Język**: [TypeScript](https://www.typescriptlang.org/)
 - **Style**: [Tailwind CSS](https://tailwindcss.com/)
 - **Animacje**: [GSAP](https://gsap.com/) (GreenSock Animation Platform) z wtyczką ScrollTrigger
@@ -61,3 +81,5 @@ npm run dev
 ```
 
 Strona będzie dostępna pod adresem `http://localhost:3000`.
+
+
