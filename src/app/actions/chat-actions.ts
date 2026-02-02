@@ -95,7 +95,15 @@ export async function sendMessage(conversationId: string, content: string) {
             // I'll return success but log heavily on server.
         }
 
-        return { success: true, message: newMessage };
+        // Return full message structure for UI to use immediately
+        return {
+            success: true,
+            message: {
+                ...newMessage,
+                senderName: session.user.name,
+                senderImage: session.user.image,
+            }
+        };
     } catch (error: any) {
         console.error("[sendMessage] Critical Error:", error);
         return { error: `Failed to send message: ${error.message}` };
@@ -156,7 +164,7 @@ export async function getMessages(conversationId: string) {
 
     if (!isParticipant) return [];
 
-    return await db.query.messages.findMany({
+    const allMessages = await db.query.messages.findMany({
         where: eq(messages.conversationId, conversationId),
         orderBy: [desc(messages.createdAt)],
         limit: 50,
@@ -164,6 +172,12 @@ export async function getMessages(conversationId: string) {
             sender: { columns: { id: true, name: true, image: true } }
         }
     });
+
+    return allMessages.map(msg => ({
+        ...msg,
+        senderName: msg.sender.name,
+        senderImage: msg.sender.image,
+    }));
 }
 
 // --- START CONVERSATION (FIXED DUPLICATES) ---
