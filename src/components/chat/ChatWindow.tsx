@@ -58,7 +58,10 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
 
         if (res?.success && res.message) {
             const newMessage = res.message;
-            setMessages((prev) => [newMessage, ...prev]);
+            setMessages((prev) => {
+                if (prev.find(m => m.id === newMessage.id)) return prev;
+                return [newMessage, ...prev];
+            });
         }
 
         if (res?.error) {
