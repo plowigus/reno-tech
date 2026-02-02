@@ -305,3 +305,39 @@ export async function startConversation(targetUserId: string) {
     revalidatePath("/dashboard/chat");
     return { success: true, conversationId: newConvo.id };
 }
+
+// --- GET CONVERSATION DETAILS ---
+export async function getConversationDetails(conversationId: string) {
+    const session = await auth();
+    if (!session?.user?.id) return null;
+
+    const convo = await db.query.conversations.findFirst({
+        where: eq(conversations.id, conversationId),
+        with: {
+            participants: {
+                with: {
+                    user: { columns: { id: true, name: true, image: true, lastSeen: true } }
+                }
+            }
+        }
+    });
+
+    if (!convo) return null;
+
+    const participant = convo.participants.find(p => p.userId === session.user.id);
+    if (!participant) return null;
+
+    const otherUser = convo.participants.find(p => p.userId !== session.user.id)?.user;
+
+    return {
+        id: convo.id,
+        isGroup: convo.isGroup,
+        name: convo.name,
+        partner: otherUser ? {
+            id: otherUser.id,
+            name: otherUser.name,
+            image: otherUser.image,
+            lastSeen: otherUser.lastSeen
+        } : null
+    };
+}
