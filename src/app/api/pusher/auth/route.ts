@@ -15,17 +15,21 @@ export async function POST(req: Request) {
     // 2. Bezpieczne parsowanie body (x-www-form-urlencoded)
     // Pusher wysyła dane jako formularz, nie JSON
     const text = await req.text();
-    console.log("[Pusher Auth] Body text:", text);
-    const params = new URLSearchParams(text);
+    console.log("[Pusher Auth] Raw Body:", text);
 
+    const params = new URLSearchParams(text);
     const socketId = params.get("socket_id");
     const channel = params.get("channel_name");
 
-    console.log("[Pusher Auth] Params:", { socketId, channel });
+    console.log("[Pusher Auth] Parsed Params:", { socketId, channel });
 
     if (!socketId || !channel) {
-        console.error("[Pusher Auth] Missing params");
-        return new NextResponse("Missing socket_id or channel_name", { status: 400 });
+        const missing = [];
+        if (!socketId) missing.push("socket_id");
+        if (!channel) missing.push("channel_name");
+
+        console.error(`[Pusher Auth] Missing params: ${missing.join(", ")}`);
+        return new NextResponse(`Missing parameters: ${missing.join(", ")}`, { status: 400 });
     }
 
     // 3. Dane użytkownika widoczne dla innych (np. na liście online)

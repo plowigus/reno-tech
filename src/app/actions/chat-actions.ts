@@ -6,6 +6,12 @@ import { conversations, messages, conversationParticipants, friends } from "@/db
 import { pusherServer } from "@/lib/pusher";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
+const sendMessageSchema = z.object({
+    conversationId: z.string().min(1),
+    content: z.string().min(1),
+});
 
 // --- EMERGENCY RESET ---
 export async function resetChatSystem() {
@@ -33,6 +39,12 @@ export async function sendMessage(conversationId: string, content: string) {
     }
 
     try {
+        const validatedFields = sendMessageSchema.safeParse({ conversationId, content });
+        if (!validatedFields.success) {
+            console.error("[sendMessage] Validation Error:", validatedFields.error);
+            return { error: "Invalid data." };
+        }
+
         console.log("[sendMessage] Inserting message to DB...");
         const [newMessage] = await db.insert(messages).values({
             conversationId,
