@@ -52,7 +52,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
                 )}
 
                 {/* Floating Capsule Container */}
-                <div className="flex items-end gap-2 p-1.5 bg-zinc-900 rounded-[28px] shadow-lg border border-zinc-800/50">
+                <div className="flex items-center gap-1.5 p-1.5 bg-zinc-900 rounded-[28px] shadow-lg border border-zinc-800/50">
                     <Button
                         type="button"
                         variant="ghost"
@@ -68,7 +68,8 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             placeholder="Napisz wiadomość..."
-                            className="bg-transparent border-none text-white focus-visible:ring-0 placeholder:text-zinc-500 py-3 text-[15px] h-auto max-h-32 min-h-[44px]"
+                            // Force override padding-left with !pl-3 to fix "huge padding" issue
+                            className="bg-transparent border-none text-white focus-visible:ring-0 placeholder:text-zinc-500 py-3 !pl-3 pr-3 text-[15px] h-auto max-h-32 min-h-[44px]"
                         // autoFocus 
                         />
                         <Button

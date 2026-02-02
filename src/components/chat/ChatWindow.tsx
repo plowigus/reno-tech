@@ -83,15 +83,11 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
                                     </div>
                                 )}
                             </div>
-                            {/* Optional Status Dot if needed for header too, currently handled by text status */}
                         </div>
                         <div className="flex flex-col">
                             <h2 className="text-white font-semibold text-lg leading-tight">{partner.name}</h2>
                             <p className="text-xs text-zinc-500 font-medium">
                                 {partner.lastSeen ? `Ostatnio: ${formatDatePL(partner.lastSeen)}` : "Dostępny"}
-                                {/* Note: "Dostępny" is placeholder if online logic isn't passed here yet. 
-                                    Ideally, we can hoist presence logic or just show lastSeen. 
-                                    For now, static or lastSeen. */}
                             </p>
                         </div>
                     </>
@@ -103,14 +99,17 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
             </div>
 
             {/* MESSAGES AREA */}
-            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
                 <div className="flex flex-col justify-end min-h-full">
                     {(() => {
                         const displayMessages = [...messages].reverse();
                         return displayMessages.map((msg, index) => {
                             const isMe = msg.senderId === currentUserId;
                             const nextMsg = displayMessages[index + 1];
+                            const prevMsg = displayMessages[index - 1];
+
                             const isLastInSequence = !nextMsg || nextMsg.senderId !== msg.senderId;
+                            const isFirstInSequence = !prevMsg || prevMsg.senderId !== msg.senderId;
 
                             return (
                                 <MessageBubble
@@ -118,6 +117,7 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
                                     message={msg}
                                     isMe={isMe}
                                     isLastInSequence={isLastInSequence}
+                                    isFirstInSequence={isFirstInSequence}
                                 />
                             );
                         });
