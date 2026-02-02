@@ -28,7 +28,7 @@ export function MessageBubble({ message, isMe, isLastInSequence, isFirstInSequen
                 <div className={cn("relative w-7 h-7 shrink-0 mb-1", isLastInSequence ? "visible" : "invisible")}>
                     <div className="w-7 h-7 rounded-full overflow-hidden bg-zinc-800 ring-1 ring-zinc-800">
                         {message.senderImage ? (
-                            <Image src={message.senderImage} alt="User" fill className="object-cover" />
+                            <Image src={message.senderImage} alt="User" fill className="object-cover rounded-full" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center text-[9px] font-bold text-zinc-500">
                                 {message.senderName?.charAt(0) || "?"}
@@ -44,7 +44,7 @@ export function MessageBubble({ message, isMe, isLastInSequence, isFirstInSequen
                 roundedClass,
                 // Colors
                 isMe
-                    ? "bg-blue-600 text-white"
+                    ? "bg-red-700 text-white"
                     : "bg-zinc-800 text-zinc-100"
             )}>
                 {message.content}

@@ -76,7 +76,7 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, par
                         <div className="relative w-12 h-12">
                             <div className="w-12 h-12 rounded-full overflow-hidden bg-zinc-800 border-2 border-zinc-900">
                                 {partner.image ? (
-                                    <Image src={partner.image} alt={partner.name || "?"} fill className="object-cover" />
+                                    <Image src={partner.image} alt={partner.name || "?"} fill className="object-cover rounded-full" />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500 text-lg">
                                         {partner.name?.[0]}

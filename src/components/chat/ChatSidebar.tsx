@@ -111,7 +111,7 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                                 <div className="relative w-10 h-10 shrink-0">
                                                     <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-800 border-2 border-transparent group-hover:border-zinc-800 transition-colors">
                                                         {friend.image ? (
-                                                            <Image src={friend.image} alt={friend.name || "?"} fill className="object-cover" />
+                                                            <Image src={friend.image} alt={friend.name || "?"} fill className="object-cover rounded-full" />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500">
                                                                 {friend.name?.[0]}
@@ -158,7 +158,7 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                                 <div className="relative w-11 h-11 shrink-0">
                                     <div className="w-full h-full rounded-full overflow-hidden bg-zinc-800 border-2 border-transparent">
                                         {chat.image ? (
-                                            <Image src={chat.image} alt="User" fill className="object-cover" />
+                                            <Image src={chat.image} alt="User" fill className="object-cover rounded-full" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center font-bold text-zinc-500">
                                                 {chat.name?.charAt(0) || "?"}
@@ -193,6 +193,6 @@ export function ChatSidebar({ conversations, friends, currentUserId }: ChatSideb
                     })
                 )}
             </div>
-        </div>
+        </div >
     );
 }
