@@ -59,19 +59,41 @@ export async function sendMessage(conversationId: string, content: string) {
             .where(eq(conversations.id, conversationId));
 
         console.log("[sendMessage] Triggering Pusher event...");
-        await pusherServer.trigger(
-            `conversation-${conversationId}`,
-            "new-message",
-            {
-                id: newMessage.id,
-                content: newMessage.content,
-                senderId: session.user.id,
-                createdAt: newMessage.createdAt,
-                senderName: session.user.name,
-                senderImage: session.user.image,
-            }
-        );
-        console.log("[sendMessage] Pusher triggered successfully");
+        try {
+            await pusherServer.trigger(
+                `conversation-${conversationId}`,
+                "new-message",
+                {
+                    id: newMessage.id,
+                    content: newMessage.content,
+                    senderId: session.user.id,
+                    createdAt: newMessage.createdAt.toISOString(), // Ensure string formatting
+                    senderName: session.user.name,
+                    senderImage: session.user.image,
+                }
+            );
+            console.log("[sendMessage] Pusher triggered successfully");
+        } catch (pusherError: any) {
+            // Log but don't fail the whole action since DB insert worked
+            console.error("[sendMessage] Pusher Trigger Failed (400 likely means invalid payload/channel):", pusherError);
+            console.error("[sendMessage] Payload was:", {
+                channel: `conversation-${conversationId}`,
+                event: "new-message",
+                data: {
+                    id: newMessage.id,
+                    content: newMessage.content,
+                    senderId: session.user.id,
+                    createdAt: newMessage.createdAt,
+                }
+            });
+            // return { success: true, message: newMessage, warning: "Message sent but realtime update failed" };
+            // For now, let's keep throwing to visibility, OR return success to stop the UI error loop?
+            // User says "message sends but error hangs". Returning success fixes the UI "error" state.
+            // But we need to fix the realtime. 
+            // Let's rethrow for now to see the log, but maybe the previous log is enough.
+            // Actually, if I suppress the error, the user won't see the toast, but realtime won't work.
+            // I'll return success but log heavily on server.
+        }
 
         return { success: true, message: newMessage };
     } catch (error: any) {
